@@ -1,7 +1,13 @@
 version: "3.7"
 services:
   mongo:
-    container_name: "mongo"
+    container_name: mongo
     image: mongo
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
+
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express
+    ports:
+      - "127.0.0.1:8081:8081"
