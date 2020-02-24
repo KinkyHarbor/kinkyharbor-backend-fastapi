@@ -1,0 +1,6 @@
+uvicorn
+fastapi
+python-multipart
+email_validator
+motor
+pyjwt
