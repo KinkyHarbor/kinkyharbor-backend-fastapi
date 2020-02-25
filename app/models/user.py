@@ -1,24 +1,31 @@
-import uuid
 from typing import Optional
-from pydantic import BaseModel, UUID4, EmailStr
+from pydantic import BaseModel, EmailStr
+
+
+from db.models import DBModelMixin
 
 
 class BaseUser(BaseModel):
-    id: UUID4
     username: str
     email: EmailStr
 
 
-class User(BaseUser):
-    is_active: bool = False
+class User(BaseUser, DBModelMixin):
     is_admin: bool = False
+    is_verified: bool = False
+    is_locked: bool = False
 
 
-class UserInDB(User):
-    hashed_password: str
-
-
-class RegisterUser(BaseModel):
-    username: str
-    email: EmailStr
+class RegisterUser(BaseUser):
     password: str
+
+
+class UserDBIn(BaseUser):
+    hashed_password: str
+    is_admin: bool = False
+    is_verified: bool = False
+    is_locked: bool = False
+
+
+class UserDBOut(UserDBIn, DBModelMixin):
+    pass

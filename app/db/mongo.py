@@ -1,4 +1,4 @@
-import motor.motor_asyncio
+from motor import motor_asyncio as motor
 
-client = motor.motor_asyncio.AsyncIOMotorClient()
+client = motor.AsyncIOMotorClient()
 db = client.kinkyharbor

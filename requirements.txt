@@ -3,4 +3,5 @@ fastapi
 python-multipart
 email_validator
 motor
-pyjwt
+pyjwt[crypto]
+passlib[bcrypt]
