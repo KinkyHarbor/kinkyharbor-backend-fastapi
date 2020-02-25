@@ -6,8 +6,13 @@
 !/LICENSE
 !/README.md
 
+!/Dockerfile
 !/docker-compose.dev.yml
 !/requirements.txt
+
+!/.github/
+!/.github/workflows/
+!/.github/workflows/docker-hub.yml
 
 !/app/
 !/app/__init__.py
