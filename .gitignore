@@ -41,3 +41,6 @@
 !/app/routers/__init__.py
 !/app/routers/auth.py
 !/app/routers/users.py
+
+!/jwt-keys/
+!/jwt-keys/.gitkeep
