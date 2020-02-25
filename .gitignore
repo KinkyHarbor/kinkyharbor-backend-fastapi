@@ -8,7 +8,6 @@
 
 !/Dockerfile
 !/docker-compose.dev.yml
-!/requirements.txt
 
 !/.github/
 !/.github/workflows/
@@ -17,6 +16,7 @@
 !/app/
 !/app/__init__.py
 !/app/main.py
+!/app/requirements.txt
 
 !/app/core/
 !/app/core/__init__.py
