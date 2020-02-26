@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import Depends, FastAPI
 
 from core.auth import get_current_user
@@ -12,7 +13,5 @@ app.include_router(
     tags=['users']
 )
 
-
-@app.get('/items/')
-async def read_items(token: str = Depends(get_current_user)):
-    return {'token': token}
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
