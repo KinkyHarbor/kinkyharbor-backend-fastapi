@@ -6,6 +6,7 @@
 !/LICENSE
 !/README.md
 
+!/.pylintrc
 !/Dockerfile
 !/docker-compose.dev.yml
 

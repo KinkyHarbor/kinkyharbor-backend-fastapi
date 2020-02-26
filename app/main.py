@@ -1,7 +1,8 @@
-import uvicorn
-from fastapi import Depends, FastAPI
+'''Main entry point for Kinky Harbor'''
 
-from core.auth import get_current_user
+import uvicorn
+from fastapi import FastAPI
+
 from routers import auth, users
 
 
@@ -13,5 +14,7 @@ app.include_router(
     tags=['users']
 )
 
+# Allows debugging of the application
+# https://fastapi.tiangolo.com/tutorial/debugging/
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
