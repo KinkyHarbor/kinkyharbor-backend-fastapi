@@ -1,14 +1,12 @@
 from datetime import timedelta
 
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_401_UNAUTHORIZED
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel, EmailStr
-import logging
 
 from core import settings, auth
 from models.token import Token
-from models.user import UserDBIn, RegisterUser
+from models.user import RegisterUser
 from crud import users
 
 
@@ -17,8 +15,8 @@ router = APIRouter()
 
 @router.post('/register')
 async def register(user: RegisterUser):
-    result = await users.register(user)
-    logging.warning(repr(result.inserted_id))
+    await users.register(user, is_verified=settings.DEMO)
+    return 'User created successfully'
 
 
 @router.post("/token", response_model=Token)
