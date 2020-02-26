@@ -7,4 +7,4 @@ from core import settings
 def get_db():
     '''Returns instance of database client'''
     client = motor.AsyncIOMotorClient(settings.MONGO_HOST)
-    return client.kinkyharbor
+    return client[settings.MONGO_DATABASE]

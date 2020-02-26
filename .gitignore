@@ -43,5 +43,9 @@
 !/app/routers/auth.py
 !/app/routers/users.py
 
+!/app/tests/
+!/app/tests/test_crud_users.py
+!/app/tests/test_main.py
+
 !/jwt-keys/
 !/jwt-keys/.gitkeep

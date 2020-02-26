@@ -40,3 +40,4 @@ async def get_jwt_key(key: str):
 
 # Mongo settings
 MONGO_HOST = environ.get('MONGO_HOST', 'localhost')
+MONGO_DATABASE = environ.get('MONGO_DATABASE', 'kinkyharbor')

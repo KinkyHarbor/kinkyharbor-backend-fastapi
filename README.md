@@ -12,6 +12,9 @@ openssl ec -in private.pem -pubout -out public.pem
 ## Env variables
 ### Types of variables
 <dl>
+  <dt>String</dt>
+  <dd>Default: See variable</dd>
+
   <dt>Boolean</dt>
   <dd>Default: False</dd>
   <dd>True (not case sensitive) => True</dd>
@@ -20,6 +23,14 @@ openssl ec -in private.pem -pubout -out public.pem
 
 ### Variables
 <dl>
+  <dt>MONGO_HOST (String)</dt>
+  <dd>Hostname of Mongo DB</dd>
+  <dd>Default: localhost</dd>
+
+  <dt>MONGO_DATABASE (String)</dt>
+  <dd>Database in Mongo DB</dd>
+  <dd>Default: kinkyharbor</dd>
+
   <dt>DEMO (Boolean)</dt>
   <dd>Disable verification for registration, password reset and email changes.</dd>
 </dl>

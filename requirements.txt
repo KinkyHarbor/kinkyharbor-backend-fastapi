@@ -1,8 +1,20 @@
+# Generic
 uvicorn
 fastapi
 python-multipart
+
+# Pydantic
 email_validator
+
+# Database
 motor
+
+# JWT
 pyjwt[crypto]
 passlib[bcrypt]
 aiofiles
+
+# Tests
+pytest
+pytest-asyncio
+requests
