@@ -1,0 +1,8 @@
+uvicorn
+fastapi
+python-multipart
+email_validator
+motor
+pyjwt[crypto]
+passlib[bcrypt]
+aiofiles
