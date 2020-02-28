@@ -1,16 +1,19 @@
 # Backend in FastAPI
 
 Generate JWT key and store in `jwt-keys` folder
+
 ```bash
 # https://gist.github.com/maxogden/62b7119909a93204c747633308a4d769
 
 cd jwt-keys
 openssl ecparam -genkey -name secp521r1 -noout -out private.pem
-openssl ec -in private.pem -pubout -out public.pem 
+openssl ec -in private.pem -pubout -out public.pem
 ```
 
 ## Env variables
+
 ### Types of variables
+
 <dl>
   <dt>String</dt>
   <dd>Default: See variable</dd>
@@ -22,7 +25,12 @@ openssl ec -in private.pem -pubout -out public.pem
 </dl>
 
 ### Variables
+
 <dl>
+  <dt>JWT_KEY_PATH (String)</dt>
+  <dd>Path to ECDSA keys for JWT signing</dd>
+  <dd>Default: ../jwt-keys</dd>
+
   <dt>MONGO_HOST (String)</dt>
   <dd>Hostname of Mongo DB</dd>
   <dd>Default: localhost</dd>

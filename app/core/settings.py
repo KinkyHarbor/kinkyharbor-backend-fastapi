@@ -27,7 +27,7 @@ def get_bool(name: str) -> bool:
 DEMO = get_bool('DEMO')
 
 # JWT settings
-JWT_KEY_PATH = Path('../jwt-keys')
+JWT_KEY_PATH = Path(environ.get('JWT_KEY_PATH', '../jwt-keys'))
 JWT_ALG = "ES512"
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
