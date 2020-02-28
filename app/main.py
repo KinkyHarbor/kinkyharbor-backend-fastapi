@@ -1,10 +1,19 @@
 '''Main entry point for Kinky Harbor'''
 
+import logging
+
 import uvicorn
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
 from routers import auth, users
+from db import mongo
+
+
+def add_database_events(server: FastAPI) -> None:
+    @server.on_event("startup")
+    async def connect_to_database() -> None:
+        server.state.db = mongo.create_db_client()
 
 
 app = FastAPI()
@@ -16,6 +25,7 @@ app.include_router(
     prefix='/users',
     tags=['users']
 )
+add_database_events(app)
 
 
 @app.get('/', include_in_schema=False)

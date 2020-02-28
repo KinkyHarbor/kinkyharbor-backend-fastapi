@@ -1,4 +1,8 @@
 # Generic
+wheel
+pylint
+
+# FastAPI
 uvicorn
 fastapi
 python-multipart

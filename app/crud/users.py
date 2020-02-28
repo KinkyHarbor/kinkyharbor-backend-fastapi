@@ -1,27 +1,29 @@
 from bson.objectid import ObjectId
 
+from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
+
 from db.mongo import get_db
 from models.user import User, RegisterUser, UserDBIn, UserDBOut
 from core import auth
 
 
-async def get(user_id: str):
+async def get(db: MotorDB, user_id: str):
     '''Return single user by ID.'''
-    db = get_db()
     user_dict = await db.users.find_one({'_id': ObjectId(user_id)})
     return User(**user_dict)
 
 
-async def get_login(username: str):
+async def get_login(db: MotorDB, username: str):
     '''Return single user by username or email.'''
-    db = get_db()
     user_dict = await db.users.find_one({'$or': [{'username': username}, {'email': username}]})
     return UserDBOut(**user_dict)
 
 
-async def register(reg_user: RegisterUser, is_admin: bool = False, is_verified: bool = False):
+async def register(db: MotorDB,
+                   reg_user: RegisterUser,
+                   is_admin: bool = False,
+                   is_verified: bool = False):
     '''Add a new user.'''
-    db = get_db()
     hpass = auth.get_password_hash(reg_user.password)
     user = UserDBIn(**reg_user.dict(),
                     hashed_password=hpass,

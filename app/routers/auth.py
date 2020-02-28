@@ -3,25 +3,28 @@ from datetime import timedelta
 from starlette.status import HTTP_401_UNAUTHORIZED
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 
 from core import settings, auth
 from models.token import Token
 from models.user import RegisterUser
 from crud import users
+from db.mongo import get_db
 
 
 router = APIRouter()
 
 
 @router.post('/register')
-async def register(user: RegisterUser):
-    await users.register(user, is_verified=settings.DEMO)
+async def register(user: RegisterUser, db: MotorDB = Depends(get_db)):
+    await users.register(db, user, is_verified=settings.DEMO)
     return 'User created successfully'
 
 
 @router.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = await auth.authenticate_user(form_data.username, form_data.password)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
+                                 db: MotorDB = Depends(get_db)):
+    user = await auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=HTTP_401_UNAUTHORIZED,

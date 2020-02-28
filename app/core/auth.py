@@ -11,6 +11,7 @@ from core import settings
 from models.user import User, UserDBOut
 from models.token import TokenData
 from crud import users
+from db.mongo import get_db
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
@@ -25,8 +26,8 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def authenticate_user(username: str, password: str):
-    user = await users.get_login(username)
+async def authenticate_user(db, username: str, password: str):
+    user = await users.get_login(db, username)
     if not user:
         # Prevent timing attack
         get_password_hash(password)
@@ -49,7 +50,7 @@ async def create_access_token(*, data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+async def get_current_user(db=Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
     credentials_exception = HTTPException(
         status_code=HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -65,7 +66,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
         token_data = TokenData(id=id)
     except jwt.PyJWTError:
         raise credentials_exception
-    user = await users.get(token_data.id)
+    user = await users.get(db, token_data.id)
     if user is None:
         raise credentials_exception
     return user
