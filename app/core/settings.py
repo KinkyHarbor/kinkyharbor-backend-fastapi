@@ -25,6 +25,7 @@ def get_bool(name: str) -> bool:
 
 # General
 DEMO = get_bool('DEMO')
+RESERVED_USERNAMES = ['kinkyharbor', 'harbor']
 
 # JWT settings
 JWT_KEY_PATH = Path(environ.get('JWT_KEY_PATH', '../jwt-keys'))

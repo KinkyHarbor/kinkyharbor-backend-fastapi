@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from starlette.status import HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
@@ -17,6 +17,12 @@ router = APIRouter()
 
 @router.post('/register')
 async def register(user: RegisterUser, db: MotorDB = Depends(get_db)):
+    if user.username in settings.RESERVED_USERNAMES:
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            detail="This is a reserved username. Please choose another one.",
+        )
+
     await users.register(db, user, is_verified=settings.DEMO)
     return 'User created successfully'
 
