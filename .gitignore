@@ -11,6 +11,9 @@
 !/docker-compose.dev.yml
 !/requirements.txt
 
+!/.vscode/
+!/.vscode/settings.json
+
 !/.github/
 !/.github/workflows/
 !/.github/workflows/docker-hub.yml
