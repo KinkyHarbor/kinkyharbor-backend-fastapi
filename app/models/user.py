@@ -1,4 +1,7 @@
+'''This module contains all user related models'''
+
 import re
+from enum import Enum, unique
 
 from pydantic import BaseModel, EmailStr, validator
 
@@ -29,6 +32,7 @@ class User(BaseUser, DBModelMixin):
 
 
 class RegisterUser(BaseUser):
+    '''Required form data for registering a user'''
     password: str
 
 
@@ -41,3 +45,10 @@ class UserDBIn(BaseUser):
 
 class UserDBOut(UserDBIn, DBModelMixin):
     pass
+
+
+@unique
+class UserFlags(Enum):
+    ADMIN = 'is_admin'
+    VERIFIED = 'is_verified'
+    LOCKED = 'is_locked'

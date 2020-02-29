@@ -9,7 +9,7 @@ from passlib.context import CryptContext
 
 from core import settings
 from models.user import User, UserDBOut
-from models.token import TokenData
+from models.token import AccessTokenData
 from crud import users
 from db.mongo import get_db
 
@@ -60,13 +60,13 @@ async def get_current_user(db=Depends(get_db), token: str = Depends(oauth2_schem
         jwt_key_public = await settings.get_jwt_key('public')
         payload = jwt.decode(token, jwt_key_public,
                              algorithms=[settings.JWT_ALG])
-        id: str = payload.get("sub").split(':')[1]
-        if id is None:
+        user_id: str = payload.get("sub").split(':')[1]
+        if user_id is None:
             raise credentials_exception
-        token_data = TokenData(id=id)
+        token_data = AccessTokenData(user_id=user_id)
     except jwt.PyJWTError:
         raise credentials_exception
-    user = await users.get(db, token_data.id)
+    user = await users.get(db, token_data.user_id)
     if user is None:
         raise credentials_exception
     return user
