@@ -85,7 +85,6 @@ async def verify_registration(token_secret: TokenSecret, db: MotorDB = Depends(g
         )
 
     # Mark account as verified
-    logging.error(valid.dict())
     await users.set_flag(db, valid.user_id, UserFlags.VERIFIED, True)
     return {'msg': 'Account is verified'}
 

@@ -55,5 +55,4 @@ async def register(db: MotorDB,
 async def set_flag(db: MotorDB, user_id: str, flag: UserFlags, value: bool):
     if not isinstance(flag, UserFlags):
         raise ValueError(f'"{str(flag)}" is not a valid user flag')
-    logging.error(user_id)
     return await db[TABLE_NAME].find_one_and_update({'_id': ObjectId(user_id)}, {'$set': {flag.value: value}})

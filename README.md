@@ -18,6 +18,9 @@ openssl ec -in private.pem -pubout -out public.pem
   <dt>String</dt>
   <dd>Default: See variable</dd>
 
+  <dt>Int (number)</dt>
+  <dd>Default: See variable</dd>
+
   <dt>Boolean</dt>
   <dd>Default: False</dd>
   <dd>True (not case sensitive) => True</dd>
@@ -27,6 +30,30 @@ openssl ec -in private.pem -pubout -out public.pem
 ### Variables
 
 <dl>
+  <dt>EMAIL_FROM_NAME (String)</dt>
+  <dd>"From" name in emails</dd>
+  <dd>Default: Kinky Harbor</dd>
+
+  <dt>EMAIL_FROM_ADDRESS (String)</dt>
+  <dd>Sender address of emails</dd>
+  <dd>Mandatory, no default</dd>
+
+  <dt>EMAIL_HOSTNAME (String)</dt>
+  <dd>Hostname of the mail server</dd>
+  <dd>Default: localhost</dd>
+
+  <dt>EMAIL_PORT (Int)</dt>
+  <dd>Port of the mail server</dd>
+  <dd>Default: 25</dd>
+
+  <dt>EMAIL_USERNAME (String)</dt>
+  <dd>Username for mail server</dd>
+  <dd>No default (empty string)</dd>
+
+  <dt>EMAIL_PASSWORD (String)</dt>
+  <dd>Password for mail server</dd>
+  <dd>No default (empty string)</dd>
+
   <dt>JWT_KEY_PATH (String)</dt>
   <dd>Path to ECDSA keys for JWT signing</dd>
   <dd>Default: ../jwt-keys</dd>
