@@ -13,7 +13,12 @@ from db import mongo
 def add_database_events(server: FastAPI) -> None:
     @server.on_event("startup")
     async def connect_to_database() -> None:
-        server.state.db = mongo.create_db_client()
+        db = mongo.create_db_client()
+        server.state.db = db
+
+        # Ensure indexes
+        await db.users.create_index("username", unique=True)
+        await db.users.create_index("email", unique=True)
 
 
 app = FastAPI()

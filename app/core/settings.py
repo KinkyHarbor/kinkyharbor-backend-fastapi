@@ -12,7 +12,7 @@ def get_required_env(name: str) -> str:
     '''Return a mandatory variable from ENV.'''
     env_var = environ.get(name)
     if not env_var:
-        logging.error('%s not defined in ENV', env_var)
+        logging.error('%s not defined in ENV', name)
         sys.exit(1)
     return env_var
 
@@ -25,7 +25,17 @@ def get_bool(name: str) -> bool:
 
 # General
 DEMO = get_bool('DEMO')
+if DEMO:
+    logging.warning('Demo mode activated! Do not use in production!')
 RESERVED_USERNAMES = ['kinkyharbor', 'harbor']
+
+# Email settings
+EMAIL_FROM_NAME = environ.get('EMAIL_FROM_NAME', 'Kinky Harbor')
+EMAIL_FROM_ADDRESS = get_required_env('EMAIL_FROM_ADDRESS')
+EMAIL_HOSTNAME = environ.get('EMAIL_HOSTNAME', 'localhost')
+EMAIL_PORT = int(environ.get('EMAIL_PORT', '25'))
+EMAIL_USERNAME = environ.get('EMAIL_USERNAME')
+EMAIL_PASSWORD = environ.get('EMAIL_PASSWORD')
 
 # JWT settings
 JWT_KEY_PATH = Path(environ.get('JWT_KEY_PATH', '../jwt-keys'))
