@@ -3,6 +3,7 @@
 import uvicorn
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
+from starlette.middleware.cors import CORSMiddleware
 
 from routers import auth
 from routers import users as router_users
@@ -26,6 +27,7 @@ def add_database_events(server: FastAPI) -> None:
 app = FastAPI()
 app.include_router(
     auth.router,
+    prefix='/auth',
     tags=['auth'])
 app.include_router(
     router_users.router,
@@ -33,6 +35,18 @@ app.include_router(
     tags=['users']
 )
 add_database_events(app)
+
+# CORS
+origins = [
+    "http://localhost:3000",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get('/', include_in_schema=False)

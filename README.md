@@ -30,9 +30,13 @@ openssl ec -in private.pem -pubout -out public.pem
 ### Variables
 
 <dl>
-  <dt>Debug (Boolean)</dt>
+  <dt>DEBUG (Boolean)</dt>
   <dd>Set log level to DEBUG</dd>
   <dd>Default: False</dd>
+
+  <dt>FRONTEND_URL (String)</dt>
+  <dd>Base url of the frontend</dd>
+  <dd>Mandatory, no default</dd>
 
   <dt>EMAIL_FROM_NAME (String)</dt>
   <dd>"From" name in emails</dd>

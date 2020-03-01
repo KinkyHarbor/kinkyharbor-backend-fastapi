@@ -24,7 +24,7 @@ from crud import users, verif_tokens
 router = APIRouter()
 
 
-@router.post('/register')
+@router.post('/register/')
 async def register(reg_user: RegisterUser,
                    background_tasks: BackgroundTasks,
                    db: MotorDB = Depends(get_db)):
@@ -47,34 +47,23 @@ async def register(reg_user: RegisterUser,
             )
         user = None
 
+    recipient = email.get_address(reg_user.username, reg_user.email)
     if user:
         # Get verification token
         token = await verif_tokens.create_verif_token(
             db, user.id, VerifPur.REGISTER)
 
         # Send verification mail
-        subject = 'Verify your Kinky Harbor account'
-        registration_link = f'http://kinkyharbor.com/register?token={token.secret}'
-        msg = email.TEMPLATE_REGISTER_TEXT.format(
-            registration_link=registration_link)
-        msg_html = email.TEMPLATE_REGISTER_HTML.format(
-            registration_link=registration_link)
+        msg = email.prepare_register_verification(recipient, token.secret)
     else:
         # Send password reset mail
-        subject = 'Registration attempt at Kinky Harbor'
-        reset_password_link = f'http://kinkyharbor.com/reset-password/'
-        msg = email.TEMPLATE_REGISTER_EMAIL_EXISTS_TEXT.format(
-            reset_password_link=reset_password_link)
-        msg_html = email.TEMPLATE_REGISTER_EMAIL_EXISTS_HTML.format(
-            reset_password_link=reset_password_link)
+        msg = email.prepare_register_email_exist(recipient)
 
-    recipient = email.get_address(reg_user.username, reg_user.email)
-    background_tasks.add_task(
-        email.send_mail, recipient, subject, msg, msg_html)
+    background_tasks.add_task(email.send_mail, msg)
     return {'msg': 'User created successfully'}
 
 
-@router.post('/register/verify')
+@router.post('/register/verify/')
 async def verify_registration(token_secret: TokenSecret, db: MotorDB = Depends(get_db)):
     token = VerifTokenReq(secret=token_secret.secret,
                           purpose=VerifPur.REGISTER)
@@ -90,7 +79,7 @@ async def verify_registration(token_secret: TokenSecret, db: MotorDB = Depends(g
     return {'msg': 'Account is verified'}
 
 
-@router.post("/token", response_model=AccessToken)
+@router.post("/login/token/", response_model=AccessToken)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
                                  db: MotorDB = Depends(get_db)):
     '''Trades username and password for an access token'''
@@ -115,4 +104,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = await auth.create_access_token(
         data={"sub": f'user:{user.id}'}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return AccessToken(
+        token=access_token,
+        access_token=access_token,
+        token_type="bearer"
+    )

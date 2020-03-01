@@ -14,7 +14,7 @@ from models.token import AccessTokenData
 from crud import users
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login/token')
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

@@ -8,7 +8,7 @@ from core.auth import get_current_active_user
 router = APIRouter()
 
 
-@router.get('/me', summary='Get own user data')
+@router.get('/me/', summary='Get own user data')
 async def read_users_me(current_user: UserDB = Depends(get_current_active_user)):
     '''Get your own user data.'''
-    return current_user
+    return {'user': current_user}

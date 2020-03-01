@@ -12,7 +12,8 @@ from models.common import DBModelMixin, ObjectIdStr
 
 class AccessToken(BaseModel):
     '''Token which grants access to the application'''
-    access_token: str
+    access_token: str = None
+    token: str = None
     token_type: str
 
 

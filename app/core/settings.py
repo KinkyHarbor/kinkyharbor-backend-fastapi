@@ -29,6 +29,7 @@ if DEBUG:
     logging.getLogger().setLevel(logging.DEBUG)
 RESERVED_USERNAMES = ['kinkyharbor', 'kinky-harbor', 'kinky_harbor', 'harbor',
                       'pirate', 'captain', 'admin', '-', '_']
+FRONTEND_URL = get_required_env('FRONTEND_URL')
 
 # Email settings
 EMAIL_FROM_NAME = environ.get('EMAIL_FROM_NAME', 'Kinky Harbor')

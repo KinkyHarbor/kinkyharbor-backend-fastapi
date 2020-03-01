@@ -37,6 +37,7 @@
 !/app/models/
 !/app/models/__init__.py
 !/app/models/common.py
+!/app/models/email.py
 !/app/models/token.py
 !/app/models/user.py
 
