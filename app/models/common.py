@@ -1,7 +1,29 @@
+'''This module contains reusable fields and mixins'''
+
+import re
 from typing import Optional, Union
 from bson.objectid import ObjectId
 
 from pydantic import BaseModel, Field
+
+
+class DisplayNameStr(str):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, name):
+        if len(name) > 40:
+            raise ValueError("Name is too long. Max 40 characters allowed.")
+
+        match = re.search(r'[^a-zA-Z0-9_\-]', name)
+        if match:
+            raise ValueError(
+                "Name should only contain alphanumerical "
+                "characters, '-' or '_'. Invalid character: " +
+                match.group())
+        return name
 
 
 class ObjectIdStr(str):

@@ -25,6 +25,7 @@
 !/app/core/
 !/app/core/__init__.py
 !/app/core/auth.py
+!/app/core/db.py
 !/app/core/email.py
 !/app/core/settings.py
 
@@ -33,13 +34,9 @@
 !/app/crud/users.py
 !/app/crud/verif_tokens.py
 
-!/app/db/
-!/app/db/__init__.py
-!/app/db/models.py
-!/app/db/mongo.py
-
 !/app/models/
 !/app/models/__init__.py
+!/app/models/common.py
 !/app/models/token.py
 !/app/models/user.py
 

@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 
 from models.user import UserDBOut
 from core.auth import get_current_active_user
-from db.mongo import get_db
+from core.db import get_db
 
 router = APIRouter()
 

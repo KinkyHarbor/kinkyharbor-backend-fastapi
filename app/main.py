@@ -6,7 +6,7 @@ from starlette.responses import RedirectResponse
 
 from routers import auth
 from routers import users as router_users
-from db import mongo
+from core.db import create_db_client
 from crud import users, verif_tokens
 
 
@@ -14,7 +14,7 @@ def add_database_events(server: FastAPI) -> None:
     '''Creates a database client on application start'''
     @server.on_event('startup')
     async def connect_to_database() -> None:
-        db = mongo.create_db_client()
+        db = create_db_client()
         server.state.db = db
 
         # Ensure indexes
@@ -22,6 +22,7 @@ def add_database_events(server: FastAPI) -> None:
         await verif_tokens.ensure_indexes(db)
 
 
+# Start app
 app = FastAPI()
 app.include_router(
     auth.router,

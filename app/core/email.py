@@ -1,8 +1,6 @@
 import smtplib
-import ssl
 from email.message import EmailMessage
 from email.headerregistry import Address
-
 
 from core import settings
 

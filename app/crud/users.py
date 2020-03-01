@@ -1,6 +1,7 @@
 '''This module contains CRUD operations for users'''
-from bson.objectid import ObjectId
+
 import logging
+from bson.objectid import ObjectId
 
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 
@@ -34,9 +35,7 @@ async def get_login(db: MotorDB, username: str, email: str = None) -> UserDBOut:
 
 
 async def register(db: MotorDB,
-                   reg_user: RegisterUser,
-                   is_admin: bool = False,
-                   is_verified: bool = False) -> User:
+                   reg_user: RegisterUser) -> User:
     '''Add a new user.
 
     Raises:
@@ -44,15 +43,18 @@ async def register(db: MotorDB,
     '''
     # Create new user
     hpass = auth.get_password_hash(reg_user.password)
-    user = UserDBIn(**reg_user.dict(),
-                    hashed_password=hpass,
-                    is_admin=is_admin,
-                    is_verified=is_verified)
+    user = UserDBIn(display_name=reg_user.username,
+                    email=reg_user.email,
+                    hashed_password=hpass)
     result = await db[TABLE_NAME].insert_one(user.dict())
+    logging.debug('New user "%s" created', user.display_name)
     return User(id=result.inserted_id, **user.dict())
 
 
 async def set_flag(db: MotorDB, user_id: str, flag: UserFlags, value: bool):
+    '''Sets a flag on the user to True or False'''
     if not isinstance(flag, UserFlags):
         raise ValueError(f'"{str(flag)}" is not a valid user flag')
-    return await db[TABLE_NAME].find_one_and_update({'_id': ObjectId(user_id)}, {'$set': {flag.value: value}})
+    return await db[TABLE_NAME].find_one_and_update(
+        {'_id': ObjectId(user_id)}, {'$set': {flag.value: value}}
+    )

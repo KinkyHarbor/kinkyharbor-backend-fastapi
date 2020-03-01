@@ -1,9 +1,9 @@
 '''This module contains CRUD operations for tokens'''
 import logging
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
-from pymongo import ASCENDING, ReturnDocument
+from pymongo import ReturnDocument
 
-from db.models import ObjectIdStr
+from models.common import ObjectIdStr
 from models.token import VerificationToken, VerificationTokenRequest
 from models.token import VerificationPurposeEnum as VerifPur
 

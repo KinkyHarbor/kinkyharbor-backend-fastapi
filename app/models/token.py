@@ -7,7 +7,7 @@ from typing import Optional
 
 from pydantic import BaseModel, validator
 
-from db.models import DBModelMixin, ObjectIdStr
+from models.common import DBModelMixin, ObjectIdStr
 
 
 class AccessToken(BaseModel):

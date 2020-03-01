@@ -24,10 +24,11 @@ def get_bool(name: str) -> bool:
 
 
 # General
-DEMO = get_bool('DEMO')
-if DEMO:
-    logging.warning('Demo mode activated! Do not use in production!')
-RESERVED_USERNAMES = ['kinkyharbor', 'harbor']
+DEBUG = get_bool('DEBUG')
+if DEBUG:
+    logging.getLogger().setLevel(logging.DEBUG)
+RESERVED_USERNAMES = ['kinkyharbor', 'kinky-harbor', 'kinky_harbor', 'harbor',
+                      'pirate', 'captain', 'admin']
 
 # Email settings
 EMAIL_FROM_NAME = environ.get('EMAIL_FROM_NAME', 'Kinky Harbor')

@@ -10,10 +10,15 @@ from pymongo.errors import DuplicateKeyError
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 
 from core import settings, auth, email
-from models.token import AccessToken, TokenSecret, VerificationTokenRequest as VerifTokenReq, VerificationPurposeEnum as VerifPur
+from core.db import get_db
+from models.token import (
+    AccessToken,
+    TokenSecret,
+    VerificationTokenRequest as VerifTokenReq,
+    VerificationPurposeEnum as VerifPur,
+)
 from models.user import RegisterUser, UserFlags
 from crud import users, verif_tokens
-from db.mongo import get_db
 
 
 router = APIRouter()
@@ -23,53 +28,49 @@ router = APIRouter()
 async def register(reg_user: RegisterUser,
                    background_tasks: BackgroundTasks,
                    db: MotorDB = Depends(get_db)):
-    if reg_user.username in settings.RESERVED_USERNAMES:
+    # Check if username is reserved
+    username = reg_user.username.lower()
+    if username in settings.RESERVED_USERNAMES:
         raise HTTPException(
             status_code=HTTP_400_BAD_REQUEST,
             detail="This is a reserved username. Please choose another one.",
         )
 
+    # Create a new user in the database
     try:
-        user = await users.register(db, reg_user, is_verified=settings.DEMO)
+        user = await users.register(db, reg_user)
     except DuplicateKeyError as error:
         if 'username' in str(error):
             raise HTTPException(
                 status_code=HTTP_409_CONFLICT,
                 detail="Username already taken",
             )
-
-        if settings.DEMO and 'email' in str(error):
-            raise HTTPException(
-                status_code=HTTP_409_CONFLICT,
-                detail="Demo: There is already an account registered with this email",
-            )
-
         user = None
 
-    if not settings.DEMO:
-        if user:
-            # Get verification token
-            token = await verif_tokens.create_verif_token(
-                db, user.id, VerifPur.REGISTER)
+    if user:
+        # Get verification token
+        token = await verif_tokens.create_verif_token(
+            db, user.id, VerifPur.REGISTER)
 
-            # Send verification mail
-            subject = 'Verify your Kinky Harbor account'
-            registration_link = f'http://kinkyharbor.com/register?token={token.secret}'
-            msg = email.TEMPLATE_REGISTER_TEXT.format(
-                registration_link=registration_link)
-            msg_html = email.TEMPLATE_REGISTER_HTML.format(
-                registration_link=registration_link)
-        else:
-            # Send password reset mail
-            subject = 'Registration attempt at Kinky Harbor'
-            reset_password_link = f'http://kinkyharbor.com/reset-password/'
-            msg = email.TEMPLATE_REGISTER_EMAIL_EXISTS_TEXT.format(
-                reset_password_link=reset_password_link)
-            msg_html = email.TEMPLATE_REGISTER_EMAIL_EXISTS_HTML.format(
-                reset_password_link=reset_password_link)
+        # Send verification mail
+        subject = 'Verify your Kinky Harbor account'
+        registration_link = f'http://kinkyharbor.com/register?token={token.secret}'
+        msg = email.TEMPLATE_REGISTER_TEXT.format(
+            registration_link=registration_link)
+        msg_html = email.TEMPLATE_REGISTER_HTML.format(
+            registration_link=registration_link)
+    else:
+        # Send password reset mail
+        subject = 'Registration attempt at Kinky Harbor'
+        reset_password_link = f'http://kinkyharbor.com/reset-password/'
+        msg = email.TEMPLATE_REGISTER_EMAIL_EXISTS_TEXT.format(
+            reset_password_link=reset_password_link)
+        msg_html = email.TEMPLATE_REGISTER_EMAIL_EXISTS_HTML.format(
+            reset_password_link=reset_password_link)
 
-        to = email.get_address(reg_user.username, reg_user.email)
-        background_tasks.add_task(email.send_mail, to, subject, msg, msg_html)
+    recipient = email.get_address(reg_user.username, reg_user.email)
+    background_tasks.add_task(
+        email.send_mail, recipient, subject, msg, msg_html)
     return {'msg': 'User created successfully'}
 
 

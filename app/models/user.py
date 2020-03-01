@@ -1,27 +1,23 @@
 '''This module contains all user related models'''
 
-import re
 from enum import Enum, unique
 
 from pydantic import BaseModel, EmailStr, validator
 
-from db.models import DBModelMixin
+from models.common import DBModelMixin, DisplayNameStr
 
 
 class BaseUser(BaseModel):
     '''Base class with properties shared among all user models'''
-    username: str
+    display_name: DisplayNameStr
+    username: str = None
     email: EmailStr
 
-    @validator('username')
-    def username_only_valid_chars(cls, username):
-        match = re.search(r'[^a-zA-Z0-9_\-]', username)
-        if match:
-            raise ValueError(
-                "Username should only contain alphanumerical "
-                "characters, '-' or '_'. Invalid character: " +
-                match.group())
-        return username
+    @validator('username', pre=True, always=True)
+    @classmethod
+    def lowercase_display_name(cls, _, values):
+        '''Converts display name to lowercase for username'''
+        return values['display_name'].lower()
 
 
 class User(BaseUser, DBModelMixin):
@@ -31,8 +27,10 @@ class User(BaseUser, DBModelMixin):
     is_locked: bool = False
 
 
-class RegisterUser(BaseUser):
+class RegisterUser(BaseModel):
     '''Required form data for registering a user'''
+    username: DisplayNameStr
+    email: EmailStr
     password: str
 
 

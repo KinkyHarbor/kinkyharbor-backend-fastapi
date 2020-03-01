@@ -30,6 +30,10 @@ openssl ec -in private.pem -pubout -out public.pem
 ### Variables
 
 <dl>
+  <dt>Debug (Boolean)</dt>
+  <dd>Set log level to DEBUG</dd>
+  <dd>Default: False</dd>
+
   <dt>EMAIL_FROM_NAME (String)</dt>
   <dd>"From" name in emails</dd>
   <dd>Default: Kinky Harbor</dd>
@@ -65,7 +69,4 @@ openssl ec -in private.pem -pubout -out public.pem
   <dt>MONGO_DATABASE (String)</dt>
   <dd>Database in Mongo DB</dd>
   <dd>Default: kinkyharbor</dd>
-
-  <dt>DEMO (Boolean)</dt>
-  <dd>Disable verification for registration, password reset and email changes.</dd>
 </dl>

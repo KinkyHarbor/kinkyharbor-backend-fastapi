@@ -8,10 +8,10 @@ from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from passlib.context import CryptContext
 
 from core import settings
+from core.db import get_db
 from models.user import User, UserDBOut
 from models.token import AccessTokenData
 from crud import users
-from db.mongo import get_db
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
