@@ -7,6 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from routers import auth
 from routers import users as router_users
+from core import settings
 from core.db import create_db_client
 from crud import users, verif_tokens
 
@@ -37,12 +38,9 @@ app.include_router(
 add_database_events(app)
 
 # CORS
-origins = [
-    "http://localhost:3000",
-]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.CORS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -38,6 +38,10 @@ openssl ec -in private.pem -pubout -out public.pem
   <dd>Base url of the frontend</dd>
   <dd>Mandatory, no default</dd>
 
+  <dt>CORS (String)</dt>
+  <dd>List of allowed origins for CORS. Origins are separated by semicolon. Schema is mandatory.</dd>
+  <dd>Default: value of FRONTEND_URL</dd>
+
   <dt>EMAIL_FROM_NAME (String)</dt>
   <dd>"From" name in emails</dd>
   <dd>Default: Kinky Harbor</dd>

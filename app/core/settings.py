@@ -1,7 +1,9 @@
 '''This module handles all ENV and file based settings.'''
 
-import logging
+import re
 import sys
+import logging
+from typing import List
 from os import environ
 from pathlib import Path
 
@@ -23,6 +25,18 @@ def get_bool(name: str) -> bool:
     return value.lower() == 'true'
 
 
+def get_cors(default_origin: str) -> List[str]:
+    '''Gets CORS origins from ENV'''
+    cors = environ.get('CORS', default_origin).split(';')
+    for origin in cors:
+        match = re.search(r'https?://', origin)
+        if not match:
+            logging.error(
+                'CORS origin "%s" doesn\'t start with http(s)', origin)
+            sys.exit(1)
+    return cors
+
+
 # General
 DEBUG = get_bool('DEBUG')
 if DEBUG:
@@ -30,6 +44,8 @@ if DEBUG:
 RESERVED_USERNAMES = ['kinkyharbor', 'kinky-harbor', 'kinky_harbor', 'harbor',
                       'pirate', 'captain', 'admin', '-', '_']
 FRONTEND_URL = get_required_env('FRONTEND_URL')
+CORS = get_cors(FRONTEND_URL)
+
 
 # Email settings
 EMAIL_FROM_NAME = environ.get('EMAIL_FROM_NAME', 'Kinky Harbor')
