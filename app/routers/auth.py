@@ -94,13 +94,22 @@ async def verify_registration(token_secret: TokenSecret, db: MotorDB = Depends(g
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
                                  db: MotorDB = Depends(get_db)):
     '''Trades username and password for an access token'''
-    user = await auth.authenticate_user(db, form_data.username, form_data.password)
-    if not user:
+    try:
+        user = await auth.authenticate_user(db, form_data.username, form_data.password)
+    except auth.InvalidCredsError:
         raise HTTPException(
             status_code=HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    except auth.UserLockedError:
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED,
+            detail="User is locked",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Authentication successful
     access_token_expires = timedelta(
         minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = await auth.create_access_token(

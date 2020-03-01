@@ -9,13 +9,21 @@ from passlib.context import CryptContext
 
 from core import settings
 from core.db import get_db
-from models.user import User, UserDBOut
+from models.user import User, UserDB
 from models.token import AccessTokenData
 from crud import users
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+class InvalidCredsError(Exception):
+    '''Provided credentials are invalid'''
+
+
+class UserLockedError(Exception):
+    '''User is locked'''
 
 
 def verify_password(plain_password, hashed_password):
@@ -27,13 +35,30 @@ def get_password_hash(password):
 
 
 async def authenticate_user(db, username: str, password: str):
+    '''Tries to authenticate a user
+
+    Raises:
+        InvalidCredsError: Provided credentials are invalid
+        UserLockedError: User is locked
+    '''
     user = await users.get_login(db, username)
+
+    # Check if matching user was found
     if not user:
         # Prevent timing attack
         get_password_hash(password)
-        return False
+        raise InvalidCredsError()
+
+    # Check if password is correct
     if not verify_password(password, user.hashed_password):
-        return False
+        raise InvalidCredsError()
+
+    # Check if user is not locked
+    if user.is_locked:
+        raise UserLockedError()
+
+    # Authentication successful
+    await users.update_last_login(db, user.id)
     return user
 
 
@@ -72,7 +97,7 @@ async def get_current_user(db=Depends(get_db), token: str = Depends(oauth2_schem
     return user
 
 
-async def get_current_active_user(current_user: UserDBOut = Depends(get_current_user)):
+async def get_current_active_user(current_user: UserDB = Depends(get_current_user)):
     if not current_user.is_locked:
         return current_user
     raise HTTPException(HTTP_400_BAD_REQUEST, detail="User is locked")

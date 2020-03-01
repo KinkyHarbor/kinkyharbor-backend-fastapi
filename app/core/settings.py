@@ -28,7 +28,7 @@ DEBUG = get_bool('DEBUG')
 if DEBUG:
     logging.getLogger().setLevel(logging.DEBUG)
 RESERVED_USERNAMES = ['kinkyharbor', 'kinky-harbor', 'kinky_harbor', 'harbor',
-                      'pirate', 'captain', 'admin']
+                      'pirate', 'captain', 'admin', '-', '_']
 
 # Email settings
 EMAIL_FROM_NAME = environ.get('EMAIL_FROM_NAME', 'Kinky Harbor')

@@ -16,7 +16,7 @@ class AccessToken(BaseModel):
     token_type: str
 
 
-class AccessTokenData():
+class AccessTokenData(BaseModel):
     '''Contains data which will be embedded into AccessToken'''
     user_id: ObjectIdStr
 

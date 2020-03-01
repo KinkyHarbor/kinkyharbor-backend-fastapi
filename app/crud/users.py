@@ -1,11 +1,12 @@
 '''This module contains CRUD operations for users'''
 
 import logging
+from datetime import datetime
 from bson.objectid import ObjectId
 
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 
-from models.user import User, RegisterUser, UserDBIn, UserDBOut, UserFlags
+from models.user import User, RegisterUser, UserDBIn, UserDB, UserFlags
 from core import auth
 
 TABLE_NAME = 'users'
@@ -24,14 +25,21 @@ async def get(db: MotorDB, user_id: str) -> User:
         return User(**user_dict)
 
 
-async def get_login(db: MotorDB, username: str, email: str = None) -> UserDBOut:
+async def get_login(db: MotorDB, username: str, email: str = None) -> UserDB:
     '''Return single user by username or email.'''
     if not email:
         email = username
 
     user_dict = await db[TABLE_NAME].find_one({'$or': [{'username': username}, {'email': email}]})
     if user_dict:
-        return UserDBOut(**user_dict)
+        return UserDB(**user_dict)
+
+
+async def update_last_login(db: MotorDB, user_id: str):
+    '''Updates last login timestamp for user'''
+    return await db[TABLE_NAME].find_one_and_update(
+        {'_id': ObjectId(user_id)}, {'$set': {'last_login': datetime.utcnow()}}
+    )
 
 
 async def register(db: MotorDB,
@@ -47,7 +55,7 @@ async def register(db: MotorDB,
                     email=reg_user.email,
                     hashed_password=hpass)
     result = await db[TABLE_NAME].insert_one(user.dict())
-    logging.debug('New user "%s" created', user.display_name)
+    logging.info('%s: New user "%s" created', __name__, user.display_name)
     return User(id=result.inserted_id, **user.dict())
 
 
