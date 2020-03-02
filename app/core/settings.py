@@ -9,6 +9,8 @@ from pathlib import Path
 
 import aiofiles
 
+from models.email import EmailSecurity
+
 
 def get_required_env(name: str) -> str:
     '''Return a mandatory variable from ENV.'''
@@ -37,6 +39,18 @@ def get_cors(default_origin: str) -> List[str]:
     return cors
 
 
+def get_mail_security(default_sec: EmailSecurity) -> EmailSecurity:
+    '''Gets security setting for SMTP'''
+    email_sec_env = environ.get('EMAIL_SECURITY', default_sec.value)
+    try:
+        return EmailSecurity(email_sec_env.lower())
+    except ValueError:
+        logging.error(
+            'Only "tls_ssl", "starttls" and "unsecure" are '
+            'valid values for "EMAIL_SECURITY" in ENV')
+        sys.exit(1)
+
+
 # General
 DEBUG = get_bool('DEBUG')
 if DEBUG:
@@ -52,6 +66,7 @@ EMAIL_FROM_NAME = environ.get('EMAIL_FROM_NAME', 'Kinky Harbor')
 EMAIL_FROM_ADDRESS = get_required_env('EMAIL_FROM_ADDRESS')
 EMAIL_HOSTNAME = environ.get('EMAIL_HOSTNAME', 'localhost')
 EMAIL_PORT = int(environ.get('EMAIL_PORT', '25'))
+EMAIL_SECURITY = get_mail_security(EmailSecurity.TLS_SSL)
 EMAIL_USERNAME = environ.get('EMAIL_USERNAME')
 EMAIL_PASSWORD = environ.get('EMAIL_PASSWORD')
 

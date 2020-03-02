@@ -1,10 +1,12 @@
 '''This module contains everything to prepare and send mails'''
-import smtplib
+
 from email.message import EmailMessage
 from email.headerregistry import Address
 
+import aiosmtplib
+
 from core import settings
-from models.email import EmailMsg
+from models.email import EmailMsg, EmailSecurity
 
 
 def get_address(name: str, email: str) -> Address:
@@ -13,8 +15,9 @@ def get_address(name: str, email: str) -> Address:
     return Address(name, email_parts[0], email_parts[1])
 
 
-def send_mail(msg: EmailMsg):
+async def send_mail(msg: EmailMsg):
     '''Sends an email'''
+    # Build message
     # Build message
     smtp_msg = EmailMessage()
     smtp_msg['Subject'] = msg.subject
@@ -24,16 +27,24 @@ def send_mail(msg: EmailMsg):
     smtp_msg.set_content(msg.text)
     smtp_msg.add_alternative(msg.html, subtype='html')
 
-    # Send message
-    with smtplib.SMTP(settings.EMAIL_HOSTNAME, settings.EMAIL_PORT) as s:
-        try:
-            s.starttls()
-            s.ehlo()
-        except smtplib.SMTPNotSupportedError:
-            pass
-        if settings.EMAIL_USERNAME and settings.EMAIL_PASSWORD:
-            s.login(settings.EMAIL_USERNAME, settings.EMAIL_PASSWORD)
-        s.send_message(smtp_msg)
+    # Get security
+    mail_sec = settings.EMAIL_SECURITY
+    if mail_sec == EmailSecurity.TLS_SSL:
+        sec_opts = {'use_tls': True}
+    elif mail_sec == EmailSecurity.STARTTLS:
+        sec_opts = {'start_tls': True}
+    else:
+        # Unsecure
+        sec_opts = {}
+
+    # Send mail
+    await aiosmtplib.send(
+        smtp_msg,
+        hostname=settings.EMAIL_HOSTNAME,
+        port=settings.EMAIL_PORT,
+        username=settings.EMAIL_USERNAME,
+        password=settings.EMAIL_PASSWORD,
+        **sec_opts)
 
 
 TEMPLATE_REGISTER_TEXT = """\

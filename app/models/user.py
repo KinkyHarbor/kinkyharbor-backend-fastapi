@@ -47,6 +47,7 @@ class UserDB(UserDBIn, DBModelMixin):
 
 @unique
 class UserFlags(Enum):
+    '''Available flags on user profile'''
     ADMIN = 'is_admin'
     VERIFIED = 'is_verified'
     LOCKED = 'is_locked'

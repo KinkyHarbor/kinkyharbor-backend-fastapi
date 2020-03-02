@@ -22,3 +22,6 @@ aiofiles
 pytest
 pytest-asyncio
 requests
+
+# Email
+aiosmtplib

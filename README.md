@@ -58,6 +58,11 @@ openssl ec -in private.pem -pubout -out public.pem
   <dd>Port of the mail server</dd>
   <dd>Default: 25</dd>
 
+  <dt>EMAIL_SECURITY (String)</dt>
+  <dd>Sets the security type for SMTP</dd>
+  <dd>Allowed values: tls_ssl, starttls, unsecure</dd>
+  <dd>Default: tls_ssl</dd>
+
   <dt>EMAIL_USERNAME (String)</dt>
   <dd>Username for mail server</dd>
   <dd>No default (empty string)</dd>
