@@ -1,5 +1,5 @@
 '''This module contains CRUD operations for tokens'''
-import logging
+
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 from pymongo import ReturnDocument
 
@@ -29,18 +29,22 @@ async def create_verif_token(db: MotorDB, user_id: ObjectIdStr, purpose: VerifPu
 
 
 async def verify_verif_token(db: MotorDB, token: VerificationTokenRequest):
-    '''Verifies a verification token'''
-    db_token = await db[TABLE_NAME].find_one({'secret': token.secret})
-    if db_token:
+    '''Verifies a verification token
+
+    Returns
+        VerificationToken: Token is valid
+        None: Token is invalid
+    '''
+    db_token_dict = await db[TABLE_NAME].find_one({'secret': token.secret})
+    if db_token_dict:
         # Don't touch tokens which don't belong to the user
-        if token.user_id and token.user_id != db_token.user_id:
-            return False
+        if token.user_id and token.user_id != db_token_dict['user_id']:
+            return None
 
         # Valid secret provided and token belong to user
         # => Delete token
-        await db[TABLE_NAME].delete_one({'_id': db_token['_id']})
+        await db[TABLE_NAME].delete_one({'_id': db_token_dict['_id']})
 
         # Check if validated for correct purpose
-        if token.purpose == db_token['purpose']:
-            return VerificationToken(**db_token)
-    return False
+        if token.purpose == db_token_dict['purpose']:
+            return VerificationToken(**db_token_dict)

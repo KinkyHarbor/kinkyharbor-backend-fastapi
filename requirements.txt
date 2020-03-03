@@ -1,6 +1,7 @@
 # Generic
 wheel
 pylint
+autopep8
 
 # FastAPI
 uvicorn

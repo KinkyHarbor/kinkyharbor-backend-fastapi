@@ -1,6 +1,5 @@
 '''This module contains all authentication related routes'''
 
-import logging
 from datetime import timedelta
 
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT
@@ -8,12 +7,14 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from pymongo.errors import DuplicateKeyError
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
+from pydantic import BaseModel
 
 from core import settings, auth, email
 from core.db import get_db
+from models.common import ObjectIdStr
+from models.email import EmailAddress
 from models.token import (
     AccessToken,
-    TokenSecret,
     VerificationTokenRequest as VerifTokenReq,
     VerificationPurposeEnum as VerifPur,
 )
@@ -63,8 +64,13 @@ async def register(reg_user: RegisterUser,
     return {'msg': 'User created successfully'}
 
 
+class RegisterVerifyBody(BaseModel):
+    '''POST model to verify registration'''
+    secret: str
+
+
 @router.post('/register/verify/')
-async def verify_registration(token_secret: TokenSecret, db: MotorDB = Depends(get_db)):
+async def verify_registration(token_secret: RegisterVerifyBody, db: MotorDB = Depends(get_db)):
     token = VerifTokenReq(secret=token_secret.secret,
                           purpose=VerifPur.REGISTER)
     valid = await verif_tokens.verify_verif_token(db, token)
@@ -109,3 +115,48 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         access_token=access_token,
         token_type="bearer"
     )
+
+
+@router.post("/login/request-password-reset/")
+async def request_password_reset(address: EmailAddress,
+                                 background_tasks: BackgroundTasks,
+                                 db: MotorDB = Depends(get_db)):
+    user = await users.get_login(db, address.email)
+    if user:
+        # User found => Send verification token
+        token = await verif_tokens.create_verif_token(db, user.id, VerifPur.RESET_PASSWORD)
+        recipient = email.get_address(user.username, user.email)
+        msg = email.prepare_reset_password(
+            recipient, token.user_id, token.secret)
+        background_tasks.add_task(email.send_mail, msg)
+    return {'msg': 'Verification mail sent, if email is linked to an existing user'}
+
+
+class PasswordResetBody(BaseModel):
+    '''POST model to reset password'''
+    user_id: ObjectIdStr
+    token: str
+    password: str
+
+
+@router.post("/login/password-reset/")
+async def password_reset(body: PasswordResetBody,
+                         db: MotorDB = Depends(get_db)):
+    token = VerifTokenReq(secret=body.token,
+                          user_id=body.user_id,
+                          purpose=VerifPur.RESET_PASSWORD)
+    valid = await verif_tokens.verify_verif_token(db, token)
+    if not valid:
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED,
+            detail="Provided token is not valid"
+        )
+
+    # Set new password
+    user = await users.set_password(db, valid.user_id, body.password)
+
+    # Mark account as verified
+    if not user.is_verified:
+        await users.set_flag(db, valid.user_id, UserFlags.VERIFIED, True)
+        return {'msg': 'Password is updated and account is verified'}
+    return {'msg': 'Password is updated'}

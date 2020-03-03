@@ -3,7 +3,11 @@
 from enum import Enum, unique
 from email.headerregistry import Address
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+
+
+class EmailAddress(BaseModel):
+    email: EmailStr
 
 
 class EmailMsg(BaseModel):

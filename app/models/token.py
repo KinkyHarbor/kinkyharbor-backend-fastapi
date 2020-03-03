@@ -30,20 +30,29 @@ class VerificationPurposeEnum(str, Enum):
     CHANGE_EMAIL = 'email'
 
 
-class TokenSecret(BaseModel):
-    secret: str
-
-
 class VerificationTokenRequest(BaseModel):
     '''Request for verification of account activation, password reset, ...'''
-    secret: str = secrets.token_urlsafe()
-    created_on: datetime = datetime.utcnow()
+    secret: str = None
+    created_on: datetime = None
     purpose: VerificationPurposeEnum
     user_id: Optional[ObjectIdStr]
 
-    @validator('user_id')
+    @validator('secret', pre=True, always=True)
+    @classmethod
+    def generate_secret(cls, secret):
+        '''Generate new secret if not filled'''
+        return secret or secrets.token_urlsafe()
+
+    @validator('created_on', pre=True, always=True)
+    @classmethod
+    def set_created_on(cls, created_on):
+        '''Set Created On if not filled'''
+        return created_on or datetime.utcnow()
+
+    @validator('user_id', always=True)
+    @classmethod
     def user_id_required(cls, user_id, values):
-        # Check if user_id is mandatory based on whitelist
+        '''Check if user_id is mandatory based on whitelist'''
         if not (user_id or values['purpose'] in (VerificationPurposeEnum.REGISTER,)):
             raise ValueError(
                 f'User_id is mandatory for purpose "{values["purpose"]}"')

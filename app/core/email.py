@@ -50,6 +50,8 @@ async def send_mail(msg: EmailMsg):
 TEMPLATE_REGISTER_TEXT = """\
 Welcome to Kinky Harbor!
 Please verify your mail address by clicking {registration_link}
+
+- Kinky Harbor crew -
 """
 
 TEMPLATE_REGISTER_HTML = """\
@@ -60,6 +62,7 @@ TEMPLATE_REGISTER_HTML = """\
     <p>Please verify your mail address by clicking
         <a href="{registration_link}">{registration_link}</a>.
     </p>
+    <p>- Kinky Harbor crew -</p>
   </body>
 </html>
 """
@@ -84,6 +87,8 @@ TEMPLATE_REGISTER_EMAIL_EXISTS_TEXT = """\
 There was an attempt to create a new account on Kinky Harbor with this mail adress.
 In case you forgot your password, please request a reset at {reset_password_link}.
 If you didn't try to register, safely ignore this message.
+
+- Kinky Harbor crew -
 """
 
 TEMPLATE_REGISTER_EMAIL_EXISTS_HTML = """\
@@ -95,13 +100,14 @@ TEMPLATE_REGISTER_EMAIL_EXISTS_HTML = """\
         <a href="{reset_password_link}">{reset_password_link}</a>.
     </p>
     <p>If you didn't try to register, safely ignore this message.</p>
+    <p>- Kinky Harbor crew -</p>
   </body>
 </html>
 """
 
 
 def prepare_register_email_exist(recipient: Address) -> EmailMsg:
-    reset_password_link = f'{settings.FRONTEND_URL}/reset-password/'
+    reset_password_link = f'{settings.FRONTEND_URL}/login/reset-password/'
     msg = TEMPLATE_REGISTER_EMAIL_EXISTS_TEXT.format(
         reset_password_link=reset_password_link)
     msg_html = TEMPLATE_REGISTER_EMAIL_EXISTS_HTML.format(
@@ -110,6 +116,44 @@ def prepare_register_email_exist(recipient: Address) -> EmailMsg:
     return EmailMsg(
         recipient=recipient,
         subject='Registration attempt at Kinky Harbor',
+        text=msg,
+        html=msg_html,
+    )
+
+
+TEMPLATE_RESET_PASSWORD_TEXT = """\
+A password reset has been requested for this mail address.
+Please use following link to set a new password: {reset_password_link}.
+If you didn't try to reset your password, safely ignore this message.
+
+- Kinky Harbor crew -
+"""
+
+TEMPLATE_RESET_PASSWORD_HTML = """\
+<html>
+  <head></head>
+  <body>
+    <p>A password reset has been requested for this mail address.</p>
+    <p>Please use following link to set a new password:
+        <a href="{reset_password_link}">{reset_password_link}</a>.
+    </p>
+    <p>If you didn't try to reset your password, safely ignore this message.</p>
+    <p>- Kinky Harbor crew -</p>
+  </body>
+</html>
+"""
+
+
+def prepare_reset_password(recipient: Address, user_id: str, token: str) -> EmailMsg:
+    reset_password_link = f'{settings.FRONTEND_URL}/login/reset-password?user={user_id}&token={token}'
+    msg = TEMPLATE_RESET_PASSWORD_TEXT.format(
+        reset_password_link=reset_password_link)
+    msg_html = TEMPLATE_RESET_PASSWORD_HTML.format(
+        reset_password_link=reset_password_link)
+
+    return EmailMsg(
+        recipient=recipient,
+        subject='Password reset for Kinky Harbor',
         text=msg,
         html=msg_html,
     )
