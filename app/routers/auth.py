@@ -46,7 +46,7 @@ async def register(reg_user: RegisterUser,
         if 'username' in str(error):
             return JSONResponse(
                 status_code=HTTP_409_CONFLICT,
-                content=Message(msg='Username already taken'),
+                content={'msg': 'Username already taken'},
             )
         user = None
 
