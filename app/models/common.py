@@ -26,6 +26,42 @@ class DisplayNameStr(str):
         return name
 
 
+class StrongPasswordStr(str):
+    '''Only allow strong passwords'''
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, password):
+        '''Check if  password is strong enough
+
+        Password should either be 16 characters or longer (passphrase).
+        Or should be minimum 8 long and have lower case, upper case and a digit.
+        '''
+        if len(password) >= 16:
+            # Password is passphrase
+            return password
+
+        if len(password) < 8:
+            raise ValueError('Password is too short. Minimum length is 8.')
+
+        if re.search('[a-z]', password) is None:
+            raise ValueError(
+                'Password should contain at least one lower case character.')
+
+        if re.search('[A-Z]', password) is None:
+            raise ValueError(
+                'Password should contain at least one upper case character.')
+
+        if re.search('[0-9]', password) is None:
+            raise ValueError(
+                'Password should contain at least one digit.')
+
+        # Password is strong enough
+        return password
+
+
 class ObjectIdStr(str):
     @classmethod
     def __get_validators__(cls):
@@ -44,3 +80,8 @@ class DBModelMixin(BaseModel):
     class Config:
         allow_population_by_field_name = True
         json_encoders = {ObjectId: str}
+
+
+class Message(BaseModel):
+    '''Basic response with message'''
+    msg: str

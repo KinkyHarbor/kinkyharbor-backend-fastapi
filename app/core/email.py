@@ -107,7 +107,7 @@ TEMPLATE_REGISTER_EMAIL_EXISTS_HTML = """\
 
 
 def prepare_register_email_exist(recipient: Address) -> EmailMsg:
-    reset_password_link = f'{settings.FRONTEND_URL}/login/reset-password/'
+    reset_password_link = f'{settings.FRONTEND_URL}/login/request-reset/'
     msg = TEMPLATE_REGISTER_EMAIL_EXISTS_TEXT.format(
         reset_password_link=reset_password_link)
     msg_html = TEMPLATE_REGISTER_EMAIL_EXISTS_HTML.format(

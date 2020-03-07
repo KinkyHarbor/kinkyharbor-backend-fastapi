@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 
+from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
@@ -11,7 +12,7 @@ from pydantic import BaseModel
 
 from core import settings, auth, email
 from core.db import get_db
-from models.common import ObjectIdStr
+from models.common import ObjectIdStr, StrongPasswordStr, Message
 from models.email import EmailAddress
 from models.token import (
     AccessToken,
@@ -25,10 +26,11 @@ from crud import users, verif_tokens
 router = APIRouter()
 
 
-@router.post('/register/')
+@router.post('/register/', responses={409: {"model": Message}})
 async def register(reg_user: RegisterUser,
                    background_tasks: BackgroundTasks,
                    db: MotorDB = Depends(get_db)):
+    '''Register a new user'''
     # Check if username is reserved
     username = reg_user.username.lower()
     if username in settings.RESERVED_USERNAMES:
@@ -42,9 +44,9 @@ async def register(reg_user: RegisterUser,
         user = await users.register(db, reg_user)
     except DuplicateKeyError as error:
         if 'username' in str(error):
-            raise HTTPException(
+            return JSONResponse(
                 status_code=HTTP_409_CONFLICT,
-                detail="Username already taken",
+                content=Message(msg='Username already taken'),
             )
         user = None
 
@@ -136,7 +138,7 @@ class PasswordResetBody(BaseModel):
     '''POST model to reset password'''
     user_id: ObjectIdStr
     token: str
-    password: str
+    password: StrongPasswordStr
 
 
 @router.post("/login/password-reset/")
