@@ -2,10 +2,11 @@
 
 from enum import Enum, unique
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel, EmailStr, validator, Field
 
-from models.common import DBModelMixin, DisplayNameStr, StrongPasswordStr
+from models.common import DBModelMixin, DisplayNameStr, StrongPasswordStr, ObjectIdStr
 
 
 class RegisterUser(BaseModel):
@@ -41,6 +42,7 @@ class RegisterUser(BaseModel):
 
 class BaseUser(BaseModel):
     '''Base class with properties shared among all user models'''
+    # Core data
     display_name: DisplayNameStr
     username: str = None
     email: EmailStr
@@ -48,6 +50,11 @@ class BaseUser(BaseModel):
     is_admin: bool = False
     is_verified: bool = False
     is_locked: bool = False
+
+    # Additional data
+    bio: str = None
+    gender: str = None
+    friends: List[ObjectIdStr] = []
 
     @validator('username', pre=True, always=True)
     @classmethod
@@ -75,3 +82,24 @@ class UserFlags(Enum):
     ADMIN = 'is_admin'
     VERIFIED = 'is_verified'
     LOCKED = 'is_locked'
+
+
+STRANGER_FIELDS = {
+    'id',
+    'display_name',
+    'username',
+    'is_admin',
+}
+
+FRIEND_FIELDS = {
+    'bio',
+    'gender',
+    'friends',
+    *STRANGER_FIELDS
+}
+
+
+class UpdateUser(BaseModel):
+    '''Info which allows direct update'''
+    bio: str = None
+    gender: str = None

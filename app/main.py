@@ -5,39 +5,40 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 
-from routers import auth
-from routers import users as router_users
+from routers import (
+    auth as router_auth,
+    users as router_users,
+)
 from core import settings
 from core.db import create_db_client
 from crud import users, verif_tokens
 
 
-def add_database_events(server: FastAPI) -> None:
-    '''Creates a database client on application start'''
-    @server.on_event('startup')
-    async def connect_to_database() -> None:
-        db = create_db_client()
-        server.state.db = db
-
-        # Ensure indexes
-        await users.ensure_indexes(db)
-        await verif_tokens.ensure_indexes(db)
-
-
 # Start app
 app = FastAPI()
 app.include_router(
-    auth.router,
+    router_auth.router,
     prefix='/auth',
-    tags=['auth'])
+    tags=['auth']
+)
 app.include_router(
     router_users.router,
     prefix='/users',
-    tags=['users']
+    tags=['users'],
 )
-add_database_events(app)
 
-# CORS
+# Connect to database
+@app.on_event('startup')
+async def connect_to_database() -> None:
+    '''Creates a database client on application start'''
+    db = create_db_client()
+    app.state.db = db
+
+    # Ensure indexes
+    await users.ensure_indexes(db)
+    await verif_tokens.ensure_indexes(db)
+
+# Add CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS,

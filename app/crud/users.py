@@ -7,7 +7,10 @@ from bson.objectid import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 from pymongo import ReturnDocument
 
-from models.user import User, RegisterUser, UserDBIn, UserDB, UserFlags
+from models.user import (
+    User, RegisterUser, UserDBIn, UserDB,
+    UserFlags, UpdateUser
+)
 from core import auth
 
 TABLE_NAME = 'users'
@@ -70,7 +73,7 @@ async def set_password(db: MotorDB, user_id: str, password: str) -> User:
     user_dict = await db[TABLE_NAME].find_one_and_update(
         {'_id': ObjectId(user_id)},
         {'$set': {'hashed_password': hpass}},
-        return_document=ReturnDocument.AFTER
+        return_document=ReturnDocument.AFTER,
     )
     return User(**user_dict)
 
@@ -84,6 +87,22 @@ async def set_flag(db: MotorDB, user_id: str, flag: UserFlags, value: bool) -> U
     if not isinstance(flag, UserFlags):
         raise ValueError(f'"{str(flag)}" is not a valid user flag')
     user_dict = await db[TABLE_NAME].find_one_and_update(
-        {'_id': ObjectId(user_id)}, {'$set': {flag.value: value}}
+        {'_id': ObjectId(user_id)},
+        {'$set': {flag.value: value}},
+        return_document=ReturnDocument.AFTER,
+    )
+    return User(**user_dict)
+
+
+async def set_info(db: MotorDB, user_id: str, user_info: UpdateUser) -> User:
+    '''Sets info which allows direct update
+
+    Returns
+        User: Updated user
+    '''
+    user_dict = await db[TABLE_NAME].find_one_and_update(
+        {'_id': ObjectId(user_id)},
+        {'$set': user_info.dict()},
+        return_document=ReturnDocument.AFTER,
     )
     return User(**user_dict)
