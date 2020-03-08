@@ -103,3 +103,9 @@ class UpdateUser(BaseModel):
     '''Info which allows direct update'''
     bio: str = None
     gender: str = None
+
+
+class SearchUser(DBModelMixin):
+    '''User returned in search results'''
+    display_name: DisplayNameStr
+    username: str

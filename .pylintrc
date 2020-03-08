@@ -405,6 +405,7 @@ function-naming-style=snake_case
 good-names=i,
            j,
            k,
+           q,
            db,
            ex,
            app,

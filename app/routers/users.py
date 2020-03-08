@@ -20,7 +20,7 @@ async def get_user_me(current_user: UserDB = Depends(get_current_active_user)):
     return {'user': current_user}
 
 
-@router.post('/me/', summary='Set own user data')
+@router.patch('/me/', summary='Set own user data')
 async def set_user_me(user_info: UpdateUser,
                       token_data: AccessTokenData = Depends(
                           validate_access_token),
