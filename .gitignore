@@ -44,6 +44,7 @@
 !/app/routers/
 !/app/routers/__init__.py
 !/app/routers/auth.py
+!/app/routers/search.py
 !/app/routers/users.py
 
 !/app/tests/
