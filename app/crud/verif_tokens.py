@@ -1,4 +1,4 @@
-'''This module contains CRUD operations for tokens'''
+'''This module contains CRUD operations for verification tokens'''
 
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 from pymongo import ReturnDocument

@@ -12,7 +12,7 @@ from routers import (
 )
 from core import settings
 from core.db import create_db_client
-from crud import users, verif_tokens
+from crud import users, verif_tokens, refresh_tokens
 
 
 # Start app
@@ -47,6 +47,7 @@ async def connect_to_database() -> None:
     app.state.db = db
 
     # Ensure indexes
+    await refresh_tokens.ensure_indexes(db)
     await users.ensure_indexes(db)
     await verif_tokens.ensure_indexes(db)
 

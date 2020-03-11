@@ -16,11 +16,13 @@ from models.common import ObjectIdStr, StrongPasswordStr, Message
 from models.email import EmailAddress
 from models.token import (
     AccessToken,
+    AccessRefreshTokens,
+    RefreshToken,
     VerificationTokenRequest as VerifTokenReq,
     VerificationPurposeEnum as VerifPur,
 )
 from models.user import RegisterUser, UserFlags
-from crud import users, verif_tokens
+from crud import users, verif_tokens, refresh_tokens
 
 
 router = APIRouter()
@@ -87,10 +89,72 @@ async def verify_registration(token_secret: RegisterVerifyBody, db: MotorDB = De
     return {'msg': 'Account is verified'}
 
 
-@router.post("/login/token/", response_model=AccessToken)
+class LoginUser(BaseModel):
+    '''Basic model for credentials'''
+    username: str
+    password: str
+
+
+@router.post('/login/', responses={
+    200: {"model": AccessRefreshTokens},
+    401: {"model": Message},
+})
+async def login(creds: LoginUser, db: MotorDB = Depends(get_db)):
+    '''Trades username and password for an access token (custom implementation)'''
+    try:
+        user = await auth.authenticate_user(db, creds.username, creds.password)
+    except auth.InvalidCredsError:
+        return JSONResponse(
+            status_code=HTTP_401_UNAUTHORIZED,
+            content={'msg': 'Incorrect username or password'},
+        )
+    except auth.UserLockedError:
+        return JSONResponse(
+            status_code=HTTP_401_UNAUTHORIZED,
+            content={'msg': 'User is locked'},
+        )
+
+    # Authentication successful
+    access_token = await auth.create_access_token(data={"sub": f'user:{user.id}'})
+    refresh_token = await refresh_tokens.create_token(db, user.id)
+    return AccessRefreshTokens(
+        access_token=access_token,
+        refresh_token=refresh_token.secret,
+    )
+
+
+class ReplaceRefreshToken(BaseModel):
+    '''Request to replace a refresh and access token'''
+    user_id: ObjectIdStr
+    token: str
+
+
+@router.post('/refresh/', responses={
+    200: {"model": AccessRefreshTokens},
+    401: {"model": Message},
+})
+async def refresh(req: ReplaceRefreshToken, db: MotorDB = Depends(get_db)):
+    '''Trades a refresh token to a new access and refresh token'''
+    old_ref_token = RefreshToken(secret=req.token, user_id=req.user_id)
+    new_ref_token = await refresh_tokens.replace_token(db, old_ref_token)
+    access_token = await auth.create_access_token(data={"sub": f'user:{req.user_id}'})
+
+    if new_ref_token:
+        return AccessRefreshTokens(
+            access_token=access_token,
+            refresh_token=new_ref_token.secret,
+        )
+
+    return JSONResponse(
+        status_code=401,
+        content={'msg': 'Invalid refresh token'}
+    )
+
+
+@router.post("/login/token/", summary='oauth2 password grant flow', response_model=AccessToken)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
                                  db: MotorDB = Depends(get_db)):
-    '''Trades username and password for an access token'''
+    '''Trades username and password for an access token (oauth2: password grant)'''
     try:
         user = await auth.authenticate_user(db, form_data.username, form_data.password)
     except auth.InvalidCredsError:
@@ -107,11 +171,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
 
     # Authentication successful
-    access_token_expires = timedelta(
-        minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = await auth.create_access_token(
-        data={"sub": f'user:{user.id}'}, expires_delta=access_token_expires
-    )
+    access_token = await auth.create_access_token(data={"sub": f'user:{user.id}'})
     return AccessToken(
         token=access_token,
         access_token=access_token,

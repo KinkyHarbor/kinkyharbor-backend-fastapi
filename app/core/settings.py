@@ -73,7 +73,7 @@ EMAIL_PASSWORD = environ.get('EMAIL_PASSWORD')
 # JWT settings
 JWT_KEY_PATH = Path(environ.get('JWT_KEY_PATH', '../jwt-keys'))
 JWT_ALG = "ES512"
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 15
 
 
 async def get_jwt_key(key: str):
