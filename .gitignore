@@ -31,6 +31,7 @@
 
 !/app/crud/
 !/app/crud/__init__.py
+!/app/crud/refresh_tokens.py
 !/app/crud/users.py
 !/app/crud/verif_tokens.py
 
