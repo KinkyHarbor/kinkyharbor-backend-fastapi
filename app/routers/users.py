@@ -17,7 +17,7 @@ router = APIRouter()
 @router.get('/me/', summary='Get own user data')
 async def get_user_me(current_user: UserDB = Depends(get_current_active_user)):
     '''Get your own user data.'''
-    return {'user': current_user}
+    return current_user
 
 
 @router.patch('/me/', summary='Set own user data')
