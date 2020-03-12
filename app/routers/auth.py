@@ -119,14 +119,13 @@ async def login(creds: LoginUser, db: MotorDB = Depends(get_db)):
     refresh_token = await refresh_tokens.create_token(db, user.id)
     return AccessRefreshTokens(
         access_token=access_token,
-        refresh_token=refresh_token.secret,
+        refresh_token=f'{user.id}:{refresh_token.secret}',
     )
 
 
 class ReplaceRefreshToken(BaseModel):
     '''Request to replace a refresh and access token'''
-    user_id: ObjectIdStr
-    token: str
+    refresh_token: str
 
 
 @router.post('/refresh/', responses={
@@ -135,14 +134,15 @@ class ReplaceRefreshToken(BaseModel):
 })
 async def refresh(req: ReplaceRefreshToken, db: MotorDB = Depends(get_db)):
     '''Trades a refresh token to a new access and refresh token'''
-    old_ref_token = RefreshToken(secret=req.token, user_id=req.user_id)
+    (user_id, token) = req.refresh_token.split(':')
+    old_ref_token = RefreshToken(secret=token, user_id=user_id)
     new_ref_token = await refresh_tokens.replace_token(db, old_ref_token)
-    access_token = await auth.create_access_token(data={"sub": f'user:{req.user_id}'})
 
     if new_ref_token:
+        access_token = await auth.create_access_token(data={"sub": f'user:{user_id}'})
         return AccessRefreshTokens(
             access_token=access_token,
-            refresh_token=new_ref_token.secret,
+            refresh_token=f'{user_id}:{new_ref_token.secret}',
         )
 
     return JSONResponse(
