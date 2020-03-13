@@ -10,6 +10,7 @@
 !/Dockerfile
 !/docker-compose.dev.yml
 !/requirements.txt
+!/start-dev.sh
 
 !/.vscode/
 !/.vscode/settings.json
