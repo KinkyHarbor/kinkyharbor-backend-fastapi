@@ -44,7 +44,8 @@ async def get_login(db: MotorDB, username: str, email: str = None) -> UserDB:
 async def search(db: MotorDB, user_id: str, search_string: str, limit: int = 10):
     '''Search users based on username'''
     cursor = db[TABLE_NAME].find(
-        filter={'username': {'$regex': search_string.lower()}},
+        filter={'username': {'$regex': search_string.lower()},
+                '_id': {'$not': {'$eq': ObjectId(user_id)}}},
         projection={'display_name', 'username'},
         limit=limit,
     )
