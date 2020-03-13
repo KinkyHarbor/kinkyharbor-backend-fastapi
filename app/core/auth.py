@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 
 from core import settings
 from core.db import get_db
-from models.user import User, UserDB
+from models.user import User
 from models.token import AccessTokenData
 from crud import users
 
@@ -120,7 +120,7 @@ async def get_current_user(db=Depends(get_db),
     return user
 
 
-async def get_current_active_user(current_user: UserDB = Depends(get_current_user)):
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
     '''Get user if not locked
 
     Raises
