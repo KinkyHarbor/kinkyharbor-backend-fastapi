@@ -2,11 +2,11 @@
 
 import logging
 from datetime import datetime
-from bson.objectid import ObjectId
 from typing import List
 
+from bson.objectid import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
-from pymongo import ReturnDocument, TEXT
+from pymongo import ReturnDocument
 from pydantic import parse_obj_as
 
 from models.user import (
@@ -41,7 +41,15 @@ async def get_login(db: MotorDB, username: str, email: str = None) -> UserDB:
         return UserDB(**user_dict)
 
 
-async def search(db: MotorDB, user_id: str, search_string: str, limit: int = 10):
+async def get_by_username(db: MotorDB, username: str) -> User:
+    '''Get single user by username.'''
+    user_dict = await db[TABLE_NAME].find_one({'username': username})
+    if user_dict:
+        return User(**user_dict)
+
+
+async def search(db: MotorDB, user_id: str,
+                 search_string: str, limit: int = 10) -> List[SearchUser]:
     '''Search users based on username'''
     cursor = db[TABLE_NAME].find(
         filter={'username': {'$regex': search_string.lower()},
