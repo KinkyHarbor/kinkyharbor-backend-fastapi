@@ -40,6 +40,7 @@
 
 !/harbor/repository/
 !/harbor/repository/__init__.py
+!/harbor/repository/base.py
 
 !/harbor/repository/mongo/
 !/harbor/repository/mongo/__init__.py
@@ -47,10 +48,6 @@
 !/harbor/repository/mongo/refresh_tokens.py
 !/harbor/repository/mongo/users.py
 !/harbor/repository/mongo/verif_tokens.py
-
-!/harbor/request_objects/
-!/harbor/request_objects/__init__.py
-!/harbor/request_objects/common.py
 
 !/harbor/rest/
 !/harbor/rest/__init__.py
@@ -73,6 +70,7 @@
 !/harbor/use_cases/user/__init__.py
 !/harbor/use_cases/user/login.py
 !/harbor/use_cases/user/register.py
+!/harbor/use_cases/user/update_profile.py
 
 !/requirements/
 !/requirements/dev.txt
