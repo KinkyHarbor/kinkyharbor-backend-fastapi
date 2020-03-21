@@ -83,3 +83,7 @@ openssl ec -in private.pem -pubout -out public.pem
   <dd>Database in Mongo DB</dd>
   <dd>Default: kinkyharbor</dd>
 </dl>
+
+## Big thanks to
+
+- [Leonardo Giordani](https://github.com/lgiordani) for his [awesome book](https://leanpub.com/clean-architectures-in-python) and [good examples](https://github.com/pycabook) on the Clean Architecture

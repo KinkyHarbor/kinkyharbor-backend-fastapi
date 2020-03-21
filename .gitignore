@@ -9,6 +9,7 @@
 !/.pylintrc
 !/Dockerfile
 !/docker-compose.dev.yml
+!/pytest.ini
 !/requirements.txt
 !/start-dev.sh
 
@@ -19,39 +20,49 @@
 !/.github/workflows/
 !/.github/workflows/docker-hub.yml
 
-!/app/
-!/app/__init__.py
-!/app/main.py
+!/harbor/
+!/harbor/__init__.py
+!/harbor/app.py
 
-!/app/core/
-!/app/core/__init__.py
-!/app/core/auth.py
-!/app/core/db.py
-!/app/core/email.py
-!/app/core/settings.py
+!/harbor/core/
+!/harbor/core/__init__.py
+!/harbor/core/auth.py
+!/harbor/core/db.py
+!/harbor/core/email.py
+!/harbor/core/settings.py
 
-!/app/crud/
-!/app/crud/__init__.py
-!/app/crud/refresh_tokens.py
-!/app/crud/users.py
-!/app/crud/verif_tokens.py
+!/harbor/repository/
+!/harbor/repository/__init__.py
 
-!/app/models/
-!/app/models/__init__.py
-!/app/models/common.py
-!/app/models/email.py
-!/app/models/token.py
-!/app/models/user.py
+!/harbor/repository/mongo/
+!/harbor/repository/mongo/__init__.py
+!/harbor/repository/mongo/common.py
+!/harbor/repository/mongo/refresh_tokens.py
+!/harbor/repository/mongo/users.py
+!/harbor/repository/mongo/verif_tokens.py
 
-!/app/routers/
-!/app/routers/__init__.py
-!/app/routers/auth.py
-!/app/routers/search.py
-!/app/routers/users.py
+!/harbor/domain/
+!/harbor/domain/__init__.py
+!/harbor/domain/common.py
+!/harbor/domain/email.py
+!/harbor/domain/token.py
+!/harbor/domain/user.py
 
-!/app/tests/
-!/app/tests/test_crud_users.py
-!/app/tests/test_main.py
+!/harbor/rest/
+!/harbor/rest/__init__.py
+!/harbor/rest/auth.py
+!/harbor/rest/search.py
+!/harbor/rest/users.py
+
+!/requirements/
+!/requirements/dev.txt
+!/requirements/prod.txt
+!/requirements/test.txt
+
+!/tests/
+!/tests/__init__.py
+!/tests/test_crud_users.py
+!/tests/test_main.py
 
 !/jwt-keys/
 !/jwt-keys/.gitkeep

@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 
-from routers import (
+from rest import (
     auth as router_auth,
     search as router_search,
     users as router_users,
