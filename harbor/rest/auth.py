@@ -1,7 +1,5 @@
 '''This module contains all authentication related routes'''
 
-from datetime import timedelta
-
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
@@ -20,7 +18,8 @@ from harbor.domain.token import (
     VerificationTokenRequest as VerifTokenReq,
     VerificationPurposeEnum as VerifPur,
 )
-from harbor.domain.user import RegisterUser, UserFlags
+from harbor.domain.user import UserFlags
+from harbor.use_cases.user.register import RegisterUser
 from harbor.repository.mongo import users, verif_tokens, refresh_tokens
 from harbor.repository.mongo.common import get_db
 
