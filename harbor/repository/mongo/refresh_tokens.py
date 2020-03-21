@@ -2,11 +2,12 @@
 
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.token import RefreshToken
+from harbor.repository.base import RefreshTokenRepo
 from harbor.repository.mongo.common import create_db_client
 
 
-class RefreshTokenMongoRepo:
-    '''Repository for RefreshTokens in Mongo'''
+class RefreshTokenMongoRepo(RefreshTokenRepo):
+    '''Repository for refresh tokens in Mongo'''
 
     COLLECTION = 'refresh_tokens'
 
@@ -19,19 +20,12 @@ class RefreshTokenMongoRepo:
         # Drop refresh token after 3 days of inactivity
         await self.col.create_index('created_on', expireAfterSeconds=3*60*60*24)
 
-    async def create_token(self, user_id: ObjectIdStr):
-        '''Creates and returns a verification token'''
+    async def create_token(self, user_id: ObjectIdStr) -> RefreshToken:
         token = RefreshToken(user_id=user_id)
         await self.col.insert_one(token.dict())
         return token
 
-    async def replace_token(self, token: RefreshToken):
-        '''Replaces a refresh token
-
-        Returns
-            RefreshToken: Token is valid, new token is returned
-            None: Token is invalid
-        '''
+    async def replace_token(self, token: RefreshToken) -> RefreshToken:
         db_token_dict = await self.col.find_one_and_delete({
             'secret': token.secret,
             'user_id': token.user_id

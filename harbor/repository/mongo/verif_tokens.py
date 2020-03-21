@@ -5,11 +5,12 @@ from pymongo import ReturnDocument
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.token import VerificationToken, VerificationTokenRequest
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
+from harbor.repository.base import VerifTokenRepo
 from harbor.repository.mongo.common import create_db_client
 
 
-class VerificationTokenMongoRepo:
-    '''Repository for VerificationTokens in Mongo'''
+class VerifTokenMongoRepo(VerifTokenRepo):
+    '''Repository for verification tokens in Mongo'''
 
     COLLECTION = 'verif_tokens'
 
@@ -22,24 +23,17 @@ class VerificationTokenMongoRepo:
         await self.col.create_index('secret', unique=True)
         await self.col.create_index('created_on', expireAfterSeconds=3600)
 
-    async def create_verif_token(self, user_id: ObjectIdStr, purpose: VerifPur):
-        '''Creates and returns a verification token'''
+    async def create_verif_token(self, user_id: str, purpose: VerifPur) -> VerificationToken:
         token_req = VerificationTokenRequest(user_id=user_id, purpose=purpose)
         token_dict = await self.col.find_one_and_update(
-            {'user_id': str(user_id), 'purpose': purpose},
+            {'user_id': user_id, 'purpose': purpose},
             {'$set': token_req.dict()},
             upsert=True,
             return_document=ReturnDocument.AFTER
         )
         return VerificationToken(**token_dict)
 
-    async def verify_verif_token(self, token: VerificationTokenRequest):
-        '''Verifies a verification token
-
-        Returns
-            VerificationToken: Token is valid
-            None: Token is invalid
-        '''
+    async def verify_verif_token(self, token: VerificationTokenRequest) -> VerificationToken:
         db_token_dict = await self.col.find_one({'secret': token.secret})
         if db_token_dict:
             # Don't touch tokens which don't belong to the user
@@ -55,8 +49,8 @@ class VerificationTokenMongoRepo:
                 return VerificationToken(**db_token_dict)
 
 
-async def create_repo() -> VerificationTokenMongoRepo:
+async def create_repo() -> VerifTokenMongoRepo:
     '''Returns a new instance of the repo'''
-    repo = VerificationTokenMongoRepo()
+    repo = VerifTokenMongoRepo()
     await repo.ensure_indexes()
     return repo
