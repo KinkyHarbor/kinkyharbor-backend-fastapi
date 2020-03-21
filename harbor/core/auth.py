@@ -11,8 +11,8 @@ from passlib.context import CryptContext
 from harbor.core import settings
 from harbor.domain.user import User
 from harbor.domain.token import AccessTokenData
-from harbor.repo.mongo import users
-from harbor.repo.mongo.common import get_db
+from harbor.repository.mongo import users
+from harbor.repository.mongo.common import get_db
 
 PASSLIB_OPTS = {
     'schemes': ['bcrypt'],

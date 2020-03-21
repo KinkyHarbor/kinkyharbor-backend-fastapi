@@ -11,8 +11,8 @@ from harbor.rest import (
     users as router_users,
 )
 from harbor.core import settings
+from harbor.repository.mongo import users, verif_tokens, refresh_tokens
 from harbor.repository.mongo.common import create_db_client
-from harbor.domain import users, verif_tokens, refresh_tokens
 
 
 # Start app
