@@ -11,8 +11,7 @@ from harbor.rest import (
     users as router_users,
 )
 from harbor.core import settings
-from harbor.repository.mongo import users, verif_tokens, refresh_tokens
-from harbor.repository.mongo.common import create_db_client
+from harbor.repository import mongo
 
 
 # Start app
@@ -38,18 +37,15 @@ app.include_router(
     tags=['users'],
 )
 
-
 # Connect to database
 @app.on_event('startup')
-async def connect_to_database() -> None:
-    '''Creates a database client on application start'''
-    db = create_db_client()
-    app.state.db = db
-
-    # Ensure indexes
-    await refresh_tokens.ensure_indexes(db)
-    await users.ensure_indexes(db)
-    await verif_tokens.ensure_indexes(db)
+async def create_repos() -> None:
+    '''Creates repositories on application start'''
+    app.state.repos = {
+        'refresh_tokens': await mongo.refresh_tokens.create_repo(),
+        'users': await mongo.users.create_repo(),
+        'verif_tokens': await mongo.verif_tokens.create_repo()
+    }
 
 # Add CORS
 app.add_middleware(
