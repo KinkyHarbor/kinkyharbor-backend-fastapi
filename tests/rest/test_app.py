@@ -5,10 +5,10 @@ import logging
 import pytest
 from starlette.testclient import TestClient
 
-from harbor import app
+from harbor.app import app
 
 
-@pytest.fixture(name="fixture_client")
+@pytest.fixture(name="client")
 def fixture_client():
     '''Returns a test client'''
     return TestClient(app)

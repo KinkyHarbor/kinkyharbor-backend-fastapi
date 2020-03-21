@@ -2,14 +2,15 @@
 
 import pytest
 
-from core import settings
-from crud import users
-from models.user import RegisterUser
+from harbor.core import settings
+from harbor.domain.user import RegisterUser
+from harbor.repository.mongo import users
 
 
 settings.MONGO_DATABASE = f'{settings.MONGO_DATABASE}_test'
 
 
+@pytest.mark.integration
 @pytest.mark.asyncio
 async def test_register_new_user():
     '''Tests to register and retrieve a new user'''

@@ -81,8 +81,17 @@
 
 !/tests/
 !/tests/__init__.py
-!/tests/test_crud_users.py
-!/tests/test_main.py
+!/tests/conftest.py
+
+!/tests/repository/
+!/tests/repository/mongo/
+!/tests/repository/mongo/test_crud_users.py
+
+!/tests/response_objects/
+!/tests/response_objects/test_response_objects.py
+
+!/tests/rest/
+!/tests/rest/test_app.py
 
 !/jwt-keys/
 !/jwt-keys/.gitkeep
