@@ -3,10 +3,10 @@
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 
-from core.auth import validate_access_token
-from core.db import get_db
-from crud import users
-from models.token import AccessTokenData
+from harbor.core.auth import validate_access_token
+from harbor.domain.token import AccessTokenData
+from harbor.repository.mongo import users
+from harbor.repository.mongo.common import get_db
 
 
 router = APIRouter()

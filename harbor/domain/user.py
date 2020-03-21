@@ -6,7 +6,7 @@ from typing import List
 
 from pydantic import BaseModel, EmailStr, validator, Field
 
-from models.common import DBModelMixin, DisplayNameStr, StrongPasswordStr, ObjectIdStr
+from harbor.domain.common import DBModelMixin, DisplayNameStr, StrongPasswordStr, ObjectIdStr
 
 
 class RegisterUser(BaseModel):

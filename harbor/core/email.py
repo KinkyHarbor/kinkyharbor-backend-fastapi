@@ -5,8 +5,8 @@ from email.headerregistry import Address
 
 import aiosmtplib
 
-from core import settings
-from models.email import EmailMsg, EmailSecurity
+from harbor.core import settings
+from harbor.domain.email import EmailMsg, EmailSecurity
 
 
 def get_address(name: str, email: str) -> Address:

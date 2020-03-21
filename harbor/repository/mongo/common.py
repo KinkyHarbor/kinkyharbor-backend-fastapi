@@ -2,7 +2,7 @@
 from motor import motor_asyncio as motor
 from starlette.requests import Request
 
-from core import settings
+from harbor.core import settings
 
 
 def create_db_client():

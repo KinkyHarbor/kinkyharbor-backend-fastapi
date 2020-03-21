@@ -5,14 +5,14 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 
-from rest import (
+from harbor.rest import (
     auth as router_auth,
     search as router_search,
     users as router_users,
 )
-from core import settings
-from core.db import create_db_client
-from crud import users, verif_tokens, refresh_tokens
+from harbor.core import settings
+from harbor.repository.mongo.common import create_db_client
+from harbor.domain import users, verif_tokens, refresh_tokens
 
 
 # Start app

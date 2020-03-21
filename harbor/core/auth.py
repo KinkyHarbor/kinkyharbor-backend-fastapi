@@ -8,11 +8,11 @@ from fastapi.security import OAuth2PasswordBearer
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from passlib.context import CryptContext
 
-from core import settings
-from core.db import get_db
-from models.user import User
-from models.token import AccessTokenData
-from crud import users
+from harbor.core import settings
+from harbor.domain.user import User
+from harbor.domain.token import AccessTokenData
+from harbor.repo.mongo import users
+from harbor.repo.mongo.common import get_db
 
 PASSLIB_OPTS = {
     'schemes': ['bcrypt'],

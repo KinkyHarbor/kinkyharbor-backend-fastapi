@@ -9,11 +9,11 @@ from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 from pymongo import ReturnDocument
 from pydantic import parse_obj_as
 
-from models.user import (
+from harbor.domain.user import (
     User, RegisterUser, UserDBIn, UserDB,
     UserFlags, UpdateUser, SearchUser
 )
-from core import auth
+from harbor.core import auth
 
 TABLE_NAME = 'users'
 

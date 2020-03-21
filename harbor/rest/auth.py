@@ -10,19 +10,19 @@ from pymongo.errors import DuplicateKeyError
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 from pydantic import BaseModel
 
-from core import settings, auth, email
-from core.db import get_db
-from models.common import ObjectIdStr, StrongPasswordStr, Message
-from models.email import EmailAddress
-from models.token import (
+from harbor.core import settings, auth, email
+from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message
+from harbor.domain.email import EmailAddress
+from harbor.domain.token import (
     AccessToken,
     AccessRefreshTokens,
     RefreshToken,
     VerificationTokenRequest as VerifTokenReq,
     VerificationPurposeEnum as VerifPur,
 )
-from models.user import RegisterUser, UserFlags
-from crud import users, verif_tokens, refresh_tokens
+from harbor.domain.user import RegisterUser, UserFlags
+from harbor.repository.mongo import users, verif_tokens, refresh_tokens
+from harbor.repository.mongo.common import get_db
 
 
 router = APIRouter()

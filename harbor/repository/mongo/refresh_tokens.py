@@ -1,12 +1,9 @@
 '''This module contains CRUD operations for refresh tokens'''
 
-import secrets
-
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
-from pymongo import ReturnDocument
 
-from models.common import ObjectIdStr
-from models.token import RefreshToken
+from harbor.domain.common import ObjectIdStr
+from harbor.domain.token import RefreshToken
 
 TABLE_NAME = 'refresh_tokens'
 

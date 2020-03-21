@@ -9,7 +9,7 @@ from pathlib import Path
 
 import aiofiles
 
-from models.email import EmailSecurity
+from harbor.domain.email import EmailSecurity
 
 
 def get_required_env(name: str) -> str:

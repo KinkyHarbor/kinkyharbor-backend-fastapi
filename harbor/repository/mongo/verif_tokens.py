@@ -3,9 +3,9 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 from pymongo import ReturnDocument
 
-from models.common import ObjectIdStr
-from models.token import VerificationToken, VerificationTokenRequest
-from models.token import VerificationPurposeEnum as VerifPur
+from harbor.domain.common import ObjectIdStr
+from harbor.domain.token import VerificationToken, VerificationTokenRequest
+from harbor.domain.token import VerificationPurposeEnum as VerifPur
 
 TABLE_NAME = 'verif_tokens'
 

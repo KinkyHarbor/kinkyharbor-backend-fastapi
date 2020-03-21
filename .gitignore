@@ -31,6 +31,13 @@
 !/harbor/core/email.py
 !/harbor/core/settings.py
 
+!/harbor/domain/
+!/harbor/domain/__init__.py
+!/harbor/domain/common.py
+!/harbor/domain/email.py
+!/harbor/domain/token.py
+!/harbor/domain/user.py
+
 !/harbor/repository/
 !/harbor/repository/__init__.py
 
@@ -41,18 +48,31 @@
 !/harbor/repository/mongo/users.py
 !/harbor/repository/mongo/verif_tokens.py
 
-!/harbor/domain/
-!/harbor/domain/__init__.py
-!/harbor/domain/common.py
-!/harbor/domain/email.py
-!/harbor/domain/token.py
-!/harbor/domain/user.py
+!/harbor/request_objects/
+!/harbor/request_objects/__init__.py
+!/harbor/request_objects/common.py
 
 !/harbor/rest/
 !/harbor/rest/__init__.py
 !/harbor/rest/auth.py
 !/harbor/rest/search.py
 !/harbor/rest/users.py
+
+!/harbor/response_objects/
+!/harbor/response_objects/__init__.py
+!/harbor/response_objects/common.py
+
+!/harbor/use_cases/
+!/harbor/use_cases/__init__.py
+
+!/harbor/use_cases/search/
+!/harbor/use_cases/search/__init__.py
+!/harbor/use_cases/search/all.py
+
+!/harbor/use_cases/user/
+!/harbor/use_cases/user/__init__.py
+!/harbor/use_cases/user/login.py
+!/harbor/use_cases/user/register.py
 
 !/requirements/
 !/requirements/dev.txt

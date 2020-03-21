@@ -4,12 +4,12 @@ from starlette.responses import JSONResponse
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 
-from core.auth import validate_access_token, get_current_active_user
-from core.db import get_db
-from crud import users
-from models.common import Message
-from models.token import AccessTokenData
-from models.user import User, UpdateUser, STRANGER_FIELDS, FRIEND_FIELDS
+from harbor.core.auth import validate_access_token, get_current_active_user
+from harbor.domain.common import Message
+from harbor.domain.token import AccessTokenData
+from harbor.domain.user import User, UpdateUser, STRANGER_FIELDS, FRIEND_FIELDS
+from harbor.repository.mongo import users
+from harbor.repository.mongo.common import get_db
 
 router = APIRouter()
 
