@@ -15,7 +15,7 @@ echo -e "\nStart uvicorn dev server ..."
 FRONTEND_URL=http://192.168.20.50:3000 \
 EMAIL_FROM_ADDRESS=no-reply@kinkyharbor.com \
 EMAIL_SECURITY=unsecure \
-uvicorn main:app \
+uvicorn harbor.app:app \
 --reload \
 --host=0.0.0.0
 '
