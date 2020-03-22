@@ -69,6 +69,9 @@
 !/harbor/use_cases/user/update_profile.py
 !/harbor/use_cases/user/verify.py
 
+!/jwt-keys/
+!/jwt-keys/.gitkeep
+
 !/requirements/
 !/requirements/dev.txt
 !/requirements/prod.txt
@@ -79,21 +82,26 @@
 !/tests/conftest.py
 
 !/tests/repository/
+!/tests/repository/__init__.py
+
 !/tests/repository/mongo/
+!/tests/repository/mongo/__init__.py
 !/tests/repository/mongo/test_crud_users.py
 
 !/tests/rest/
+!/tests/rest/__init__.py
 !/tests/rest/test_app.py
 
 !/tests/use_cases/
+!/tests/use_cases/__init__.py
+
 !/tests/use_cases/search/
+!/tests/use_cases/search/__init__.py
 !/tests/use_cases/search/test_all.py
 
 !/tests/use_cases/user/
+!/tests/use_cases/user/__init__.py
 !/tests/use_cases/user/test_login.py
 !/tests/use_cases/user/test_register.py
 !/tests/use_cases/user/test_update_profile.py
 !/tests/use_cases/user/test_verify.py
-
-!/jwt-keys/
-!/jwt-keys/.gitkeep
