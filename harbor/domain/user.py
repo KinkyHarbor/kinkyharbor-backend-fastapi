@@ -38,7 +38,7 @@ class User(BaseUser):
 
 class UserWithPassword(User):
     '''User model including password hash'''
-    hashed_password: str
+    password_hash: str
 
 
 @unique

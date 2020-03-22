@@ -58,20 +58,20 @@ class UserMongoRepo(UserRepo):
     async def add(self,
                   display_name: str,
                   email: str,
-                  hashed_password: str) -> User:
+                  password_hash: str) -> User:
         # Create new user
         user = UserWithPassword(display_name=display_name,
                                 email=email,
-                                hashed_password=hashed_password)
+                                password_hash=password_hash)
         await self.col.insert_one(user.dict())
         # pylint: disable=no-member
         logging.info('%s: New user "%s" created', __name__, user.display_name)
         return User(**user.dict())
 
-    async def set_password(self, user_id: str, hashed_password: str) -> User:
+    async def set_password(self, user_id: str, password_hash: str) -> User:
         user_dict = await self.col.find_one_and_update(
             {'_id': ObjectId(user_id)},
-            {'$set': {'hashed_password': hashed_password}},
+            {'$set': {'password_hash': password_hash}},
         )
         return User(**user_dict)
 
