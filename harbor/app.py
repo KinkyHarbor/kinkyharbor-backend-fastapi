@@ -5,13 +5,17 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 
+from harbor.core import settings
+from harbor.repository.mongo import (
+    refresh_tokens as mongo_rt,
+    users as mongo_user,
+    verif_tokens as mongo_vt,
+)
 from harbor.rest import (
     auth as router_auth,
     search as router_search,
     users as router_users,
 )
-from harbor.core import settings
-from harbor.repository import mongo
 
 
 # Start app
@@ -42,9 +46,9 @@ app.include_router(
 async def create_repos() -> None:
     '''Creates repositories on application start'''
     app.state.repos = {
-        'refresh_token': await mongo.refresh_tokens.create_repo(),
-        'user': await mongo.users.create_repo(),
-        'verif_token': await mongo.verif_tokens.create_repo()
+        'refresh_token': await mongo_rt.create_repo(),
+        'user': await mongo_user.create_repo(),
+        'verif_token': await mongo_vt.create_repo()
     }
 
 # Add CORS
