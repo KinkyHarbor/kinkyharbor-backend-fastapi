@@ -71,7 +71,7 @@ class RegisterUseCase:
         # Create a new user in the database
         # This call might raise UsernameTakenError
         user = await self.user_repo.add(
-            display_name=req.display_name,
+            display_name=req.username,
             email=req.email,
             password_hash=auth.get_password_hash(req.password)
         )
