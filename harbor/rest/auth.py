@@ -108,18 +108,19 @@ async def login(creds: Credentials, repos: RepoDict = Depends(get_repos)):
             login=creds.login,
             password=creds.password
         )
-        tokens = await uc.execute(uc_req)
+        return await uc.execute(uc_req)
+
     except uc_user_login.InvalidCredsError:
         return JSONResponse(
             status_code=HTTP_401_UNAUTHORIZED,
             content={'msg': 'Incorrect username or password'},
         )
+
     except uc_user_login.UserLockedError:
         return JSONResponse(
             status_code=HTTP_401_UNAUTHORIZED,
             content={'msg': 'User is locked'},
         )
-    return tokens
 
 
 class ReplaceRefreshToken(BaseModel):
