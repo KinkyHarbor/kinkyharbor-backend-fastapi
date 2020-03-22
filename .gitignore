@@ -55,10 +55,6 @@
 !/harbor/rest/search.py
 !/harbor/rest/users.py
 
-!/harbor/response_objects/
-!/harbor/response_objects/__init__.py
-!/harbor/response_objects/common.py
-
 !/harbor/use_cases/
 !/harbor/use_cases/__init__.py
 
@@ -71,6 +67,7 @@
 !/harbor/use_cases/user/login.py
 !/harbor/use_cases/user/register.py
 !/harbor/use_cases/user/update_profile.py
+!/harbor/use_cases/user/verify.py
 
 !/requirements/
 !/requirements/dev.txt
@@ -85,11 +82,18 @@
 !/tests/repository/mongo/
 !/tests/repository/mongo/test_crud_users.py
 
-!/tests/response_objects/
-!/tests/response_objects/test_response_objects.py
-
 !/tests/rest/
 !/tests/rest/test_app.py
+
+!/tests/use_cases/
+!/tests/use_cases/search/
+!/tests/use_cases/search/test_all.py
+
+!/tests/use_cases/user/
+!/tests/use_cases/user/test_login.py
+!/tests/use_cases/user/test_register.py
+!/tests/use_cases/user/test_update_profile.py
+!/tests/use_cases/user/test_verify.py
 
 !/jwt-keys/
 !/jwt-keys/.gitkeep
