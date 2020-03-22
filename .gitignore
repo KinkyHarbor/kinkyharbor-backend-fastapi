@@ -91,6 +91,7 @@
 !/tests/rest/
 !/tests/rest/__init__.py
 !/tests/rest/test_app.py
+!/tests/rest/test_auth.py
 
 !/tests/use_cases/
 !/tests/use_cases/__init__.py
