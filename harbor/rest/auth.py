@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from pymongo.errors import DuplicateKeyError
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, constr
 
 from harbor.core import settings, auth, email
 from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message
@@ -29,7 +29,7 @@ from harbor.repository.mongo.common import get_db
 router = APIRouter()
 
 
-@router.post('/register/', responses={409: {"model": Message}})
+@router.post('/register/', response_model=Message, responses={409: {"model": Message}})
 async def register(reg_user: RegisterUser,
                    background_tasks: BackgroundTasks,
                    db: MotorDB = Depends(get_db)):
@@ -74,7 +74,7 @@ class RegisterVerifyBody(BaseModel):
     secret: str
 
 
-@router.post('/register/verify/')
+@router.post('/register/verify/', response_model=Message)
 async def verify_registration(token_secret: RegisterVerifyBody, db: MotorDB = Depends(get_db)):
     token = VerifTokenReq(secret=token_secret.secret,
                           purpose=VerifPur.REGISTER)
@@ -92,14 +92,11 @@ async def verify_registration(token_secret: RegisterVerifyBody, db: MotorDB = De
 
 class Credentials(BaseModel):
     '''Basic model for credentials'''
-    login: str
-    password: str
+    login: constr(min_length=1) = Field(..., title='Username or email')
+    password: constr(min_length=1)
 
 
-@router.post('/login/', responses={
-    200: {"model": AccessRefreshTokens},
-    401: {"model": Message},
-})
+@router.post('/login/', response_model=AccessRefreshTokens, responses={401: {"model": Message}})
 async def login(creds: Credentials, repos: RepoDict = Depends(get_repos)):
     '''Trades username and password for an access token (custom implementation)'''
     try:
@@ -128,10 +125,7 @@ class ReplaceRefreshToken(BaseModel):
     refresh_token: str
 
 
-@router.post('/refresh/', responses={
-    200: {"model": AccessRefreshTokens},
-    401: {"model": Message},
-})
+@router.post('/refresh/', response_model=AccessRefreshTokens, responses={401: {"model": Message}})
 async def refresh(req: ReplaceRefreshToken, db: MotorDB = Depends(get_db)):
     '''Trades a refresh token to a new access and refresh token'''
     (user_id, token) = req.refresh_token.split(':')
@@ -179,7 +173,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
 
 
-@router.post("/login/request-password-reset/")
+@router.post("/login/request-password-reset/", response_model=Message)
 async def request_password_reset(address: EmailAddress,
                                  background_tasks: BackgroundTasks,
                                  db: MotorDB = Depends(get_db)):
@@ -201,7 +195,7 @@ class PasswordResetBody(BaseModel):
     password: StrongPasswordStr
 
 
-@router.post("/login/password-reset/")
+@router.post("/login/password-reset/", response_model=Message)
 async def password_reset(body: PasswordResetBody,
                          db: MotorDB = Depends(get_db)):
     token = VerifTokenReq(secret=body.token,

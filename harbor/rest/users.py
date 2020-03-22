@@ -15,13 +15,13 @@ from harbor.use_cases.user.update_profile import UpdateUser
 router = APIRouter()
 
 
-@router.get('/me/', summary='Get own user data')
+@router.get('/me/', summary='Get own user data', response_model=User, response_model_by_alias=True)
 async def get_user_me(current_user: User = Depends(get_current_active_user)):
     '''Get your own user data.'''
     return current_user.dict()
 
 
-@router.patch('/me/', summary='Set own user data')
+@router.patch('/me/', summary='Set own user data', response_model=User)
 async def set_user_me(user_info: UpdateUser,
                       token_data: AccessTokenData = Depends(
                           validate_access_token),
@@ -34,6 +34,7 @@ async def set_user_me(user_info: UpdateUser,
 @router.get(
     '/{username}/',
     summary='Get user profile of a single user',
+    response_model=User,
     responses={404: {"model": Message}}
 )
 async def get_user(username: str,
