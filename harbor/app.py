@@ -42,9 +42,9 @@ app.include_router(
 async def create_repos() -> None:
     '''Creates repositories on application start'''
     app.state.repos = {
-        'refresh_tokens': await mongo.refresh_tokens.create_repo(),
-        'users': await mongo.users.create_repo(),
-        'verif_tokens': await mongo.verif_tokens.create_repo()
+        'refresh_token': await mongo.refresh_tokens.create_repo(),
+        'user': await mongo.users.create_repo(),
+        'verif_token': await mongo.verif_tokens.create_repo()
     }
 
 # Add CORS
