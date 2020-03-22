@@ -3,6 +3,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict
 
+from starlette.requests import Request
+
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.token import RefreshToken, VerificationToken
 from harbor.domain.token import VerificationTokenRequest as VerifTokenReq
@@ -10,7 +12,19 @@ from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.domain.user import BaseUser, User, UserWithPassword, UserFlags
 
 
-class RefreshTokenRepo(ABC):
+class Repo(ABC):
+    '''Base class for repositories to support typing'''
+
+
+RepoDict = Dict[str, Repo]
+
+
+def get_repos(request: Request) -> RepoDict:
+    '''Returns instance of all repositories from request'''
+    return request.app.state.repos
+
+
+class RefreshTokenRepo(Repo):
     '''Repository for refresh tokens'''
     @abstractmethod
     async def create_token(self, user_id: ObjectIdStr) -> RefreshToken:
@@ -26,7 +40,7 @@ class RefreshTokenRepo(ABC):
         '''
 
 
-class UserRepo(ABC):
+class UserRepo(Repo):
     '''Repository for users'''
     @abstractmethod
     async def get(self, user_id: str) -> User:
@@ -50,7 +64,7 @@ class UserRepo(ABC):
     async def add(self,
                   display_name: str,
                   email: str,
-                  hashed_password: str) -> User:
+                  password_hash: str) -> User:
         '''Add a new user
 
         Raises:
@@ -58,7 +72,7 @@ class UserRepo(ABC):
         '''
 
     @abstractmethod
-    async def set_password(self, user_id: str, hashed_password: str) -> User:
+    async def set_password(self, user_id: str, password_hash: str) -> User:
         '''Sets a new password for the user'''
 
     @abstractmethod
@@ -82,7 +96,7 @@ class UserRepo(ABC):
         '''Updates last login timestamp for user'''
 
 
-class VerifTokenRepo(ABC):
+class VerifTokenRepo(Repo):
     '''Repository for verification tokens'''
     @abstractmethod
     async def create_verif_token(self, user_id: str, purpose: VerifPur) -> VerificationToken:
