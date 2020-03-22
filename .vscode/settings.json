@@ -6,5 +6,11 @@
   "files.exclude": {
     "**/__init__.py": true,
     "**/__pycache__": true
-  }
+  },
+  "python.testing.unittestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "tests"
+  ]
 }
