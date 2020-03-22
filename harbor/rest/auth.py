@@ -4,11 +4,10 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
-from pymongo.errors import DuplicateKeyError
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 from pydantic import BaseModel, Field, constr
 
-from harbor.core import settings, auth, email
+from harbor.core import auth, email
 from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message
 from harbor.domain.email import EmailAddress
 from harbor.domain.token import (
@@ -19,8 +18,10 @@ from harbor.domain.token import (
     VerificationPurposeEnum as VerifPur,
 )
 from harbor.domain.user import UserFlags
-from harbor.use_cases.user import login as uc_user_login
-from harbor.use_cases.user.register import RegisterUser
+from harbor.use_cases.user import (
+    login as uc_user_login,
+    register as uc_user_register,
+)
 from harbor.repository.base import RepoDict, get_repos
 from harbor.repository.mongo import users, verif_tokens, refresh_tokens
 from harbor.repository.mongo.common import get_db
@@ -30,43 +31,31 @@ router = APIRouter()
 
 
 @router.post('/register/', response_model=Message, responses={409: {"model": Message}})
-async def register(reg_user: RegisterUser,
+async def register(req: uc_user_register.RegisterRequest,
                    background_tasks: BackgroundTasks,
-                   db: MotorDB = Depends(get_db)):
+                   repos: RepoDict = Depends(get_repos)):
     '''Register a new user'''
-    # Check if username is reserved
-    username = reg_user.username.lower()
-    if username in settings.RESERVED_USERNAMES:
-        raise HTTPException(
+    uc = uc_user_register.RegisterUseCase(
+        repos['user'],
+        repos['verif_token'],
+        background_tasks
+    )
+
+    try:
+        await uc.execute(req)
+        return {'msg': 'User created successfully'}
+
+    except uc_user_register.UsernameReservedError:
+        return JSONResponse(
             status_code=HTTP_400_BAD_REQUEST,
-            detail="This is a reserved username. Please choose another one.",
+            content={'msg': 'This is a reserved username'},
         )
 
-    # Create a new user in the database
-    try:
-        user = await users.register(db, reg_user)
-    except DuplicateKeyError as error:
-        if 'username' in str(error):
-            return JSONResponse(
-                status_code=HTTP_409_CONFLICT,
-                content={'msg': 'Username already taken'},
-            )
-        user = None
-
-    recipient = email.get_address(reg_user.username, reg_user.email)
-    if user:
-        # Get verification token
-        token = await verif_tokens.create_verif_token(
-            db, user.id, VerifPur.REGISTER)
-
-        # Send verification mail
-        msg = email.prepare_register_verification(recipient, token.secret)
-    else:
-        # Send password reset mail
-        msg = email.prepare_register_email_exist(recipient)
-
-    background_tasks.add_task(email.send_mail, msg)
-    return {'msg': 'User created successfully'}
+    except uc_user_register.UsernameTakenError:
+        return JSONResponse(
+            status_code=HTTP_409_CONFLICT,
+            content={'msg': 'Username already taken'},
+        )
 
 
 class RegisterVerifyBody(BaseModel):

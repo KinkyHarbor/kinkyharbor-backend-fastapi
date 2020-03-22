@@ -6,11 +6,13 @@ from typing import List, Dict
 
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
+from pymongo.errors import DuplicateKeyError
 from pydantic import parse_obj_as
 
 from harbor.domain.user import BaseUser, User, UserWithPassword, UserFlags
 from harbor.repository.base import UserRepo
 from harbor.repository.mongo.common import create_db_client
+from harbor.use_cases.user.register import UsernameTakenError
 
 
 class UserMongoRepo(UserRepo):
@@ -63,7 +65,15 @@ class UserMongoRepo(UserRepo):
         user = UserWithPassword(display_name=display_name,
                                 email=email,
                                 password_hash=password_hash)
-        await self.col.insert_one(user.dict())
+
+        # Try to insert new user into database
+        try:
+            await self.col.insert_one(user.dict())
+        except DuplicateKeyError as dup_error:
+            if 'username' in str(dup_error):
+                raise UsernameTakenError()
+            return None
+
         # pylint: disable=no-member
         logging.info('%s: New user "%s" created', __name__, user.display_name)
         return User(**user.dict())
