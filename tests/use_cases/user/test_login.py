@@ -4,9 +4,19 @@ from unittest import mock
 
 import pytest
 
+from harbor.domain.token import RefreshToken
 from harbor.domain.user import UserWithPassword
 from harbor.repository.base import UserRepo, RefreshTokenRepo
 from harbor.use_cases.user import login as uc_user_login
+
+
+@pytest.fixture(name='uc_req')
+def fixture_uc_req():
+    '''Returns a login request'''
+    return uc_user_login.LoginRequest(
+        login='TestUser',
+        password='TestPassword'
+    )
 
 
 @pytest.fixture(name='test_user')
@@ -22,21 +32,90 @@ def fixture_test_user():
 
 
 @pytest.mark.asyncio
-async def test_uc_user_login_success(test_user):
+@mock.patch('harbor.core.auth.create_access_token')
+async def test_uc_user_login_success(create_access_token, uc_req, test_user):
     '''Tests happy flow of User Login usecase'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)
     user_repo.get_by_login.return_value = test_user
     rt_repo = mock.Mock(RefreshTokenRepo)
+    rt_repo.create_token.return_value = RefreshToken(
+        user_id=test_user.id,
+        secret='TestRefreshToken',
+    )
+    create_access_token.return_value = 'TestAccessToken'
 
     # Call usecase
-    uc_req = uc_user_login.LoginRequest(
-        login='TestUser',
-        password='TestPassword'
-    )
     uc = uc_user_login.LoginUseCase(user_repo, rt_repo)
     tokens = await uc.execute(uc_req)
 
     # Assert results
     user_repo.get_by_login.assert_called_with('testuser')
-    user_repo.update_last_login.assert_called_with('507f1f77bcf86cd799439011')
+    user_repo.update_last_login.assert_called_with(test_user.id)
+    rt_repo.create_token.assert_called_with(test_user.id)
+    assert tokens.access_token == 'TestAccessToken'
+    assert tokens.refresh_token == f'{test_user.id}:TestRefreshToken'
+
+
+@pytest.mark.asyncio
+async def test_uc_user_not_found_fail(uc_req):
+    '''Should throw InvalidCredsError if user is not found'''
+    # Create mocks
+    user_repo = mock.Mock(UserRepo)
+    user_repo.get_by_login.return_value = None
+    rt_repo = mock.Mock(RefreshTokenRepo)
+
+    # Call usecase
+    uc = uc_user_login.LoginUseCase(user_repo, rt_repo)
+    tokens = None
+    with pytest.raises(uc_user_login.InvalidCredsError):
+        tokens = await uc.execute(uc_req)
+
+    # Assert results
+    user_repo.get_by_login.assert_called_with('testuser')
+    user_repo.update_last_login.assert_not_called()
+    assert tokens is None
+
+
+@pytest.mark.asyncio
+async def test_uc_invalid_password_fail(uc_req, test_user):
+    '''Should throw InvalidCredsError if invalid password'''
+    # Create mocks
+    user_repo = mock.Mock(UserRepo)
+    user_repo.get_by_login.return_value = test_user
+    rt_repo = mock.Mock(RefreshTokenRepo)
+
+    # Invalidate password
+    uc_req.password = 'InvalidPassword'
+
+    # Call usecase
+    uc = uc_user_login.LoginUseCase(user_repo, rt_repo)
+    tokens = None
+    with pytest.raises(uc_user_login.InvalidCredsError):
+        tokens = await uc.execute(uc_req)
+
+    # Assert results
+    user_repo.get_by_login.assert_called_with('testuser')
+    user_repo.update_last_login.assert_not_called()
+    assert tokens is None
+
+
+@pytest.mark.asyncio
+async def test_uc_user_locked_fail(uc_req, test_user):
+    '''Should throw UserLockedError if user is locked'''
+    # Create mocks
+    user_repo = mock.Mock(UserRepo)
+    test_user.is_locked = True
+    user_repo.get_by_login.return_value = test_user
+    rt_repo = mock.Mock(RefreshTokenRepo)
+
+    # Call usecase
+    uc = uc_user_login.LoginUseCase(user_repo, rt_repo)
+    tokens = None
+    with pytest.raises(uc_user_login.UserLockedError):
+        tokens = await uc.execute(uc_req)
+
+    # Assert results
+    user_repo.get_by_login.assert_called_with('testuser')
+    user_repo.update_last_login.assert_not_called()
+    assert tokens is None

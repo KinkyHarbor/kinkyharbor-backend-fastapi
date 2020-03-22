@@ -1,16 +1,15 @@
 '''User logs in to API'''
 
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 
 from harbor.core import auth
-from harbor.domain.token import AccessToken, RefreshToken
 from harbor.repository.base import UserRepo, RefreshTokenRepo
 
 
 class LoginRequest(BaseModel):
     '''Request for login usecase'''
-    login: str
-    password: str
+    login: constr(min_length=1)
+    password: constr(min_length=1)
 
 
 class LoginResponse(BaseModel):
