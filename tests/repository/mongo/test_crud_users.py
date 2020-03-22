@@ -3,7 +3,7 @@
 import pytest
 
 from harbor.core import settings
-from harbor.domain.user import RegisterUser
+from harbor.use_cases.user.register import RegisterUser
 from harbor.repository.mongo import users
 
 

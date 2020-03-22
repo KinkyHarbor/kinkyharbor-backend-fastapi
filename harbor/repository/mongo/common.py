@@ -1,4 +1,5 @@
 '''This module provides common functions to access the database.'''
+
 from motor import motor_asyncio as motor
 from starlette.requests import Request
 

@@ -19,7 +19,9 @@ from harbor.domain.token import (
     VerificationPurposeEnum as VerifPur,
 )
 from harbor.domain.user import UserFlags
+from harbor.use_cases.user import login as uc_user_login
 from harbor.use_cases.user.register import RegisterUser
+from harbor.repository.base import RepoDict, get_repos
 from harbor.repository.mongo import users, verif_tokens, refresh_tokens
 from harbor.repository.mongo.common import get_db
 
@@ -88,9 +90,9 @@ async def verify_registration(token_secret: RegisterVerifyBody, db: MotorDB = De
     return {'msg': 'Account is verified'}
 
 
-class LoginUser(BaseModel):
+class Credentials(BaseModel):
     '''Basic model for credentials'''
-    username: str
+    login: str
     password: str
 
 
@@ -98,28 +100,26 @@ class LoginUser(BaseModel):
     200: {"model": AccessRefreshTokens},
     401: {"model": Message},
 })
-async def login(creds: LoginUser, db: MotorDB = Depends(get_db)):
+async def login(creds: Credentials, repos: RepoDict = Depends(get_repos)):
     '''Trades username and password for an access token (custom implementation)'''
     try:
-        user = await auth.authenticate_user(db, creds.username, creds.password)
-    except auth.InvalidCredsError:
+        uc = uc_user_login.LoginUseCase(repos['user'], repos['refresh_token'])
+        uc_req = uc_user_login.LoginRequest(
+            login=creds.login,
+            password=creds.password
+        )
+        tokens = await uc.execute(uc_req)
+    except uc_user_login.InvalidCredsError:
         return JSONResponse(
             status_code=HTTP_401_UNAUTHORIZED,
             content={'msg': 'Incorrect username or password'},
         )
-    except auth.UserLockedError:
+    except uc_user_login.UserLockedError:
         return JSONResponse(
             status_code=HTTP_401_UNAUTHORIZED,
             content={'msg': 'User is locked'},
         )
-
-    # Authentication successful
-    access_token = await auth.create_access_token(data={"sub": f'user:{user.id}'})
-    refresh_token = await refresh_tokens.create_token(db, user.id)
-    return AccessRefreshTokens(
-        access_token=access_token,
-        refresh_token=f'{user.id}:{refresh_token.secret}',
-    )
+    return tokens
 
 
 class ReplaceRefreshToken(BaseModel):

@@ -22,14 +22,6 @@ PASSLIB_OPTS = {
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login/token')
 
 
-class InvalidCredsError(Exception):
-    '''Provided credentials are invalid'''
-
-
-class UserLockedError(Exception):
-    '''User is locked'''
-
-
 CREDENTIALS_ERROR = HTTPException(
     status_code=HTTP_401_UNAUTHORIZED,
     detail="Could not validate credentials",
@@ -37,43 +29,16 @@ CREDENTIALS_ERROR = HTTPException(
 )
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password, password_hash):
     '''Verify if password matches hashed password'''
     ctx = CryptContext(**PASSLIB_OPTS)
-    return ctx.verify(plain_password, hashed_password)
+    return ctx.verify(plain_password, password_hash)
 
 
 def get_password_hash(password):
+    '''Generates password hash from password'''
     ctx = CryptContext(**PASSLIB_OPTS)
     return ctx.hash(password)
-
-
-async def authenticate_user(db, username: str, password: str):
-    '''Tries to authenticate a user
-
-    Raises:
-        InvalidCredsError: Provided credentials are invalid
-        UserLockedError: User is locked
-    '''
-    user = await users.get_login(db, username)
-
-    # Check if matching user was found
-    if not user:
-        # Prevent timing attack
-        get_password_hash(password)
-        raise InvalidCredsError()
-
-    # Check if password is correct
-    if not verify_password(password, user.hashed_password):
-        raise InvalidCredsError()
-
-    # Check if user is not locked
-    if user.is_locked:
-        raise UserLockedError()
-
-    # Authentication successful
-    await users.update_last_login(db, user.id)
-    return user
 
 
 async def create_access_token(*, data: dict, expires_delta: timedelta = None):
