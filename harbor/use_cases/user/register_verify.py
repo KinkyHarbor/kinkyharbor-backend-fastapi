@@ -1,4 +1,4 @@
-'''User registers a new account'''
+'''User wants to verify his registration'''
 
 from pydantic import BaseModel, constr
 
