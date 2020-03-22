@@ -66,6 +66,7 @@
 !/harbor/use_cases/user/__init__.py
 !/harbor/use_cases/user/login.py
 !/harbor/use_cases/user/register.py
+!/harbor/use_cases/user/register_verify.py
 !/harbor/use_cases/user/update_profile.py
 !/harbor/use_cases/user/verify.py
 

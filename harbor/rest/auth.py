@@ -21,6 +21,7 @@ from harbor.domain.user import UserFlags
 from harbor.use_cases.user import (
     login as uc_user_login,
     register as uc_user_register,
+    register_verify as uc_user_reg_verify,
 )
 from harbor.repository.base import RepoDict, get_repos
 from harbor.repository.mongo import users, verif_tokens, refresh_tokens
@@ -60,23 +61,32 @@ async def register(req: uc_user_register.RegisterRequest,
 
 class RegisterVerifyBody(BaseModel):
     '''POST model to verify registration'''
-    secret: str
+    secret: constr(min_length=1)
 
 
 @router.post('/register/verify/', response_model=Message)
-async def verify_registration(token_secret: RegisterVerifyBody, db: MotorDB = Depends(get_db)):
-    token = VerifTokenReq(secret=token_secret.secret,
-                          purpose=VerifPur.REGISTER)
-    valid = await verif_tokens.verify_verif_token(db, token)
-    if not valid:
-        raise HTTPException(
-            status_code=HTTP_401_UNAUTHORIZED,
-            detail="Provided token is not valid"
-        )
+async def verify_registration(token_secret: RegisterVerifyBody,
+                              repos: RepoDict = Depends(get_repos)):
+    '''User wants to verify his registration'''
+    # Setup usecase and usecase request
+    uc = uc_user_reg_verify.RegisterVerifyUseCase(
+        user_repo=repos['user'],
+        vt_repo=repos['verif_token'],
+    )
+    uc_req = uc_user_reg_verify.RegisterVerifyRequest(
+        secret=token_secret.secret
+    )
 
-    # Mark account as verified
-    await users.set_flag(db, valid.user_id, UserFlags.VERIFIED, True)
-    return {'msg': 'Account is verified'}
+    try:
+        # Execute usecase
+        uc.execute(uc_req)
+        return {'msg': 'Account is verified'}
+
+    except uc_user_reg_verify.InvalidTokenError:
+        return JSONResponse(
+            status_code=HTTP_409_CONFLICT,
+            content={'msg': 'Provided token is not valid'},
+        )
 
 
 class Credentials(BaseModel):
@@ -116,7 +126,7 @@ class ReplaceRefreshToken(BaseModel):
 
 @router.post('/refresh/', response_model=AccessRefreshTokens, responses={401: {"model": Message}})
 async def refresh(req: ReplaceRefreshToken, db: MotorDB = Depends(get_db)):
-    '''Trades a refresh token to a new access and refresh token'''
+    '''Trades a refresh token to a new access and refresh token (custom implementation)'''
     (user_id, token) = req.refresh_token.split(':')
     old_ref_token = RefreshToken(secret=token, user_id=user_id)
     new_ref_token = await refresh_tokens.replace_token(db, old_ref_token)
