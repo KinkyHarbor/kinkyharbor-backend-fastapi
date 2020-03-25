@@ -1,13 +1,13 @@
 version: "3.7"
 services:
   mongo:
-    container_name: mongo
+    container_name: harbor-mongo
     image: mongo
     ports:
       - "127.0.0.1:27017:27017"
 
   mongo-express:
-    container_name: mongo-express
+    container_name: harbor-mongo-web
     image: mongo-express
     ports:
       - "127.0.0.1:8027:8081"
@@ -15,7 +15,7 @@ services:
       - mongo
 
   smtpd:
-    container_name: smtpd
+    container_name: harbor-smtpd
     image: rnwood/smtp4dev:linux-amd64-v3
     ports:
       - "127.0.0.1:8025:80"
