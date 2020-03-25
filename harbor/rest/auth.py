@@ -207,7 +207,8 @@ async def password_reset(body: PasswordResetBody,
         result = uc.execute(uc_req)
         if result == uc_user_reset_pw_exec.ExecResetPasswordResponse.UPDATED:
             return {'msg': 'Password is updated'}
-        elif result == uc_user_reset_pw_exec.ExecResetPasswordResponse.UPDATED_AND_VERIFIED:
+
+        if result == uc_user_reset_pw_exec.ExecResetPasswordResponse.UPDATED_AND_VERIFIED:
             return {'msg': 'Password is updated and account is verified'}
 
     except uc_user_reset_pw_exec.InvalidTokenError:
