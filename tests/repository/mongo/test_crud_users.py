@@ -3,8 +3,8 @@
 import pytest
 
 from harbor.core import settings
-from harbor.use_cases.user.register import RegisterUser
 from harbor.repository.mongo import users
+from harbor.use_cases.user.register import RegisterRequest
 
 
 settings.MONGO_DATABASE = f'{settings.MONGO_DATABASE}_test'
@@ -14,7 +14,7 @@ settings.MONGO_DATABASE = f'{settings.MONGO_DATABASE}_test'
 @pytest.mark.asyncio
 async def test_register_new_user():
     '''Tests to register and retrieve a new user'''
-    user = RegisterUser(
+    user = RegisterRequest(
         username='pytest',
         email='test@example.com',
         password='test'
