@@ -1,41 +1,27 @@
 '''This module handles all routes for search operations'''
 
-from typing import List
-
 from fastapi import APIRouter, Depends
-from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
-from pydantic import BaseModel
 
 from harbor.core.auth import validate_access_token
 from harbor.domain.token import AccessTokenData
-from harbor.domain.user import BaseUser
-from harbor.repository.mongo import users
-from harbor.repository.mongo.common import get_db
-
+from harbor.repository.base import RepoDict, get_repos
+from harbor.use_cases.search import (
+    generic as uc_gen_search,
+)
 
 router = APIRouter()
 
 
-class SearchResult(BaseModel):
-    '''Result model for generic search'''
-    users: List[BaseUser] = []
-    groups: List = []
-    pages: List = []
-    events: List = []
-
-
-@router.get('/', summary='Search for people, pages, groups and events', response_model=SearchResult)
+@router.get('/',
+            summary='Search for people, pages, groups and events',
+            response_model=uc_gen_search.GenericSearchResponse)
 async def search(q: str,
-                 cat: str = 'all',
                  token_data: AccessTokenData = Depends(validate_access_token),
-                 repos: MotorDB = Depends(get_db)):
+                 repos: RepoDict = Depends(get_repos)):
     '''Search for people, pages, groups and events'''
-    all_cat = cat == 'all'
-    cats = cat.split(',')
-
-    if all_cat or 'user' in cats:
-        user_list = await users.get_search(db, token_data.user_id, q)
-    else:
-        user_list = []
-
-    return SearchResult(users=user_list)
+    uc = uc_gen_search.GenericSearchUseCase(user_repo=repos['user'])
+    uc_req = uc_gen_search.GenericSearchRequest(
+        query=q,
+        user_id=token_data.user_id,
+    )
+    return await uc.execute(uc_req)

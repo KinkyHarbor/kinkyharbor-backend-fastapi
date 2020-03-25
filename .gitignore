@@ -60,7 +60,7 @@
 
 !/harbor/use_cases/search/
 !/harbor/use_cases/search/__init__.py
-!/harbor/use_cases/search/all.py
+!/harbor/use_cases/search/generic.py
 
 !/harbor/use_cases/user/
 !/harbor/use_cases/user/__init__.py
