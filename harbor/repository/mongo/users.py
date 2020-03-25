@@ -48,8 +48,11 @@ class UserMongoRepo(UserRepo):
                          search_string: str,
                          limit: int = 10) -> List[BaseUser]:
         cursor = self.col.find(
-            filter={'username': {'$regex': search_string.lower()},
-                    '_id': {'$not': {'$eq': ObjectId(user_id)}}},
+            filter={
+                'username': {'$regex': search_string.lower()},
+                '_id': {'$not': {'$eq': ObjectId(user_id)}},
+                'is_verified': True,
+            },
             projection={'display_name', 'username'},
             limit=limit,
         )
