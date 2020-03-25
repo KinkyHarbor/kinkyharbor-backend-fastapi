@@ -19,7 +19,7 @@ PASSLIB_OPTS = {
     'deprecated': 'auto',
 }
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login/token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login/token/')
 
 
 CREDENTIALS_ERROR = HTTPException(
