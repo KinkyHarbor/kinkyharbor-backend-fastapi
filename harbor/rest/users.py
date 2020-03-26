@@ -10,7 +10,7 @@ from harbor.domain.token import AccessTokenData
 from harbor.domain.user import User, STRANGER_FIELDS, FRIEND_FIELDS
 from harbor.repository.mongo import users
 from harbor.repository.mongo.common import get_db
-from harbor.use_cases.user.update_profile import UpdateUser
+from harbor.use_cases.user.profile_update import UpdateUser
 
 router = APIRouter()
 

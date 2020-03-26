@@ -12,7 +12,7 @@ from pydantic import parse_obj_as
 from harbor.domain.user import BaseUser, User, UserWithPassword, UserFlags
 from harbor.repository.base import UserRepo
 from harbor.repository.mongo.common import create_db_client
-from harbor.use_cases.user.register import UsernameTakenError
+from harbor.use_cases.auth.register import UsernameTakenError
 
 
 class UserMongoRepo(UserRepo):

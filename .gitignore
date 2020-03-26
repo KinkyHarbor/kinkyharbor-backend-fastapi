@@ -58,20 +58,24 @@
 !/harbor/use_cases/
 !/harbor/use_cases/__init__.py
 
+!/harbor/use_cases/auth/
+!/harbor/use_cases/auth/__init__.py
+!/harbor/use_cases/auth/login.py
+!/harbor/use_cases/auth/register.py
+!/harbor/use_cases/auth/register_verify.py
+!/harbor/use_cases/auth/reset_password_exec.py
+!/harbor/use_cases/auth/reset_password_req.py
+!/harbor/use_cases/auth/token_refresh.py
+!/harbor/use_cases/auth/update_profile.py
+
 !/harbor/use_cases/search/
 !/harbor/use_cases/search/__init__.py
 !/harbor/use_cases/search/generic.py
 
 !/harbor/use_cases/user/
 !/harbor/use_cases/user/__init__.py
-!/harbor/use_cases/user/login.py
-!/harbor/use_cases/user/register.py
-!/harbor/use_cases/user/register_verify.py
-!/harbor/use_cases/user/reset_password_exec.py
-!/harbor/use_cases/user/reset_password_req.py
-!/harbor/use_cases/user/token_refresh.py
-!/harbor/use_cases/user/update_profile.py
-!/harbor/use_cases/user/verify.py
+!/harbor/use_cases/user/profile_get.py
+!/harbor/use_cases/user/profile_update.py
 
 !/jwt-keys/
 !/jwt-keys/.gitkeep
@@ -100,13 +104,13 @@
 !/tests/use_cases/
 !/tests/use_cases/__init__.py
 
+!/tests/use_cases/auth/
+!/tests/use_cases/auth/__init__.py
+!/tests/use_cases/auth/test_login.py
+!/tests/use_cases/auth/test_register.py
+!/tests/use_cases/auth/test_update_profile.py
+!/tests/use_cases/auth/test_verify.py
+
 !/tests/use_cases/search/
 !/tests/use_cases/search/__init__.py
 !/tests/use_cases/search/test_all.py
-
-!/tests/use_cases/user/
-!/tests/use_cases/user/__init__.py
-!/tests/use_cases/user/test_login.py
-!/tests/use_cases/user/test_register.py
-!/tests/use_cases/user/test_update_profile.py
-!/tests/use_cases/user/test_verify.py

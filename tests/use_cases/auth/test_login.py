@@ -7,7 +7,7 @@ import pytest
 from harbor.domain.token import RefreshToken
 from harbor.domain.user import UserWithPassword
 from harbor.repository.base import UserRepo, RefreshTokenRepo
-from harbor.use_cases.user import login as uc_user_login
+from harbor.use_cases.auth import login as uc_user_login
 
 
 @pytest.fixture(name='uc_req')

@@ -7,7 +7,7 @@ from starlette.testclient import TestClient
 
 from harbor.app import app
 from harbor.repository.base import get_repos
-from harbor.use_cases.user import login as uc
+from harbor.use_cases.auth import login as uc
 
 
 def get_repos_override():

@@ -10,7 +10,7 @@ from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message
 from harbor.domain.email import EmailAddress
 from harbor.domain.token import AccessToken, AccessRefreshTokens
 from harbor.repository.base import RepoDict, get_repos
-from harbor.use_cases.user import (
+from harbor.use_cases.auth import (
     login as uc_user_login,
     register as uc_user_register,
     register_verify as uc_user_reg_verify,

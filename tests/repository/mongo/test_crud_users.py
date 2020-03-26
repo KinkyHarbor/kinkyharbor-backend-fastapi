@@ -4,7 +4,7 @@ import pytest
 
 from harbor.core import settings
 from harbor.repository.mongo import users
-from harbor.use_cases.user.register import RegisterRequest
+from harbor.use_cases.auth.register import RegisterRequest
 
 
 settings.MONGO_DATABASE = f'{settings.MONGO_DATABASE}_test'
