@@ -8,6 +8,7 @@ from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.repository import base as repo_base
 from harbor.repository.base import UserRepo, VerifTokenRepo
 
+
 class RegisterRequest(BaseModel):
     '''Required form data for registering a user'''
     username: DisplayNameStr

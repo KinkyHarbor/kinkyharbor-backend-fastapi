@@ -4,25 +4,37 @@ from starlette.responses import JSONResponse
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
 
-from harbor.core.auth import validate_access_token, get_current_active_user
+from harbor.core.auth import validate_access_token
 from harbor.domain.common import Message
 from harbor.domain.token import AccessTokenData
-from harbor.domain.user import User, STRANGER_FIELDS, FRIEND_FIELDS
-from harbor.repository.mongo import users
+from harbor.domain.user import User
+from harbor.repository.base import RepoDict, get_repos
 from harbor.repository.mongo.common import get_db
-from harbor.use_cases.user.profile_update import UpdateUser
+from harbor.use_cases.user import (
+    profile_get as uc_get_profile,
+    profile_update as uc_update_profile,
+)
 
 router = APIRouter()
 
 
-@router.get('/me/', summary='Get own user data', response_model=User, response_model_by_alias=True)
-async def get_user_me(current_user: User = Depends(get_current_active_user)):
+@router.get('/me/',
+            summary='Get own user data',
+            response_model=uc_get_profile.GetProfileResponse,
+            response_model_by_alias=True)
+async def get_user_me(token_data: AccessTokenData = Depends(validate_access_token),
+                      repos: RepoDict = Depends(get_repos)):
     '''Get your own user data.'''
-    return current_user.dict()
+    uc = uc_get_profile.GetProfileUsercase(user_repo=repos['user'])
+    uc_req = uc_get_profile.GetProfileByIDRequest(
+        requester=token_data.user_id,
+        user_id=token_data.user_id,
+    )
+    return await uc.execute(uc_req)
 
 
 @router.patch('/me/', summary='Set own user data', response_model=User)
-async def set_user_me(user_info: UpdateUser,
+async def set_user_me(user_info: uc_update_profile.UpdateUser,
                       token_data: AccessTokenData = Depends(
                           validate_access_token),
                       db: MotorDB = Depends(get_db)):
@@ -34,25 +46,24 @@ async def set_user_me(user_info: UpdateUser,
 @router.get(
     '/{username}/',
     summary='Get user profile of a single user',
-    response_model=User,
+    response_model=uc_get_profile.GetProfileResponse,
     responses={404: {"model": Message}}
 )
 async def get_user(username: str,
                    token_data: AccessTokenData = Depends(
                        validate_access_token),
-                   db: MotorDB = Depends(get_db)):
+                   repos: RepoDict = Depends(get_repos)):
     '''Get a user profile'''
-    user = await users.get_by_username(db, username)
-    if not user:
+    uc = uc_get_profile.GetProfileUsercase(user_repo=repos['user'])
+    uc_req = uc_get_profile.GetProfileByUsernameRequest(
+        requester=token_data.user_id,
+        username=username,
+    )
+
+    try:
+        return await uc.execute(uc_req)
+    except uc_get_profile.UserNotFoundError:
         return JSONResponse(
             status_code=404,
             content='User not found',
         )
-
-    is_friend = token_data.user_id in user.friends
-    include_fields = FRIEND_FIELDS if is_friend else STRANGER_FIELDS
-
-    return {
-        'isFriend': is_friend,
-        'user': user.dict(include=include_fields),
-    }

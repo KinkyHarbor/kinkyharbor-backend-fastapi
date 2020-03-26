@@ -5,14 +5,11 @@ from datetime import datetime, timedelta
 import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_401_UNAUTHORIZED
 from passlib.context import CryptContext
 
 from harbor.core import settings
-from harbor.domain.user import User
 from harbor.domain.token import AccessTokenData
-from harbor.repository.mongo import users
-from harbor.repository.mongo.common import get_db
 
 PASSLIB_OPTS = {
     'schemes': ['bcrypt'],
@@ -70,27 +67,3 @@ async def validate_access_token(token: str = Depends(oauth2_scheme)) -> AccessTo
         return AccessTokenData(user_id=user_id)
     except jwt.PyJWTError:
         raise CREDENTIALS_ERROR
-
-
-async def get_current_user(db=Depends(get_db),
-                           token_data: str = Depends(validate_access_token)) -> User:
-    '''Get current user from User ID in token
-
-    Raises
-        CREDENTIALS_ERROR: User not found
-    '''
-    user = await users.get(db, token_data.user_id)
-    if user is None:
-        raise CREDENTIALS_ERROR
-    return user
-
-
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
-    '''Get user if not locked
-
-    Raises
-        HTTPException: User is locked
-    '''
-    if current_user.is_locked:
-        raise HTTPException(HTTP_400_BAD_REQUEST, detail="User is locked")
-    return current_user
