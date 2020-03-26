@@ -39,6 +39,8 @@ class RefreshTokenRepo(Repo):
             None: Token is invalid
         '''
 
+class UsernameTakenError(Exception):
+    '''Username is already taken'''
 
 class UserRepo(Repo):
     '''Repository for users'''
@@ -68,7 +70,7 @@ class UserRepo(Repo):
         '''Add a new user
 
         Raises:
-            DuplicateKeyError: Either username or email is already in use
+            UsernameTakenError: Username is already in use
         '''
 
     @abstractmethod

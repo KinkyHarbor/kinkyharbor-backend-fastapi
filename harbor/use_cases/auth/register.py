@@ -5,8 +5,8 @@ from pydantic import BaseModel, EmailStr, validator, Field
 from harbor.core import auth, email, settings
 from harbor.domain.common import DisplayNameStr, StrongPasswordStr
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
+from harbor.repository import base as repo_base
 from harbor.repository.base import UserRepo, VerifTokenRepo
-
 
 class RegisterRequest(BaseModel):
     '''Required form data for registering a user'''
@@ -69,12 +69,15 @@ class RegisterUseCase:
             raise UsernameReservedError()
 
         # Create a new user in the database
-        # This call might raise UsernameTakenError
-        user = await self.user_repo.add(
-            display_name=req.username,
-            email=req.email,
-            password_hash=auth.get_password_hash(req.password)
-        )
+        try:
+            user = await self.user_repo.add(
+                display_name=req.username,
+                email=req.email,
+                password_hash=auth.get_password_hash(req.password)
+            )
+        except repo_base.UsernameTakenError:
+            # Translate error
+            raise UsernameTakenError
 
         # Send mail to user
         recipient = email.get_address(req.username, req.email)
