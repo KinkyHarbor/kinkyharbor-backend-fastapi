@@ -1,8 +1,8 @@
 '''This module handles all routes for user operations'''
 
-from starlette.responses import JSONResponse
 from fastapi import APIRouter, Depends
-from motor.motor_asyncio import AsyncIOMotorDatabase as MotorDB
+from pydantic import BaseModel
+from starlette.responses import JSONResponse
 
 from harbor.core.auth import validate_access_token
 from harbor.domain.common import Message
@@ -19,7 +19,7 @@ router = APIRouter()
 
 
 @router.get('/me/',
-            summary='Get own user data',
+            summary='Get own profile',
             response_model=uc_get_profile.GetProfileResponse,
             response_model_by_alias=True)
 async def get_user_me(token_data: AccessTokenData = Depends(validate_access_token),
@@ -33,14 +33,24 @@ async def get_user_me(token_data: AccessTokenData = Depends(validate_access_toke
     return await uc.execute(uc_req)
 
 
-@router.patch('/me/', summary='Set own user data', response_model=User)
-async def set_user_me(user_info: uc_update_profile.UpdateUser,
+class ProfileUpdate(BaseModel):
+    '''Input to update user profile'''
+    bio: str = None
+    gender: str = None
+
+
+@router.patch('/me/', summary='Update own profile', response_model=User)
+async def set_user_me(profile: ProfileUpdate,
                       token_data: AccessTokenData = Depends(
                           validate_access_token),
-                      db: MotorDB = Depends(get_db)):
+                      repos: RepoDict = Depends(get_repos)):
     '''Set your own user data.'''
-    user = await users.set_info(db, token_data.user_id, user_info)
-    return {'user': user.dict()}
+    uc = uc_update_profile.UpdateProfileUsercase(user_repo=repos['user'])
+    uc_req = uc_update_profile.UpdateProfileRequest(
+        user_id=token_data.user_id,
+        **profile.dict(),
+    )
+    return await uc.execute(uc_req)
 
 
 @router.get(

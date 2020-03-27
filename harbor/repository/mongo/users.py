@@ -98,7 +98,7 @@ class UserMongoRepo(UserRepo):
     async def set_info(self, user_id: str, user_info: Dict) -> User:
         user_dict = await self.col.find_one_and_update(
             {'_id': ObjectId(user_id)},
-            {'$set': user_info.dict()},
+            {'$set': user_info},
             return_document=ReturnDocument.AFTER,
         )
         return User(**user_dict)
