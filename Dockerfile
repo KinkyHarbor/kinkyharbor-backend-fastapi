@@ -1,8 +1,10 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
 
+# Setup ENV
+ENV MODULE_NAME harbor.app
+
 # Copy Harbor into container
-COPY ./app /app/
+COPY . /app/
 
 # Install dependencies
-COPY requirements.txt /
-RUN pip install -r /requirements.txt
+RUN pip install -r /app/requirements.txt

@@ -1,0 +1,30 @@
+# Generic
+wheel
+pylint
+autopep8
+
+# FastAPI
+uvicorn
+fastapi
+python-multipart
+
+# Pydantic
+email_validator
+
+# Database
+motor
+
+# JWT
+pyjwt[crypto]
+passlib[bcrypt]
+aiofiles
+
+# Tests
+pytest
+pytest-asyncio
+pytest-cov
+pytest-env
+requests
+
+# Email
+aiosmtplib
