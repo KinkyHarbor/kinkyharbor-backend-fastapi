@@ -8,12 +8,14 @@ from pydantic import BaseModel, Field
 
 
 class DisplayNameStr(str):
+    '''Display name of a user'''
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
 
     @classmethod
     def validate(cls, name):
+        '''Check if display name matches criteria'''
         if len(name) > 40:
             raise ValueError("Name is too long. Max 40 characters allowed.")
 
@@ -63,21 +65,25 @@ class StrongPasswordStr(str):
 
 
 class ObjectIdStr(str):
+    '''String containing a MongoDB ObjectID'''
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
 
     @classmethod
     def validate(cls, object_id: Union[str, ObjectId]):
+        '''Check if string is a valid ObjectID'''
         if not ObjectId.is_valid(str(object_id)):
             return ValueError(f"Not a valid ObjectId: {object_id}")
         return str(object_id)
 
 
 class DBModelMixin(BaseModel):
+    '''Mixin to add an ID to a Pydantic model'''
     id: Optional[ObjectIdStr] = Field(None, alias="_id")
 
     class Config:
+        '''Configuration of DBModelMixin'''
         allow_population_by_field_name = True
         json_encoders = {ObjectId: str}
 

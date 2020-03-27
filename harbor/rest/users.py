@@ -9,7 +9,6 @@ from harbor.domain.common import Message
 from harbor.domain.token import AccessTokenData
 from harbor.domain.user import User
 from harbor.repository.base import RepoDict, get_repos
-from harbor.repository.mongo.common import get_db
 from harbor.use_cases.user import (
     profile_get as uc_get_profile,
     profile_update as uc_update_profile,

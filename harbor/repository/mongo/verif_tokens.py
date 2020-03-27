@@ -2,7 +2,6 @@
 
 from pymongo import ReturnDocument
 
-from harbor.domain.common import ObjectIdStr
 from harbor.domain.token import VerificationToken, VerificationTokenRequest
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.repository.base import VerifTokenRepo

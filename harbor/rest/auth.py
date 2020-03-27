@@ -4,10 +4,9 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel, Field, constr
+from pydantic import BaseModel, constr, EmailStr, Field
 
 from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message
-from harbor.domain.email import EmailAddress
 from harbor.domain.token import AccessToken, AccessRefreshTokens
 from harbor.repository.base import RepoDict, get_repos
 from harbor.use_cases.auth import (
@@ -167,8 +166,13 @@ async def login_for_access_token(creds: OAuth2PasswordRequestForm = Depends(),
         )
 
 
+class FormRequestPasswordReset(BaseModel):
+    '''Form to request a password reset'''
+    email: EmailStr
+
+
 @router.post("/login/request-password-reset/", response_model=Message)
-async def request_password_reset(address: EmailAddress,
+async def request_password_reset(form: FormRequestPasswordReset,
                                  background_tasks: BackgroundTasks,
                                  repos: RepoDict = Depends(get_repos)):
     '''User requests a password reset'''
@@ -178,7 +182,7 @@ async def request_password_reset(address: EmailAddress,
         background_tasks=background_tasks,
     )
     uc_req = uc_user_reset_pw_req.RequestPasswordResetRequest(
-        email=address
+        email=form.email
     )
     await uc.execute(uc_req)
     return {'msg': 'Verification mail sent, if email is linked to an existing user'}

@@ -14,6 +14,7 @@ class GenericSearchRequest(BaseModel):
     query: constr(min_length=1)
     user_id: ObjectIdStr
 
+
 class GenericSearchResponse(BaseModel):
     '''Result of generic search'''
     users: List[BaseUser]
