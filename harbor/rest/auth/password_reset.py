@@ -40,8 +40,8 @@ async def request_password_reset(form: FormRequestPasswordReset,
     return {'msg': 'Verification mail sent, if email is linked to an existing user'}
 
 
-class PasswordResetBody(BaseModel):
-    '''POST model to reset password'''
+class FormPasswordReset(BaseModel):
+    '''Form to execute a password reset'''
     user_id: ObjectIdStr
     token: str
     password: StrongPasswordStr
@@ -50,19 +50,17 @@ class PasswordResetBody(BaseModel):
 @router.post("/login/password-reset/",
              summary='Execute password reset',
              response_model=Message)
-async def password_reset(body: PasswordResetBody,
-                         repos: RepoDict = Depends(get_repos)):
+async def exec_password_reset(form: FormPasswordReset,
+                              repos: RepoDict = Depends(get_repos)):
     '''Verifies password reset token and sets new password'''
     uc = uc_user_reset_pw_exec.ExecResetPasswordUseCase(
         user_repo=repos['user'],
         vt_repo=repos['verif_token'],
     )
-    uc_req = uc_user_reset_pw_exec.ExecResetPasswordRequest(
-        **body
-    )
+    uc_req = uc_user_reset_pw_exec.ExecPasswordResetRequest(**form.dict())
 
     try:
-        result = uc.execute(uc_req)
+        result = await uc.execute(uc_req)
         if result == uc_user_reset_pw_exec.ExecResetPasswordResponse.UPDATED:
             return {'msg': 'Password is updated'}
 
@@ -72,5 +70,5 @@ async def password_reset(body: PasswordResetBody,
     except uc_user_reset_pw_exec.InvalidTokenError:
         return JSONResponse(
             status_code=HTTP_401_UNAUTHORIZED,
-            content={'msg': 'Provided token is not valid'}
+            content={'msg': 'Provided token is invalid'}
         )
