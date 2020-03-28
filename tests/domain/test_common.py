@@ -160,7 +160,7 @@ def test_success_objectidstr_valid_id(obj_id):
 def test_fail_objectidstr_invalid_id(obj_id):
     '''Should return ValueError (too short and not hex)'''
     with pytest.raises(ValidationError) as info:
-        model = ObjectIdStrModel(obj_id=obj_id)
+        ObjectIdStrModel(obj_id=obj_id)
     err = info.value.errors()[0]
     assert err['type'] == 'value_error'
     assert "invalid" in err['msg'].lower()
