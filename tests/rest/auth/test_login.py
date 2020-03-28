@@ -1,4 +1,4 @@
-'''Test generic behavior'''
+'''Unit tests for Auth Login rest api'''
 
 from unittest import mock
 

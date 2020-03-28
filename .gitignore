@@ -112,7 +112,10 @@
 !/tests/rest/
 !/tests/rest/__init__.py
 !/tests/rest/test_app.py
-!/tests/rest/test_auth.py
+
+!/tests/rest/auth/
+!/tests/rest/auth/__init__.py
+!/tests/rest/auth/test_login.py
 
 !/tests/use_cases/
 !/tests/use_cases/__init__.py
