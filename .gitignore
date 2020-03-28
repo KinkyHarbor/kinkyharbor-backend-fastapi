@@ -109,6 +109,7 @@
 !/tests/use_cases/auth/__init__.py
 !/tests/use_cases/auth/test_login.py
 !/tests/use_cases/auth/test_register.py
+!/tests/use_cases/auth/test_register_verify.py
 !/tests/use_cases/auth/test_update_profile.py
 !/tests/use_cases/auth/test_verify.py
 

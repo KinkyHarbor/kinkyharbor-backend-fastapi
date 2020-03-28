@@ -24,6 +24,7 @@ pytest
 pytest-asyncio
 pytest-cov
 pytest-env
+pytest-freezegun
 requests
 
 # Email
