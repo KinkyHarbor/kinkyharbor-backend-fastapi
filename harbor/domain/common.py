@@ -1,10 +1,11 @@
 '''This module contains reusable fields and mixins'''
 
 import re
+from datetime import datetime
 from typing import Optional, Union, Dict, Any
-from bson.objectid import ObjectId
 
-from pydantic import BaseModel, Field
+from bson.objectid import ObjectId
+from pydantic import BaseModel, Field, validator
 
 
 class StrictBoolTrue(int):
@@ -109,6 +110,17 @@ class DBModelMixin(BaseModel):
         '''Configuration of DBModelMixin'''
         allow_population_by_field_name = True
         json_encoders = {ObjectId: str}
+
+
+class CreatedOnMixin(BaseModel):
+    '''Mixin to add a created on date'''
+    created_on: datetime = None
+
+    @validator('created_on', always=True)
+    @classmethod
+    def set_created_on(cls, created_on):
+        '''Set Created On if not filled'''
+        return created_on or datetime.utcnow()
 
 
 class Message(BaseModel):

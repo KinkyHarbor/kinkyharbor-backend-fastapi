@@ -93,6 +93,8 @@
 !/tests/domain/
 !/tests/domain/__init__.py
 !/tests/domain/test_common.py
+!/tests/domain/test_token.py
+!/tests/domain/test_user.py
 
 !/tests/repository/
 !/tests/repository/__init__.py

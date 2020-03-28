@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, constr
 
-from harbor.domain.token import VerificationTokenRequest as VerifTokenReq
+from harbor.domain.token import TokenVerifyRequest as VerifTokenReq
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.domain.user import UserFlags
 from harbor.repository.base import UserRepo, VerifTokenRepo

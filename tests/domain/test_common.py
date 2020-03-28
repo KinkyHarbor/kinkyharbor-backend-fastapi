@@ -1,4 +1,7 @@
 '''Unit tests for common domain'''
+# pylint: disable=unused-argument
+
+from datetime import datetime
 
 import pytest
 from pydantic import BaseModel, ValidationError
@@ -140,10 +143,10 @@ def test_fail_strongpwstr_no_digit():
     assert err['type'] == 'value_error'
     assert "digit" in err['msg'].lower()
 
+
 # ================================
 # =          ObjectIdStr         =
 # ================================
-
 
 class ObjectIdStrModel(BaseModel):
     '''Model to test ObjectIdStr'''
@@ -164,3 +167,20 @@ def test_fail_objectidstr_invalid_id(obj_id):
     err = info.value.errors()[0]
     assert err['type'] == 'value_error'
     assert "invalid" in err['msg'].lower()
+
+
+# ================================
+# =        CreatedOnMixin        =
+# ================================
+
+def test_success_createdonmixin_createdon_filled():
+    '''Values should stay the same if provided'''
+    test_dt = datetime(2020, 3, 28, 17, 42)
+    created_mixin = common.CreatedOnMixin(created_on=test_dt)
+    assert created_mixin.created_on == test_dt
+
+
+def test_success_createdonmixin_createdon_empty(freezer):
+    '''Should automatically store current datetime'''
+    created_mixin = common.CreatedOnMixin()
+    assert created_mixin.created_on == datetime.utcnow()

@@ -17,7 +17,7 @@ class BaseUser(DBModelMixin):
     @validator('username', pre=True, always=True)
     @classmethod
     def lowercase_display_name(cls, _, values):
-        '''Converts display name to lowercase for username'''
+        '''Username should match lowercase display name'''
         return values['display_name'].lower()
 
 

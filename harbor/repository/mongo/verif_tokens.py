@@ -2,7 +2,7 @@
 
 from pymongo import ReturnDocument
 
-from harbor.domain.token import VerificationToken, VerificationTokenRequest
+from harbor.domain.token import VerificationToken, TokenVerifyRequest
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.repository.base import VerifTokenRepo
 from harbor.repository.mongo.common import create_db_client
@@ -23,7 +23,7 @@ class VerifTokenMongoRepo(VerifTokenRepo):
         await self.col.create_index('created_on', expireAfterSeconds=3600)
 
     async def create_verif_token(self, user_id: str, purpose: VerifPur) -> VerificationToken:
-        token_req = VerificationTokenRequest(user_id=user_id, purpose=purpose)
+        token_req = TokenVerifyRequest(user_id=user_id, purpose=purpose)
         token_dict = await self.col.find_one_and_update(
             {'user_id': user_id, 'purpose': purpose},
             {'$set': token_req.dict()},
@@ -32,7 +32,7 @@ class VerifTokenMongoRepo(VerifTokenRepo):
         )
         return VerificationToken(**token_dict)
 
-    async def verify_verif_token(self, token: VerificationTokenRequest) -> VerificationToken:
+    async def verify_verif_token(self, token: TokenVerifyRequest) -> VerificationToken:
         db_token_dict = await self.col.find_one({'secret': token.secret})
         if db_token_dict:
             # Don't touch tokens which don't belong to the user

@@ -7,7 +7,7 @@ import pytest
 
 from harbor.domain.token import (
     VerificationToken,
-    VerificationTokenRequest as VerifReq,
+    TokenVerifyRequest as VerifReq,
     VerificationPurposeEnum as VerifPur,
 )
 from harbor.domain.user import User, UserFlags
@@ -37,6 +37,7 @@ def fixture_test_verif_token():
     '''Returns a verification token'''
     return VerificationToken(
         id='507f1f77bcf86cd799439000',
+        secret='-qEfNMazB8jg67-EMTZP_gKBok18952RCbrfhyCudOM',
         purpose=VerifPur.REGISTER,
         user_id='507f1f77bcf86cd799439111',
     )
