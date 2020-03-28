@@ -1,6 +1,8 @@
 {
   "python.pythonPath": "env/bin/python",
-  "python.autoComplete.extraPaths": ["./app"],
+  "python.autoComplete.extraPaths": [
+    "./app"
+  ],
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": true,
   "files.exclude": {
@@ -11,6 +13,7 @@
   "python.testing.nosetestsEnabled": false,
   "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": [
+    "-n4",
     "tests"
   ]
 }
