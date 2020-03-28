@@ -36,6 +36,9 @@ class DisplayNameStr(str):
     @classmethod
     def validate(cls, name):
         '''Check if display name matches criteria'''
+        if len(name) < 1:
+            raise ValueError("Name can't be empty.")
+
         if len(name) > 40:
             raise ValueError("Name is too long. Max 40 characters allowed.")
 
