@@ -14,7 +14,7 @@ class BaseUser(DBModelMixin):
     display_name: DisplayNameStr
     username: str = None
 
-    @validator('username', pre=True, always=True)
+    @validator('username', always=True)
     @classmethod
     def lowercase_display_name(cls, _, values):
         '''Username should match lowercase display name'''
