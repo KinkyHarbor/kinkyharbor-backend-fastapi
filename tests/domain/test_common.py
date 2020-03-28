@@ -139,3 +139,28 @@ def test_fail_strongpwstr_no_digit():
     err = info.value.errors()[0]
     assert err['type'] == 'value_error'
     assert "digit" in err['msg'].lower()
+
+# ================================
+# =          ObjectIdStr         =
+# ================================
+
+
+class ObjectIdStrModel(BaseModel):
+    '''Model to test ObjectIdStr'''
+    obj_id: common.ObjectIdStr
+
+
+@pytest.mark.parametrize("obj_id", ['5e7f656765f1b64f3f7f69f2', '507f191e810c19729de860ea'])
+def test_success_objectidstr_valid_id(obj_id):
+    '''Should return no error'''
+    ObjectIdStrModel(obj_id=obj_id)
+
+
+@pytest.mark.parametrize("obj_id", ['5e7f656765f1b64f3f7f69f', '507f191e810c19729de860ez'])
+def test_fail_objectidstr_invalid_id(obj_id):
+    '''Should return ValueError (too short and not hex)'''
+    with pytest.raises(ValidationError) as info:
+        model = ObjectIdStrModel(obj_id=obj_id)
+    err = info.value.errors()[0]
+    assert err['type'] == 'value_error'
+    assert "invalid" in err['msg'].lower()

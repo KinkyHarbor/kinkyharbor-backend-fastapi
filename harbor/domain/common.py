@@ -97,7 +97,7 @@ class ObjectIdStr(str):
     def validate(cls, object_id: Union[str, ObjectId]):
         '''Check if string is a valid ObjectID'''
         if not ObjectId.is_valid(str(object_id)):
-            return ValueError(f"Not a valid ObjectId: {object_id}")
+            raise ValueError(f"Invalid ObjectId: {object_id}")
         return str(object_id)
 
 
