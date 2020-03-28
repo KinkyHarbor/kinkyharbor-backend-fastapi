@@ -1,9 +1,9 @@
-name: Docker Image CI
+name: Build latest Docker image
 
 on:
   push:
     branches:
-      - master
+      - development
 
 jobs:
   build:
@@ -11,6 +11,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.8"
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: |
+          pytest
+
       - name: Build & Push to Docker Hub
         uses: opspresso/action-docker@master
         with:

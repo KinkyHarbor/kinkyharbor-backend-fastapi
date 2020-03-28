@@ -18,7 +18,8 @@
 
 !/.github/
 !/.github/workflows/
-!/.github/workflows/docker-hub.yml
+!/.github/workflows/docker-latest.yml
+!/.github/workflows/docker-stable.yml
 
 !/harbor/
 !/harbor/__init__.py
