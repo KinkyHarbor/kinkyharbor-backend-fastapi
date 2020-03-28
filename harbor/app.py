@@ -19,7 +19,11 @@ from harbor.rest import (
 
 
 # Start app
-app = FastAPI()
+app = FastAPI(
+    title='Kinky Harbor',
+    description='Welcome to Kinky Harbor! Your safe harbor.',
+    version='alpha',
+)
 
 # Add routers
 # Auth

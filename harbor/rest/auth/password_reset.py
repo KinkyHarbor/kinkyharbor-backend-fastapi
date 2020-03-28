@@ -21,7 +21,9 @@ class FormRequestPasswordReset(BaseModel):
     email: EmailStr
 
 
-@router.post("/login/request-password-reset/", response_model=Message)
+@router.post("/login/request-password-reset/",
+             summary='Request password reset (mail reset link)',
+             response_model=Message)
 async def request_password_reset(form: FormRequestPasswordReset,
                                  background_tasks: BackgroundTasks,
                                  repos: RepoDict = Depends(get_repos)):
@@ -45,7 +47,9 @@ class PasswordResetBody(BaseModel):
     password: StrongPasswordStr
 
 
-@router.post("/login/password-reset/", response_model=Message)
+@router.post("/login/password-reset/",
+             summary='Execute password reset',
+             response_model=Message)
 async def password_reset(body: PasswordResetBody,
                          repos: RepoDict = Depends(get_repos)):
     '''Verifies password reset token and sets new password'''

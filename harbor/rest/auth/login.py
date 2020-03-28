@@ -21,7 +21,10 @@ class Credentials(BaseModel):
     password: constr(min_length=1)
 
 
-@router.post('/login/', response_model=AccessRefreshTokens, responses={401: {"model": Message}})
+@router.post('/login/',
+             summary='Login (custom implementation)',
+             response_model=AccessRefreshTokens,
+             responses={401: {"model": Message}})
 async def login(creds: Credentials, repos: RepoDict = Depends(get_repos)):
     '''Trades username and password for an access token (custom implementation)'''
     try:
@@ -45,7 +48,9 @@ async def login(creds: Credentials, repos: RepoDict = Depends(get_repos)):
         )
 
 
-@router.post("/login/token/", summary='oauth2 password grant flow', response_model=AccessToken)
+@router.post("/login/token/",
+             summary='OAuth 2.0 password grant flow',
+             response_model=AccessToken)
 async def login_for_access_token(creds: OAuth2PasswordRequestForm = Depends(),
                                  repos: RepoDict = Depends(get_repos)):
     '''Trades username and password for an access token (oauth2: password grant)'''

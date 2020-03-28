@@ -18,9 +18,12 @@ class ReplaceRefreshToken(BaseModel):
     refresh_token: str
 
 
-@router.post('/refresh/', response_model=AccessRefreshTokens, responses={401: {"model": Message}})
+@router.post('/refresh/',
+             summary='Refresh tokens (custom implementation)',
+             response_model=AccessRefreshTokens,
+             responses={401: {"model": Message}})
 async def refresh(req: ReplaceRefreshToken, repos: RepoDict = Depends(get_repos)):
-    '''Trades a refresh token to a new access and refresh token (custom implementation)'''
+    '''Trades a refresh token for a new access and refresh token (custom implementation)'''
     uc = uc_token_refresh.TokenRefreshUseCase(rt_repo=repos['refresh_token'])
     uc_req = uc_token_refresh.TokenRefreshRequest(
         refresh_token=req.refresh_token

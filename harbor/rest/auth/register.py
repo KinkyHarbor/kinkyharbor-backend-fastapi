@@ -51,11 +51,14 @@ class FormRegister(BaseModel):
         return True
 
 
-@router.post('/register/', response_model=Message, responses={409: {"model": Message}})
+@router.post('/register/',
+             summary='Register and mail verification link',
+             response_model=Message,
+             responses={409: {"model": Message}})
 async def register(form: FormRegister,
                    background_tasks: BackgroundTasks,
                    repos: RepoDict = Depends(get_repos)):
-    '''Register a new user'''
+    '''Register a new user and send verification link'''
     uc = uc_user_register.RegisterUseCase(
         repos['user'],
         repos['verif_token'],
@@ -87,7 +90,9 @@ class RegisterVerifyBody(BaseModel):
     secret: constr(min_length=1)
 
 
-@router.post('/register/verify/', response_model=Message)
+@router.post('/register/verify/',
+             summary='Execute registration verification',
+             response_model=Message)
 async def verify_registration(token_secret: RegisterVerifyBody,
                               repos: RepoDict = Depends(get_repos)):
     '''User wants to verify his registration'''
