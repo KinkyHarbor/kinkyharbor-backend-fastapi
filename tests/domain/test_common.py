@@ -5,10 +5,10 @@ from pydantic import BaseModel, ValidationError
 
 from harbor.domain import common
 
+
 # ================================
 # =        StrictBoolTrue        =
 # ================================
-
 
 class StrictBoolTrueModel(BaseModel):
     '''Model to test StrictBool'''
@@ -81,3 +81,61 @@ def test_fail_displaynamestr_invalid_chars(name):
     err = info.value.errors()[0]
     assert err['type'] == 'value_error'
     assert "invalid" in err['msg'].lower()
+
+
+# ================================
+# =       StrongPasswordStr      =
+# ================================
+
+class StrongPasswordStrModel(BaseModel):
+    '''Model to test StrongPasswordStr'''
+    passwd: common.StrongPasswordStr
+
+
+@pytest.mark.parametrize("name_len", [16, 100, 10000])
+def test_success_strongpwstr_valid_passphrase(name_len):
+    '''Should accept any passphrase (min 16 chars)'''
+    StrongPasswordStrModel(passwd="T"*name_len)
+
+
+@pytest.mark.parametrize("name", ["TestPass1", "Secure12", "123HaRbOr"])
+def test_success_strongpwstr_valid_password(name):
+    '''Should accept valid passwords'''
+    StrongPasswordStrModel(passwd=name)
+
+
+@pytest.mark.parametrize("pass_len", [1, 7])
+def test_fail_strongpwstr_too_short(pass_len):
+    '''Should return ValueError as password requires at least 8 chars'''
+    with pytest.raises(ValidationError) as info:
+        StrongPasswordStrModel(passwd="T"*pass_len)
+    err = info.value.errors()[0]
+    assert err['type'] == 'value_error'
+    assert "too short" in err['msg'].lower()
+
+
+def test_fail_strongpwstr_no_uppercase():
+    '''Should return ValueError as password requires at least 1 upper case char'''
+    with pytest.raises(ValidationError) as info:
+        StrongPasswordStrModel(passwd="insecure123")
+    err = info.value.errors()[0]
+    assert err['type'] == 'value_error'
+    assert "upper case" in err['msg'].lower()
+
+
+def test_fail_strongpwstr_no_lowercase():
+    '''Should return ValueError as password requires at least 1 lower case char'''
+    with pytest.raises(ValidationError) as info:
+        StrongPasswordStrModel(passwd="INSECURE123")
+    err = info.value.errors()[0]
+    assert err['type'] == 'value_error'
+    assert "lower case" in err['msg'].lower()
+
+
+def test_fail_strongpwstr_no_digit():
+    '''Should return ValueError as password requires at least 1 digit'''
+    with pytest.raises(ValidationError) as info:
+        StrongPasswordStrModel(passwd="Insecure")
+    err = info.value.errors()[0]
+    assert err['type'] == 'value_error'
+    assert "digit" in err['msg'].lower()
