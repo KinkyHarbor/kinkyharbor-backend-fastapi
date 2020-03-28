@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_401_UNAUTHORIZED
 
 from harbor.domain.common import Message
-from harbor.domain.token import AccessToken, AccessRefreshTokens
+from harbor.domain.token import AccessRefreshTokens
 from harbor.repository.base import RepoDict, get_repos
 from harbor.use_cases.auth import login as uc_user_login
 
@@ -48,9 +48,15 @@ async def login(creds: Credentials, repos: RepoDict = Depends(get_repos)):
         )
 
 
+class AccessTokenResponse(BaseModel):
+    '''Token which grants access to the application'''
+    token: str
+    token_type: str
+
+
 @router.post("/login/token/",
              summary='OAuth 2.0 password grant flow',
-             response_model=AccessToken)
+             response_model=AccessTokenResponse)
 async def login_for_access_token(creds: OAuth2PasswordRequestForm = Depends(),
                                  repos: RepoDict = Depends(get_repos)):
     '''Trades username and password for an access token (oauth2: password grant)'''
@@ -61,9 +67,8 @@ async def login_for_access_token(creds: OAuth2PasswordRequestForm = Depends(),
             password=creds.password
         )
         tokens = await uc.execute(uc_req)
-        return AccessToken(
+        return AccessTokenResponse(
             token=tokens.access_token,
-            access_token=tokens.access_token,
             token_type="bearer"
         )
 

@@ -9,13 +9,6 @@ from pydantic import BaseModel, validator
 from harbor.domain.common import CreatedOnMixin, DBModelMixin, ObjectIdStr
 
 
-class AccessToken(BaseModel):
-    '''Token which grants access to the application'''
-    access_token: str = None
-    token: str = None
-    token_type: str
-
-
 class AccessTokenData(BaseModel):
     '''Contains data which will be embedded into AccessToken'''
     user_id: ObjectIdStr
