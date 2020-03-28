@@ -6,9 +6,8 @@ on:
       - development
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
 
@@ -25,6 +24,12 @@ jobs:
       - name: Run pytest
         run: |
           pytest
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
       - name: Build & Push to Docker Hub
         uses: opspresso/action-docker@master
