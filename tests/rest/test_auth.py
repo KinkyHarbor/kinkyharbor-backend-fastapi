@@ -26,7 +26,7 @@ def fixture_client():
 
 
 @mock.patch.object(uc.LoginUseCase, 'execute')
-def test_login_success(repo_exc, client):
+def test_success_login(repo_exc, client):
     '''Should return an access and refresh token'''
     # Mock use case response
     repo_exc.return_value = uc.LoginResponse(
@@ -50,7 +50,7 @@ def test_login_success(repo_exc, client):
 
 
 @mock.patch.object(uc.LoginUseCase, 'execute')
-def test_login_invalid_creds_fail(repo_exc, client):
+def test_fail_login_invalid_creds(repo_exc, client):
     '''Should return an invalid credentials error'''
     # Mock use case response
     repo_exc.side_effect = uc.InvalidCredsError
@@ -68,7 +68,7 @@ def test_login_invalid_creds_fail(repo_exc, client):
 
 
 @mock.patch.object(uc.LoginUseCase, 'execute')
-def test_login_user_locked_fail(repo_exc, client):
+def test_fail_login_user_locked(repo_exc, client):
     '''Should return a user locked error'''
     # Mock use case response
     repo_exc.side_effect = uc.UserLockedError

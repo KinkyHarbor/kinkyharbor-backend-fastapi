@@ -34,7 +34,7 @@ def fixture_test_users():
 
 
 @pytest.mark.asyncio
-async def test_uc_search_gen_success(uc_req, test_users):
+async def test_success(uc_req, test_users):
     '''Should return lists of users, groups, pages and events'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)
