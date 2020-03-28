@@ -1,4 +1,4 @@
-'''Unit tests for User Login usecase'''
+'''Unit tests for Verify Register User usecase'''
 # pylint: disable=unused-argument
 
 from unittest import mock

@@ -1,4 +1,4 @@
-'''Unit tests for Search Generic usecase'''
+'''Unit tests for Generic Search usecase'''
 
 from unittest import mock
 
