@@ -114,4 +114,4 @@
 
 !/tests/use_cases/search/
 !/tests/use_cases/search/__init__.py
-!/tests/use_cases/search/test_all.py
+!/tests/use_cases/search/test_generic.py
