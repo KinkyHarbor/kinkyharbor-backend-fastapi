@@ -24,7 +24,7 @@ class BaseUser(DBModelMixin):
 class User(BaseUser):
     '''General user to be used throughout the application'''
     # Core data
-    email: EmailStr
+    email: EmailStr = None
     last_login: datetime = None
     is_admin: bool = False
     is_verified: bool = False
