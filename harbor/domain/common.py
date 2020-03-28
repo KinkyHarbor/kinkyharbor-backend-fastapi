@@ -1,10 +1,30 @@
 '''This module contains reusable fields and mixins'''
 
 import re
-from typing import Optional, Union
+from typing import Optional, Union, Dict, Any
 from bson.objectid import ObjectId
 
 from pydantic import BaseModel, Field
+
+
+class StrictBoolTrue(int):
+    '''Bool which must be True'''
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def __modify_schema__(cls, field_schema: Dict[str, Any]) -> None:
+        field_schema.update(type='boolean')
+
+    @classmethod
+    def validate(cls, value):
+        '''Check if True'''
+        if not isinstance(value, bool):
+            raise TypeError('Value must be a bool')
+        if not bool(value):
+            raise ValueError('Value must be True')
+        return True
 
 
 class DisplayNameStr(str):

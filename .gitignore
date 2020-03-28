@@ -90,6 +90,10 @@
 !/tests/__init__.py
 !/tests/conftest.py
 
+!/tests/domain/
+!/tests/domain/__init__.py
+!/tests/domain/test_common.py
+
 !/tests/repository/
 !/tests/repository/__init__.py
 

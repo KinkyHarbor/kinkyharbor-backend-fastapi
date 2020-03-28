@@ -4,9 +4,9 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_409_CONFLICT
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel, constr, EmailStr, Field
+from pydantic import BaseModel, constr, EmailStr, Field, validator
 
-from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message
+from harbor.domain.common import StrictBoolTrue, DisplayNameStr, ObjectIdStr, StrongPasswordStr, Message
 from harbor.domain.token import AccessToken, AccessRefreshTokens
 from harbor.repository.base import RepoDict, get_repos
 from harbor.use_cases.auth import (
@@ -22,8 +22,43 @@ from harbor.use_cases.auth import (
 router = APIRouter()
 
 
+class FormRegister(BaseModel):
+    '''Required form data for registering a user'''
+    display_name: DisplayNameStr = Field(..., alias='username')
+    email: EmailStr
+    password: StrongPasswordStr = Field(...,
+                                        description='Password should either be 16 characters or '
+                                        'longer (passphrase). Or should be minimum 8 long and '
+                                        'have lower case, upper case and a digit.')
+    is_adult: StrictBoolTrue = Field(...,
+                                     title='Is adult',
+                                     description='Confirms the user is an adult',
+                                     alias='isAdult')
+    accept_privacy_and_terms: StrictBoolTrue = Field(...,
+                                                     title='Accept privacy and terms',
+                                                     description='User accepts Privacy Policy and Terms of Service',
+                                                     alias='acceptPrivacyAndTerms')
+
+    @validator('is_adult')
+    @classmethod
+    def must_be_adult(cls, is_adult):
+        '''User must be an adult'''
+        if not is_adult:
+            raise ValueError('User must be an adult')
+        return True
+
+    @validator('accept_privacy_and_terms')
+    @classmethod
+    def must_accept_priv_and_terms(cls, accepted):
+        '''User must accept Privacy policy and Terms and conditions'''
+        if not accepted:
+            raise ValueError(
+                'User must accept Privacy policy and Terms and conditions to use this platform')
+        return True
+
+
 @router.post('/register/', response_model=Message, responses={409: {"model": Message}})
-async def register(req: uc_user_register.RegisterRequest,
+async def register(form: FormRegister,
                    background_tasks: BackgroundTasks,
                    repos: RepoDict = Depends(get_repos)):
     '''Register a new user'''
@@ -34,6 +69,9 @@ async def register(req: uc_user_register.RegisterRequest,
     )
 
     try:
+        req = uc_user_register.RegisterRequest(
+            **form.dict()
+        )
         await uc.execute(req)
         return {'msg': 'User created successfully'}
 
