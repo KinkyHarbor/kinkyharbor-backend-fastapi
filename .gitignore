@@ -52,9 +52,15 @@
 
 !/harbor/rest/
 !/harbor/rest/__init__.py
-!/harbor/rest/auth.py
 !/harbor/rest/search.py
 !/harbor/rest/users.py
+
+!/harbor/rest/auth/
+!/harbor/rest/auth/base.py
+!/harbor/rest/auth/login.py
+!/harbor/rest/auth/password_reset.py
+!/harbor/rest/auth/refresh.py
+!/harbor/rest/auth/register.py
 
 !/harbor/use_cases/
 !/harbor/use_cases/__init__.py

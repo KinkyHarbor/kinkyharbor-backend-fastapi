@@ -11,8 +11,8 @@ from harbor.repository.mongo import (
     users as mongo_user,
     verif_tokens as mongo_vt,
 )
+from harbor.rest.auth import base as router_auth
 from harbor.rest import (
-    auth as router_auth,
     search as router_search,
     users as router_users,
 )
