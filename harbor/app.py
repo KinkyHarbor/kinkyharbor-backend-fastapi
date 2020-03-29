@@ -30,19 +30,19 @@ app = FastAPI(
 app.include_router(
     router_auth.router,
     prefix='/auth',
-    tags=['auth']
+    tags=['Auth']
 )
 # Search
 app.include_router(
     router_search.router,
     prefix='/search',
-    tags=['search'],
+    tags=['Search'],
 )
 # Users
 app.include_router(
     router_users.router,
     prefix='/users',
-    tags=['users'],
+    tags=['Users'],
 )
 
 # Connect to database
