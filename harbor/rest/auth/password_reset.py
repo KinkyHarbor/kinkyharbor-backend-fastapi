@@ -16,7 +16,7 @@ from harbor.use_cases.auth import (
 router = APIRouter()
 
 
-class FormRequestPasswordReset(BaseModel):
+class RequestPasswordResetForm(BaseModel):
     '''Form to request a password reset'''
     email: EmailStr
 
@@ -24,7 +24,7 @@ class FormRequestPasswordReset(BaseModel):
 @router.post("/login/request-password-reset/",
              summary='Request password reset (mail reset link)',
              response_model=Message)
-async def request_password_reset(form: FormRequestPasswordReset,
+async def request_password_reset(form: RequestPasswordResetForm,
                                  background_tasks: BackgroundTasks,
                                  repos: RepoDict = Depends(get_repos)):
     '''User requests a password reset'''
@@ -40,7 +40,7 @@ async def request_password_reset(form: FormRequestPasswordReset,
     return {'msg': 'Verification mail sent, if email is linked to an existing user'}
 
 
-class FormPasswordReset(BaseModel):
+class ExecPasswordResetForm(BaseModel):
     '''Form to execute a password reset'''
     user_id: ObjectIdStr
     token: str
@@ -50,7 +50,7 @@ class FormPasswordReset(BaseModel):
 @router.post("/login/password-reset/",
              summary='Execute password reset',
              response_model=Message)
-async def exec_password_reset(form: FormPasswordReset,
+async def exec_password_reset(form: ExecPasswordResetForm,
                               repos: RepoDict = Depends(get_repos)):
     '''Verifies password reset token and sets new password'''
     uc = uc_user_reset_pw_exec.ExecResetPasswordUseCase(

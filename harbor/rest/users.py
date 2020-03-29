@@ -32,14 +32,14 @@ async def get_user_me(token_data: AccessTokenData = Depends(validate_access_toke
     return await uc.execute(uc_req)
 
 
-class ProfileUpdate(BaseModel):
-    '''Input to update user profile'''
+class UpdateProfileForm(BaseModel):
+    '''Form to update user profile'''
     bio: str = None
     gender: str = None
 
 
 @router.patch('/me/', summary='Update own profile', response_model=User)
-async def set_user_me(profile: ProfileUpdate,
+async def set_user_me(form: UpdateProfileForm,
                       token_data: AccessTokenData = Depends(
                           validate_access_token),
                       repos: RepoDict = Depends(get_repos)):
@@ -47,7 +47,7 @@ async def set_user_me(profile: ProfileUpdate,
     uc = uc_update_profile.UpdateProfileUsercase(user_repo=repos['user'])
     uc_req = uc_update_profile.UpdateProfileRequest(
         user_id=token_data.user_id,
-        **profile.dict(),
+        **form.dict(),
     )
     return await uc.execute(uc_req)
 

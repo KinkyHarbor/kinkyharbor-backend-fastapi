@@ -16,7 +16,7 @@ from harbor.use_cases.auth import (
 router = APIRouter()
 
 
-class FormRegister(BaseModel):
+class RegisterForm(BaseModel):
     '''Required form data for registering a user'''
     display_name: DisplayNameStr = Field(..., alias='username')
     email: EmailStr
@@ -55,7 +55,7 @@ class FormRegister(BaseModel):
              summary='Register and mail verification link',
              response_model=Message,
              responses={409: {"model": Message}})
-async def register(form: FormRegister,
+async def register(form: RegisterForm,
                    background_tasks: BackgroundTasks,
                    repos: RepoDict = Depends(get_repos)):
     '''Register a new user and send verification link'''
@@ -85,7 +85,7 @@ async def register(form: FormRegister,
         )
 
 
-class RegisterVerifyBody(BaseModel):
+class VerifyRegistrationForm(BaseModel):
     '''POST model to verify registration'''
     secret: constr(min_length=1)
 
@@ -93,7 +93,7 @@ class RegisterVerifyBody(BaseModel):
 @router.post('/register/verify/',
              summary='Execute registration verification',
              response_model=Message)
-async def verify_registration(token_secret: RegisterVerifyBody,
+async def verify_registration(form: VerifyRegistrationForm,
                               repos: RepoDict = Depends(get_repos)):
     '''User wants to verify his registration'''
     # Setup usecase and usecase request
@@ -102,7 +102,7 @@ async def verify_registration(token_secret: RegisterVerifyBody,
         vt_repo=repos['verif_token'],
     )
     uc_req = uc_user_reg_verify.RegisterVerifyRequest(
-        secret=token_secret.secret
+        secret=form.secret
     )
 
     try:

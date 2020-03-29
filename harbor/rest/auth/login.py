@@ -15,8 +15,8 @@ from harbor.use_cases.auth import login as uc_user_login
 router = APIRouter()
 
 
-class Credentials(BaseModel):
-    '''Basic model for credentials'''
+class LoginForm(BaseModel):
+    '''Form to provide credentials to login'''
     login: constr(min_length=1) = Field(..., title='Username or email')
     password: constr(min_length=1)
 
@@ -25,13 +25,13 @@ class Credentials(BaseModel):
              summary='Login (custom implementation)',
              response_model=AccessRefreshTokens,
              responses={401: {"model": Message}})
-async def login(creds: Credentials, repos: RepoDict = Depends(get_repos)):
+async def login(form: LoginForm, repos: RepoDict = Depends(get_repos)):
     '''Trades username and password for an access token (custom implementation)'''
     try:
         uc = uc_user_login.LoginUseCase(repos['user'], repos['refresh_token'])
         uc_req = uc_user_login.LoginRequest(
-            login=creds.login,
-            password=creds.password
+            login=form.login,
+            password=form.password
         )
         return await uc.execute(uc_req)
 
@@ -48,7 +48,7 @@ async def login(creds: Credentials, repos: RepoDict = Depends(get_repos)):
         )
 
 
-class AccessTokenResponse(BaseModel):
+class LoginResponse(BaseModel):
     '''Token which grants access to the application'''
     token: str
     token_type: str
@@ -56,7 +56,7 @@ class AccessTokenResponse(BaseModel):
 
 @router.post("/login/token/",
              summary='OAuth 2.0 password grant flow',
-             response_model=AccessTokenResponse)
+             response_model=LoginResponse)
 async def login_for_access_token(creds: OAuth2PasswordRequestForm = Depends(),
                                  repos: RepoDict = Depends(get_repos)):
     '''Trades username and password for an access token (oauth2: password grant)'''
@@ -67,7 +67,7 @@ async def login_for_access_token(creds: OAuth2PasswordRequestForm = Depends(),
             password=creds.password
         )
         tokens = await uc.execute(uc_req)
-        return AccessTokenResponse(
+        return LoginResponse(
             token=tokens.access_token,
             token_type="bearer"
         )
