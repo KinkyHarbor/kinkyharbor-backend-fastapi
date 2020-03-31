@@ -1,7 +1,7 @@
 '''This module contains all registration related routes'''
 
 from fastapi import APIRouter, Depends, BackgroundTasks
-from pydantic import BaseModel, constr, EmailStr, Field, validator
+from pydantic import BaseModel, constr, EmailStr, Field
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_409_CONFLICT
 
@@ -33,28 +33,20 @@ class RegisterForm(BaseModel):
                                                      description='User accepts Privacy Policy and Terms of Service',
                                                      alias='acceptPrivacyAndTerms')
 
-    @validator('is_adult')
-    @classmethod
-    def must_be_adult(cls, is_adult):
-        '''User must be an adult'''
-        if not is_adult:
-            raise ValueError('User must be an adult')
-        return True
-
-    @validator('accept_privacy_and_terms')
-    @classmethod
-    def must_accept_priv_and_terms(cls, accepted):
-        '''User must accept Privacy policy and Terms and conditions'''
-        if not accepted:
-            raise ValueError(
-                'User must accept Privacy policy and Terms and conditions to use this platform')
-        return True
-
 
 @router.post('/register/',
              summary='Register and mail verification link',
              response_model=Message,
-             responses={409: {"model": Message}})
+             responses={
+                 400: {
+                     'model': Message,
+                     'description': 'Reserved username'
+                 },
+                 409: {
+                     'model': Message,
+                     'description': 'Username taken'
+                 }
+             })
 async def register(form: RegisterForm,
                    background_tasks: BackgroundTasks,
                    repos: RepoDict = Depends(get_repos)):
@@ -87,12 +79,18 @@ async def register(form: RegisterForm,
 
 class VerifyRegistrationForm(BaseModel):
     '''POST model to verify registration'''
-    secret: constr(min_length=1)
+    token: constr(min_length=1)
 
 
 @router.post('/register/verify/',
              summary='Execute registration verification',
-             response_model=Message)
+             response_model=Message,
+             responses={
+                 400: {
+                     'model': Message,
+                     'description': 'Invalid token'
+                 }
+             })
 async def verify_registration(form: VerifyRegistrationForm,
                               repos: RepoDict = Depends(get_repos)):
     '''User wants to verify his registration'''
@@ -102,16 +100,16 @@ async def verify_registration(form: VerifyRegistrationForm,
         vt_repo=repos['verif_token'],
     )
     uc_req = uc_user_reg_verify.RegisterVerifyRequest(
-        secret=form.secret
+        secret=form.token
     )
 
     try:
         # Execute usecase
-        uc.execute(uc_req)
+        await uc.execute(uc_req)
         return {'msg': 'Account is verified'}
 
     except uc_user_reg_verify.InvalidTokenError:
         return JSONResponse(
-            status_code=HTTP_409_CONFLICT,
-            content={'msg': 'Provided token is not valid'},
+            status_code=HTTP_400_BAD_REQUEST,
+            content={'msg': 'Provided token is invalid'},
         )
