@@ -76,5 +76,5 @@ def test_fail_invalid_token(uc_exec, client, json_refresh_req, uc_refresh_req):
     # Assert results
     uc_exec.assert_called_with(uc_refresh_req)
     assert response.url == 'http://testserver/auth/refresh/'
-    assert 'invalid' in response.json().get('msg').lower()
-    assert response.status_code == 401
+    assert response.json()['code'] == 'invalid_token'
+    assert response.status_code == 400

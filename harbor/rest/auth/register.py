@@ -64,8 +64,8 @@ async def register(form: RegisterForm,
         )
         await uc.execute(req)
         return {
-            'code': 'user_created',
-            'msg': 'User created successfully',
+            'code': 'account_created',
+            'msg': 'Account created',
         }
 
     except uc_user_register.UsernameReservedError:

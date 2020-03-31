@@ -64,7 +64,7 @@ def test_success_register(uc_exec, client, json_reg_req, uc_reg_req):
     # Assert results
     uc_exec.assert_called_with(uc_reg_req)
     assert response.url == 'http://testserver/auth/register/'
-    assert 'success' in response.json().get('msg').lower()
+    assert response.json()['code'] == 'account_created'
     assert response.status_code == 200
 
 
@@ -80,8 +80,8 @@ def test_fail_register_username_reserved(uc_exec, client, json_reg_req, uc_reg_r
     # Assert results
     uc_exec.assert_called_with(uc_reg_req)
     assert response.url == 'http://testserver/auth/register/'
-    assert 'reserved' in response.json().get('msg').lower()
-    assert response.status_code == 400
+    assert response.json()['code'] == 'reserved_username'
+    assert response.status_code == 403
 
 
 @mock.patch.object(uc_reg.RegisterUseCase, 'execute')
@@ -96,7 +96,7 @@ def test_fail_register_username_taken(uc_exec, client, json_reg_req, uc_reg_req)
     # Assert results
     uc_exec.assert_called_with(uc_reg_req)
     assert response.url == 'http://testserver/auth/register/'
-    assert 'taken' in response.json().get('msg').lower()
+    assert response.json()['code'] == 'username_taken'
     assert response.status_code == 409
 
 
@@ -127,7 +127,7 @@ def test_success_verify(uc_exec, client, json_ver_req, uc_ver_req):
     # Assert results
     uc_exec.assert_called_with(uc_ver_req)
     assert response.url == 'http://testserver/auth/register/verify/'
-    assert 'verified' in response.json().get('msg').lower()
+    assert response.json()['code'] == 'account_verified'
     assert response.status_code == 200
 
 
@@ -143,5 +143,5 @@ def test_fail_verify_invalid_token(uc_exec, client, json_ver_req, uc_ver_req):
     # Assert results
     uc_exec.assert_called_with(uc_ver_req)
     assert response.url == 'http://testserver/auth/register/verify/'
-    assert 'invalid' in response.json().get('msg').lower()
+    assert response.json()['code'] == 'invalid_token'
     assert response.status_code == 400

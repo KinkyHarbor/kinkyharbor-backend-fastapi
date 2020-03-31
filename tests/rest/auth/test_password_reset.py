@@ -44,7 +44,7 @@ def test_success_request_password_reset(uc_exec, client):
     uc_req = uc_pw_req.RequestPasswordResetRequest(email='user@kh.test')
     uc_exec.assert_called_with(uc_req)
     assert response.url == 'http://testserver/auth/login/request-password-reset/'
-    assert 'mail sent' in response.json().get('msg')
+    assert response.json()['code'] == 'reset_sent'
     assert response.status_code == 200
 
 
@@ -81,8 +81,7 @@ def test_success_exec_password_reset_updated(uc_exec, client, json_pw_exec_req, 
     # Assert results
     uc_exec.assert_called_with(uc_pw_exec_req)
     assert response.url == 'http://testserver/auth/login/password-reset/'
-    assert 'updated' in response.json().get('msg')
-    assert 'verified' not in response.json().get('msg')
+    assert response.json()['code'] == 'password_updated'
     assert response.status_code == 200
 
 
@@ -99,8 +98,7 @@ def test_success_exec_password_reset_verified(uc_exec, client, json_pw_exec_req,
     # Assert results
     uc_exec.assert_called_with(uc_pw_exec_req)
     assert response.url == 'http://testserver/auth/login/password-reset/'
-    assert 'updated' in response.json().get('msg')
-    assert 'verified' in response.json().get('msg')
+    assert response.json()['code'] == 'updated_and_verified'
     assert response.status_code == 200
 
 
@@ -117,5 +115,5 @@ def test_fail_exec_password_reset_invalid_token(uc_exec, client, json_pw_exec_re
     # Assert results
     uc_exec.assert_called_with(uc_pw_exec_req)
     assert response.url == 'http://testserver/auth/login/password-reset/'
-    assert 'invalid' in response.json().get('msg')
+    assert response.json()['code'] == 'invalid_token'
     assert response.status_code == 400

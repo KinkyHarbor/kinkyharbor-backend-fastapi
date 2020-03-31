@@ -38,7 +38,7 @@ async def request_password_reset(form: RequestPasswordResetForm,
     )
     await uc.execute(uc_req)
     return {
-        'code': 'verification_sent',
+        'code': 'reset_sent',
         'msg': 'Verification mail sent, if email is linked to an existing user',
     }
 
@@ -68,10 +68,16 @@ async def exec_password_reset(form: ExecPasswordResetForm,
     try:
         result = await uc.execute(uc_req)
         if result == uc_user_reset_pw_exec.ExecResetPasswordResponse.UPDATED:
-            return {'msg': 'Password is updated'}
+            return {
+                'code': 'password_updated',
+                'msg': 'Password is updated',
+            }
 
         if result == uc_user_reset_pw_exec.ExecResetPasswordResponse.UPDATED_AND_VERIFIED:
-            return {'msg': 'Password is updated and account is verified'}
+            return {
+                'code': 'updated_and_verified',
+                'msg': 'Password is updated and account is verified',
+            }
 
     except uc_user_reset_pw_exec.InvalidTokenError:
         return JSONResponse(

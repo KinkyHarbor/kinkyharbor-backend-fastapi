@@ -78,7 +78,7 @@ def test_fail_login_invalid_creds(uc_exec, client, uc_req):
     # Assert results
     uc_exec.assert_called_with(uc_req)
     assert response.url == 'http://testserver/auth/login/'
-    assert response.json() == {'msg': 'Incorrect username or password'}
+    assert response.json()['code'] == 'incorrect_credentials'
     assert response.status_code == 401
 
 
@@ -97,7 +97,7 @@ def test_fail_login_user_locked(uc_exec, client, uc_req):
     # Assert results
     uc_exec.assert_called_with(uc_req)
     assert response.url == 'http://testserver/auth/login/'
-    assert response.json() == {'msg': 'User is locked'}
+    assert response.json()['code'] == 'user_locked'
     assert response.status_code == 401
 
 
@@ -145,7 +145,7 @@ def test_fail_login_token_invalid_creds(uc_exec, client, uc_req):
     # Assert results
     uc_exec.assert_called_with(uc_req)
     assert response.url == 'http://testserver/auth/login/token/'
-    assert response.json() == {'detail': 'Incorrect username or password'}
+    assert 'incorrect' in response.json().get('detail').lower()
     assert response.status_code == 401
 
 
@@ -164,5 +164,5 @@ def test_fail_login_user_token_locked(uc_exec, client, uc_req):
     # Assert results
     uc_exec.assert_called_with(uc_req)
     assert response.url == 'http://testserver/auth/login/token/'
-    assert response.json() == {'detail': 'User is locked'}
+    assert 'locked' in response.json().get('detail').lower()
     assert response.status_code == 401
