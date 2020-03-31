@@ -39,8 +39,8 @@ def fixture_json_reg_req():
         'username': 'TestUser',
         'email': 'user@kh.test',
         'password': 'VeryStrongTestPassword',
-        'isAdult': True,
-        'acceptPrivacyAndTerms': True,
+        'is_adult': True,
+        'accept_privacy_and_terms': True,
     }
 
 
@@ -49,8 +49,6 @@ def fixture_uc_reg_req(json_reg_req):
     '''Returns expected request to execute register usecase'''
     return uc_reg.RegisterRequest(
         display_name=json_reg_req['username'],
-        is_adult=json_reg_req['isAdult'],
-        accept_privacy_and_terms=json_reg_req['acceptPrivacyAndTerms'],
         **json_reg_req,
     )
 

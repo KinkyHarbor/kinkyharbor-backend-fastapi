@@ -31,13 +31,11 @@ class RegisterForm(BaseModel):
         ...,
         title='Is adult',
         description='Confirms the user is an adult',
-        alias='isAdult'
     )
     accept_privacy_and_terms: StrictBoolTrue = Field(
         ...,
         title='Accept privacy and terms',
         description='User accepts Privacy Policy and Terms of Service',
-        alias='acceptPrivacyAndTerms'
     )
 
 
