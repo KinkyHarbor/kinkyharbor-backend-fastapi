@@ -112,6 +112,8 @@
 !/tests/rest/
 !/tests/rest/__init__.py
 !/tests/rest/test_app.py
+!/tests/rest/test_search.py
+!/tests/rest/test_users.py
 
 !/tests/rest/auth/
 !/tests/rest/auth/__init__.py
