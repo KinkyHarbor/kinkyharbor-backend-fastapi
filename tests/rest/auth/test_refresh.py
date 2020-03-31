@@ -31,7 +31,7 @@ def fixture_client():
 # =======================================
 
 @pytest.fixture(name="json_refresh_req")
-def fixture_json_pw_exec_req():
+def fixture_json_refresh_req():
     '''Returns expected request to execute refresh usecase'''
     return {
         'refresh_token': '5e7f656765f1b64f3f7f69f2:-qEfNMazB8jg67-EMTZP_gKBok18952RCbrfhyCudOM'
@@ -39,7 +39,7 @@ def fixture_json_pw_exec_req():
 
 
 @pytest.fixture(name="uc_refresh_req")
-def fixture_uc_pw_exec_req(json_refresh_req):
+def fixture_uc_refresh_req(json_refresh_req):
     '''Returns expected request to execute refresh usecase'''
     return uc_refresh.TokenRefreshRequest(**json_refresh_req)
 

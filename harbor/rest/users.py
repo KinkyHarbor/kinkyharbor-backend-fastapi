@@ -20,7 +20,7 @@ router = APIRouter()
 @router.get('/me/',
             summary='Get own profile',
             response_model=uc_get_profile.GetProfileResponse,
-            response_model_by_alias=True)
+            response_model_by_alias=False)
 async def get_user_me(token_data: AccessTokenData = Depends(validate_access_token),
                       repos: RepoDict = Depends(get_repos)):
     '''Get your own user data.'''
@@ -38,7 +38,10 @@ class UpdateProfileForm(BaseModel):
     gender: str = None
 
 
-@router.patch('/me/', summary='Update own profile', response_model=User)
+@router.patch('/me/',
+              summary='Update own profile',
+              response_model=User,
+              response_model_by_alias=False)
 async def set_user_me(form: UpdateProfileForm,
                       token_data: AccessTokenData = Depends(
                           validate_access_token),
@@ -56,6 +59,7 @@ async def set_user_me(form: UpdateProfileForm,
     '/{username}/',
     summary='Get user profile of a single user',
     response_model=uc_get_profile.GetProfileResponse,
+    response_model_by_alias=False,
     responses=message_responses({
         404: 'User not found (Code: not_found)',
     }))
