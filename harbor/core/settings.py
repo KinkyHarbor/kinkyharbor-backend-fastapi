@@ -55,7 +55,7 @@ def get_mail_security(default_sec: EmailSecurity) -> EmailSecurity:
 DEBUG = get_bool('DEBUG')
 if DEBUG:
     logging.getLogger().setLevel(logging.DEBUG)
-RESERVED_USERNAMES = ['kinkyharbor', 'kinky-harbor', 'kinky_harbor', 'harbor',
+RESERVED_USERNAMES = ['me', 'kinkyharbor', 'kinky-harbor', 'kinky_harbor', 'harbor',
                       'pirate', 'captain', 'admin', '-', '_']
 FRONTEND_URL = get_required_env('FRONTEND_URL')
 CORS = get_cors(FRONTEND_URL)
