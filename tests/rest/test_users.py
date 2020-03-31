@@ -51,6 +51,7 @@ def test_success_get_profile_me(uc_exec, client):
     )
     uc_exec.return_value = uc_get.GetProfileResponse(
         user=user,
+        exposed_fields=['test-field'],
         is_self=True,
         is_friend=False,
     )
@@ -67,6 +68,7 @@ def test_success_get_profile_me(uc_exec, client):
     assert response.url == 'http://testserver/users/me/'
     assert response.json() == {
         'user': user.dict(),
+        'exposed_fields': ['test-field'],
         'is_self': True,
         'is_friend': False,
     }
@@ -129,6 +131,7 @@ def test_success_get_profile_username(uc_exec, client):
     )
     uc_exec.return_value = uc_get.GetProfileResponse(
         user=user,
+        exposed_fields=['test-field'],
         is_self=False,
         is_friend=True,
     )
@@ -145,6 +148,7 @@ def test_success_get_profile_username(uc_exec, client):
     assert response.url == 'http://testserver/users/test-user/'
     assert response.json() == {
         'user': user.dict(),
+        'exposed_fields': ['test-field'],
         'is_self': False,
         'is_friend': True,
     }

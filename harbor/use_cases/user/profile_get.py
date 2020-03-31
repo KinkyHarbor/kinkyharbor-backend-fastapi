@@ -1,7 +1,6 @@
 '''User requests a user profile'''
 
-import logging
-from typing import Union
+from typing import Union, List
 
 from pydantic import BaseModel
 
@@ -35,6 +34,7 @@ class UserNotFoundError(Exception):
 class GetProfileResponse(BaseModel):
     '''Result of get profile'''
     user: User
+    exposed_fields: List[str]
     is_self: bool
     is_friend: bool
 
@@ -57,12 +57,11 @@ class GetProfileUsercase:
         if not user:
             raise UserNotFoundError
 
-        logging.error(user)
-
         # User requested own profile
         if req.requester == user.id:
             return GetProfileResponse(
                 user=user,
+                exposed_fields=list(user.fields.keys()),
                 is_self=True,
                 is_friend=False,
             )
@@ -73,6 +72,7 @@ class GetProfileUsercase:
         filtered_user = user.copy(include=include_fields)
         return GetProfileResponse(
             user=filtered_user,
+            exposed_fields=include_fields,
             is_self=False,
             is_friend=is_friend,
         )

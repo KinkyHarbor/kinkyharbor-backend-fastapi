@@ -67,7 +67,13 @@ async def get_user(username: str,
                    token_data: AccessTokenData = Depends(
                        validate_access_token),
                    repos: RepoDict = Depends(get_repos)):
-    '''Get a user profile'''
+    '''Get a user profile.
+
+    Note: The whole User object will always be returned. Depending if it's your own profile,
+    it's a friend or you're no friends, the profile will be filled. Field "exposed_fields" will
+    have a list of all filled fields. Fields which are not in this list will receive a
+    default value.
+    '''
     uc = uc_get_profile.GetProfileUsercase(user_repo=repos['user'])
     uc_req = uc_get_profile.GetProfileByUsernameRequest(
         requester=token_data.user_id,
