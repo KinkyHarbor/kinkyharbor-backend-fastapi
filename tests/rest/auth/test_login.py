@@ -124,7 +124,7 @@ def test_success_login_token(uc_exec, client, uc_req):
     uc_exec.assert_called_with(uc_req)
     assert response.url == 'http://testserver/auth/login/token/'
     assert response.json() == {
-        'token': 'TestAccessToken',
+        'access_token': 'TestAccessToken',
         'token_type': 'bearer',
     }
     assert response.status_code == 200
