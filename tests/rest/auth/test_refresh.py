@@ -1,4 +1,4 @@
-'''Unit tests for Auth Password Reset rest api'''
+'''Unit tests for Auth Refresh rest api'''
 
 from unittest import mock
 

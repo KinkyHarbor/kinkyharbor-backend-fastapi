@@ -1,4 +1,4 @@
-'''Test generic behavior'''
+'''Test generic behavior of rest api'''
 
 import logging
 
