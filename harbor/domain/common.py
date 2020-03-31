@@ -125,4 +125,16 @@ class CreatedOnMixin(BaseModel):
 
 class Message(BaseModel):
     '''Basic response with message'''
+    code: str
     msg: str
+
+
+def message_responses(responses: Dict[int, str]):
+    '''Converts status descriptions to FastAPI dict for responses'''
+    result = {}
+    for (status, msg) in responses.items():
+        result[status] = {
+            'model': Message,
+            'description': msg
+        }
+    return result

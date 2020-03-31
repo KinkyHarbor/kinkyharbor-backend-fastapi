@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST
 
-from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message
+from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message, message_responses
 from harbor.repository.base import RepoDict, get_repos
 from harbor.use_cases.auth import (
     reset_password_exec as uc_user_reset_pw_exec,
@@ -22,7 +22,7 @@ class RequestPasswordResetForm(BaseModel):
 
 
 @router.post("/login/request-password-reset/",
-             summary='Request password reset (mail reset link)',
+             summary='Request mail with password reset link',
              response_model=Message)
 async def request_password_reset(form: RequestPasswordResetForm,
                                  background_tasks: BackgroundTasks,
@@ -37,7 +37,10 @@ async def request_password_reset(form: RequestPasswordResetForm,
         email=form.email
     )
     await uc.execute(uc_req)
-    return {'msg': 'Verification mail sent, if email is linked to an existing user'}
+    return {
+        'code': 'verification_sent',
+        'msg': 'Verification mail sent, if email is linked to an existing user',
+    }
 
 
 class ExecPasswordResetForm(BaseModel):
@@ -50,7 +53,9 @@ class ExecPasswordResetForm(BaseModel):
 @router.post("/login/password-reset/",
              summary='Execute password reset',
              response_model=Message,
-             responses={400: {"model": Message}})
+             responses=message_responses({
+                 400: 'Invalid token (Code: invalid_token)',
+             }))
 async def exec_password_reset(form: ExecPasswordResetForm,
                               repos: RepoDict = Depends(get_repos)):
     '''Verifies password reset token and sets new password'''
@@ -71,5 +76,8 @@ async def exec_password_reset(form: ExecPasswordResetForm,
     except uc_user_reset_pw_exec.InvalidTokenError:
         return JSONResponse(
             status_code=HTTP_400_BAD_REQUEST,
-            content={'msg': 'Provided token is invalid'}
+            content={
+                'code': 'invalid_token',
+                'msg': 'Invalid token',
+            }
         )

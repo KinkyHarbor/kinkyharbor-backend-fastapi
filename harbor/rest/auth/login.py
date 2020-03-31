@@ -6,7 +6,7 @@ from pydantic import BaseModel, constr, Field
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-from harbor.domain.common import Message
+from harbor.domain.common import message_responses
 from harbor.domain.token import AccessRefreshTokens
 from harbor.repository.base import RepoDict, get_repos
 from harbor.use_cases.auth import login as uc_user_login
@@ -24,7 +24,10 @@ class LoginForm(BaseModel):
 @router.post('/login/',
              summary='Login (custom implementation)',
              response_model=AccessRefreshTokens,
-             responses={401: {"model": Message}})
+             responses=message_responses({
+                 401: 'Incorrect username or password (Code: incorrect_credentials) '
+                      'or user is locked (Code: user_locked)',
+             }))
 async def login(form: LoginForm, repos: RepoDict = Depends(get_repos)):
     '''Trades username and password for an access token (custom implementation)'''
     try:
@@ -38,13 +41,19 @@ async def login(form: LoginForm, repos: RepoDict = Depends(get_repos)):
     except uc_user_login.InvalidCredsError:
         return JSONResponse(
             status_code=HTTP_401_UNAUTHORIZED,
-            content={'msg': 'Incorrect username or password'},
+            content={
+                'code': 'incorrect_credentials',
+                'msg': 'Incorrect username or password',
+            },
         )
 
     except uc_user_login.UserLockedError:
         return JSONResponse(
             status_code=HTTP_401_UNAUTHORIZED,
-            content={'msg': 'User is locked'},
+            content={
+                'code': 'user_locked',
+                'msg': 'User is locked',
+            },
         )
 
 
@@ -55,8 +64,9 @@ class LoginResponse(BaseModel):
 
 
 @router.post("/login/token/",
-             summary='OAuth 2.0 password grant flow',
-             response_model=LoginResponse)
+             summary='Login (OAuth 2.0 password grant flow)',
+             response_model=LoginResponse,
+             responses={400: {'description': 'User is locked or incorrect username or password'}})
 async def login_for_access_token(creds: OAuth2PasswordRequestForm = Depends(),
                                  repos: RepoDict = Depends(get_repos)):
     '''Trades username and password for an access token (oauth2: password grant)'''

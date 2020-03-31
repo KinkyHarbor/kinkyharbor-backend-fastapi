@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
 from harbor.core.auth import validate_access_token
-from harbor.domain.common import Message
+from harbor.domain.common import message_responses
 from harbor.domain.token import AccessTokenData
 from harbor.domain.user import User
 from harbor.repository.base import RepoDict, get_repos
@@ -56,8 +56,9 @@ async def set_user_me(form: UpdateProfileForm,
     '/{username}/',
     summary='Get user profile of a single user',
     response_model=uc_get_profile.GetProfileResponse,
-    responses={404: {"model": Message}}
-)
+    responses=message_responses({
+        404: 'User not found (Code: not_found)',
+    }))
 async def get_user(username: str,
                    token_data: AccessTokenData = Depends(
                        validate_access_token),
@@ -74,5 +75,8 @@ async def get_user(username: str,
     except uc_get_profile.UserNotFoundError:
         return JSONResponse(
             status_code=404,
-            content='User not found',
+            content={
+                'code': 'not_found',
+                'msg': 'User not found',
+            },
         )

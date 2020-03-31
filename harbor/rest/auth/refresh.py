@@ -3,8 +3,9 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
+from starlette.status import HTTP_400_BAD_REQUEST
 
-from harbor.domain.common import Message
+from harbor.domain.common import message_responses
 from harbor.domain.token import AccessRefreshTokens
 from harbor.repository.base import RepoDict, get_repos
 from harbor.use_cases.auth import token_refresh as uc_token_refresh
@@ -21,7 +22,9 @@ class RefreshTokenForm(BaseModel):
 @router.post('/refresh/',
              summary='Refresh tokens (custom implementation)',
              response_model=AccessRefreshTokens,
-             responses={401: {"model": Message}})
+             responses=message_responses({
+                 400: 'Invalid token (Code: invalid_token)',
+             }))
 async def refresh(form: RefreshTokenForm, repos: RepoDict = Depends(get_repos)):
     '''Trades a refresh token for a new access and refresh token (custom implementation)'''
     uc = uc_token_refresh.TokenRefreshUseCase(rt_repo=repos['refresh_token'])
@@ -35,6 +38,9 @@ async def refresh(form: RefreshTokenForm, repos: RepoDict = Depends(get_repos)):
 
     except uc_token_refresh.InvalidTokenError:
         return JSONResponse(
-            status_code=401,
-            content={'msg': 'Invalid refresh token'}
+            status_code=HTTP_400_BAD_REQUEST,
+            content={
+                'code': 'invalid_token',
+                'msg': 'Invalid token',
+            }
         )
