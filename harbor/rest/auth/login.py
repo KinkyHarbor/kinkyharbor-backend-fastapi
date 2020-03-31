@@ -59,7 +59,7 @@ async def login(form: LoginForm, repos: RepoDict = Depends(get_repos)):
 
 class LoginResponse(BaseModel):
     '''Token which grants access to the application'''
-    token: str
+    access_token: str
     token_type: str
 
 
@@ -78,7 +78,7 @@ async def login_for_access_token(creds: OAuth2PasswordRequestForm = Depends(),
         )
         tokens = await uc.execute(uc_req)
         return LoginResponse(
-            token=tokens.access_token,
+            access_token=tokens.access_token,
             token_type="bearer"
         )
 
