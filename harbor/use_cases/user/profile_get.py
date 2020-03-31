@@ -70,10 +70,7 @@ class GetProfileUsercase:
         # Restrict returned fields
         is_friend = req.requester in user.friends
         include_fields = FRIEND_FIELDS if is_friend else STRANGER_FIELDS
-        filtered_user = User(
-            **user.dict(include=include_fields),
-            email='redacted@kinkyharbor.com'
-        )
+        filtered_user = user.copy(include=include_fields)
         return GetProfileResponse(
             user=filtered_user,
             is_self=False,
