@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, BackgroundTasks
 from pydantic import BaseModel, EmailStr
 from starlette.responses import JSONResponse
-from starlette.status import HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_400_BAD_REQUEST
 
 from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message
 from harbor.repository.base import RepoDict, get_repos
@@ -49,7 +49,8 @@ class ExecPasswordResetForm(BaseModel):
 
 @router.post("/login/password-reset/",
              summary='Execute password reset',
-             response_model=Message)
+             response_model=Message,
+             responses={400: {"model": Message}})
 async def exec_password_reset(form: ExecPasswordResetForm,
                               repos: RepoDict = Depends(get_repos)):
     '''Verifies password reset token and sets new password'''
@@ -69,6 +70,6 @@ async def exec_password_reset(form: ExecPasswordResetForm,
 
     except uc_user_reset_pw_exec.InvalidTokenError:
         return JSONResponse(
-            status_code=HTTP_401_UNAUTHORIZED,
+            status_code=HTTP_400_BAD_REQUEST,
             content={'msg': 'Provided token is invalid'}
         )

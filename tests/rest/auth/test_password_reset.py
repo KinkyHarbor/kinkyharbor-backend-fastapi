@@ -118,4 +118,4 @@ def test_fail_exec_password_reset_invalid_token(uc_exec, client, json_pw_exec_re
     uc_exec.assert_called_with(uc_pw_exec_req)
     assert response.url == 'http://testserver/auth/login/password-reset/'
     assert 'invalid' in response.json().get('msg')
-    assert response.status_code == 401
+    assert response.status_code == 400
