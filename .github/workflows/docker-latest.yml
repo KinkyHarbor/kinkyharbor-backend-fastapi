@@ -36,8 +36,8 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
-          coverageCommand: pytest --cov=harbor --cov-report=xml
-          coverageLocations: "./coverage.xml:xml"
+          coverageCommand: sleep 1
+          coverageLocations: "./coverage.xml:coverage.py"
 
   build:
     needs: test
