@@ -136,3 +136,8 @@
 !/tests/use_cases/search/
 !/tests/use_cases/search/__init__.py
 !/tests/use_cases/search/test_generic.py
+
+!/tests/use_cases/user/
+!/tests/use_cases/user/__init__.py
+!/tests/use_cases/user/test_profile_get.py
+!/tests/use_cases/user/test_profile_update.py
