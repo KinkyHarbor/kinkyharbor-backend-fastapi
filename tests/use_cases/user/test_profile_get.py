@@ -9,10 +9,10 @@ from harbor.domain.user import User, FRIEND_FIELDS, STRANGER_FIELDS
 from harbor.repository.base import UserRepo
 from harbor.use_cases.user import profile_get as uc_get
 
+
 # =======================================
 # =               HELPERS               =
 # =======================================
-
 
 def get_user_self():
     '''Returns own user'''
