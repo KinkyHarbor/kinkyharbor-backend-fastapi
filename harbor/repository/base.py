@@ -66,6 +66,7 @@ class UserRepo(Repo):
 
     @abstractmethod
     async def add(self,
+                  *,  # Force key words only
                   display_name: str,
                   email: str,
                   password_hash: str) -> User:

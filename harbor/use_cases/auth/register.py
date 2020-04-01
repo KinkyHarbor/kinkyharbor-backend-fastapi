@@ -43,14 +43,14 @@ class RegisterUseCase:
         '''
 
         # Check if username is reserved
-        username = req.username.lower()
+        username = req.display_name.lower()
         if username in settings.RESERVED_USERNAMES:
             raise UsernameReservedError()
 
         # Create a new user in the database
         try:
             user = await self.user_repo.add(
-                display_name=req.username,
+                display_name=req.display_name,
                 email=req.email,
                 password_hash=auth.get_password_hash(req.password)
             )
@@ -59,7 +59,7 @@ class RegisterUseCase:
             raise UsernameTakenError
 
         # Send mail to user
-        recipient = email.get_address(req.username, req.email)
+        recipient = email.get_address(req.display_name, req.email)
         if user:
             # Get verification token
             token = await self.vt_repo.create_verif_token(user.id, VerifPur.REGISTER)

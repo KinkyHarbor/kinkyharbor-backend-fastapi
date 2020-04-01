@@ -60,6 +60,7 @@ class UserMongoRepo(UserRepo):
         return parse_obj_as(List[BaseUser], user_list)
 
     async def add(self,
+                  *,  # Force key words only
                   display_name: str,
                   email: str,
                   password_hash: str) -> User:
