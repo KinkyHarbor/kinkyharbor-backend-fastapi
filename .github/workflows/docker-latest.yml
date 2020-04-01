@@ -37,8 +37,7 @@ jobs:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
           coverageCommand: pytest --cov=harbor --cov-report=lcov
-          coverageLocations:
-            - "./coverage.lcov:lcov"
+          coverageLocations: "./coverage.lcov:lcov"
 
   build:
     needs: test
