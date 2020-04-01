@@ -31,6 +31,15 @@ jobs:
           file: ./coverage.xml
           flags: unittests
 
+      - name: Upload coverage to CodeClimate
+        uses: paambaati/codeclimate-action@v2.2.4
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: pytest --cov=harbor --cov-report=lcov
+          coverageLocations:
+            - "./coverage.lcov:lcov"
+
   build:
     needs: test
     runs-on: ubuntu-latest
