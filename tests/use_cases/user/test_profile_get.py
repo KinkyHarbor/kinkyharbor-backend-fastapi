@@ -1,4 +1,5 @@
 '''Unit tests for User Profile Get usecase'''
+# pylint: disable=unused-argument
 
 from unittest import mock
 
