@@ -20,7 +20,7 @@ def test_password_hash_roundtrip():
 @pytest.mark.asyncio
 @mock.patch('harbor.helpers.auth.jwt.encode')
 @mock.patch('harbor.helpers.auth.settings.get_jwt_key')
-async def test_success_create_access_token_with_defaults(get_jwt_key, jwt_encode, freezer):
+async def test_create_access_token_with_defaults(get_jwt_key, jwt_encode, freezer):
     '''Should return an access token'''
     # Create mocks
     get_jwt_key.return_value = 'test-private-key'
@@ -45,7 +45,7 @@ async def test_success_create_access_token_with_defaults(get_jwt_key, jwt_encode
 @pytest.mark.asyncio
 @mock.patch('harbor.helpers.auth.jwt.encode')
 @mock.patch('harbor.helpers.auth.settings.get_jwt_key')
-async def test_success_create_access_token_with_expire(get_jwt_key, jwt_encode, freezer):
+async def test_create_access_token_with_expire(get_jwt_key, jwt_encode, freezer):
     '''Should return an access token'''
     # Create mocks
     get_jwt_key.return_value = 'test-private-key'

@@ -79,8 +79,8 @@ JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 15
 async def get_jwt_key(key: str):
     '''Return ECDSA keys from files for JWT signing.'''
     filename = f'{key}.pem'
-    async with aiofiles.open(JWT_KEY_PATH / filename, mode='r') as f:
-        return await f.read()
+    async with aiofiles.open(JWT_KEY_PATH / filename, mode='r') as key_file:
+        return await key_file.read()
 
 # Mongo settings
 MONGO_HOST = environ.get('MONGO_HOST', 'localhost')
