@@ -86,7 +86,7 @@ async def test_success_new_user(get_pw_hash, email, uc_req, user, verif_token):
 @pytest.mark.asyncio
 @mock.patch('harbor.use_cases.auth.register.email')
 @mock.patch('harbor.core.auth.get_password_hash')
-async def test_success_exsting_user(get_pw_hash, email, uc_req, verif_token):
+async def test_success_existing_user(get_pw_hash, email, uc_req, verif_token):
     '''Should inform user for registering existing mail address'''
     # Create mocks
     get_pw_hash.return_value = "test-secure-hash"
