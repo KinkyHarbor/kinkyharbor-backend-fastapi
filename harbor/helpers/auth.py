@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 import jwt
 from passlib.context import CryptContext
+from pydantic import ValidationError
 
 from harbor.domain.token import AccessTokenData
 from harbor.helpers import settings
@@ -53,13 +54,26 @@ async def validate_access_token(token: str) -> AccessTokenData:
     Raises
         InvalidTokenError: Provided token is invalid
     '''
+    # Decode JWT token
     try:
         jwt_key_public = await settings.get_jwt_key('public')
         payload = jwt.decode(token, jwt_key_public,
                              algorithms=[settings.JWT_ALG])
-        user_id: str = payload.get("sub").split(':')[1]
-        if user_id is None:
-            raise InvalidTokenError(token)
-        return AccessTokenData(user_id=user_id)
     except jwt.PyJWTError:
-        raise InvalidTokenError(token)
+        raise InvalidTokenError(f'Unable to decode token "{token}"')
+
+    # Extract user ID
+    try:
+        user_id = payload.get("sub").split(':')[1]
+    except IndexError:
+        raise InvalidTokenError(
+            f"Token payload doesn't contain valid user ID. Payload: {payload!r}"
+        )
+
+    # Build access token data
+    try:
+        return AccessTokenData(user_id=user_id)
+    except ValidationError:
+        raise InvalidTokenError(
+            f'JWT token contains invalid user ID: "{user_id!r}"'
+        )
