@@ -130,8 +130,9 @@
 !/tests/use_cases/auth/test_login.py
 !/tests/use_cases/auth/test_register.py
 !/tests/use_cases/auth/test_register_verify.py
-!/tests/use_cases/auth/test_update_profile.py
-!/tests/use_cases/auth/test_verify.py
+!/tests/use_cases/auth/test_reset_password_req.py
+!/tests/use_cases/auth/test_reset_password_exec.py
+!/tests/use_cases/auth/test_token_refresh.py
 
 !/tests/use_cases/search/
 !/tests/use_cases/search/__init__.py
