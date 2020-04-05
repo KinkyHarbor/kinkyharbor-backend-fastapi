@@ -8,8 +8,8 @@ from starlette.testclient import TestClient
 from harbor.app import app
 from harbor.domain.token import AccessTokenData
 from harbor.domain.user import User
-from harbor.helpers.auth import validate_access_token
 from harbor.repository.base import get_repos
+from harbor.rest.auth.base import validate_access_token
 from harbor.use_cases.user import (
     profile_get as uc_get,
     profile_update as uc_upd,

@@ -7,8 +7,8 @@ from starlette.responses import JSONResponse
 from harbor.domain.common import message_responses
 from harbor.domain.token import AccessTokenData
 from harbor.domain.user import User
-from harbor.helpers.auth import validate_access_token
 from harbor.repository.base import RepoDict, get_repos
+from harbor.rest.auth.base import validate_access_token
 from harbor.use_cases.user import (
     profile_get as uc_get_profile,
     profile_update as uc_update_profile,

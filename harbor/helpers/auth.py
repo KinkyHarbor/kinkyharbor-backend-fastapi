@@ -3,9 +3,6 @@
 from datetime import datetime, timedelta
 
 import jwt
-from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
-from starlette.status import HTTP_401_UNAUTHORIZED
 from passlib.context import CryptContext
 
 from harbor.domain.token import AccessTokenData
@@ -46,27 +43,23 @@ async def create_access_token(*, user_id: str, expires_delta: timedelta = None):
     return jwt.encode(data, jwt_key_private, algorithm=settings.JWT_ALG)
 
 
-async def validate_access_token(token: str = Depends(
-        OAuth2PasswordBearer(tokenUrl='/auth/login/token/')
-)) -> AccessTokenData:
+class InvalidTokenError(Exception):
+    '''Provided token is invalid'''
+
+
+async def validate_access_token(token: str) -> AccessTokenData:
     '''Validates and extracts User ID from token
 
     Raises
-        HTTPException: Provided token is invalid
+        InvalidTokenError: Provided token is invalid
     '''
-    invalid_token_error = HTTPException(
-        status_code=HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
     try:
         jwt_key_public = await settings.get_jwt_key('public')
         payload = jwt.decode(token, jwt_key_public,
                              algorithms=[settings.JWT_ALG])
         user_id: str = payload.get("sub").split(':')[1]
         if user_id is None:
-            raise invalid_token_error
+            raise InvalidTokenError(token)
         return AccessTokenData(user_id=user_id)
     except jwt.PyJWTError:
-        raise invalid_token_error
+        raise InvalidTokenError(token)
