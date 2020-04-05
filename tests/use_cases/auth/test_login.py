@@ -32,7 +32,7 @@ def fixture_test_user():
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.core.auth.create_access_token')
+@mock.patch('harbor.helpers.auth.create_access_token')
 async def test_success_case_insensitive(create_access_token, uc_req, test_user):
     '''Should return an access and refresh token'''
     # Create mocks
@@ -52,6 +52,7 @@ async def test_success_case_insensitive(create_access_token, uc_req, test_user):
     # Assert results
     user_repo.get_by_login.assert_called_with('testuser')
     user_repo.update_last_login.assert_called_with(test_user.id)
+    create_access_token.assert_called_with(user_id=test_user.id)
     rt_repo.create_token.assert_called_with(test_user.id)
     assert tokens.access_token == 'TestAccessToken'
     assert tokens.refresh_token == f'{test_user.id}:TestRefreshToken'

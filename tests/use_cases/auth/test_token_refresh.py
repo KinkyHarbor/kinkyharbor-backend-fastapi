@@ -28,7 +28,7 @@ def fixture_refresh_token(freezer):
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.core.auth.create_access_token')
+@mock.patch('harbor.helpers.auth.create_access_token')
 async def test_success(create_access_token, uc_req, refresh_token, freezer):
     '''Should return an access and refresh token'''
     # Create mocks
@@ -45,6 +45,7 @@ async def test_success(create_access_token, uc_req, refresh_token, freezer):
 
     # Assert results
     rt_repo.replace_token.assert_called_with(refresh_token)
+    create_access_token.assert_called_with(user_id='507f1f77bcf86cd799439111')
     assert tokens.access_token == 'TestAccessToken'
     assert tokens.refresh_token == '507f1f77bcf86cd799439111:TestRefreshToken'
 

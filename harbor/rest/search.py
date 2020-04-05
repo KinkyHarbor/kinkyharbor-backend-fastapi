@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter, Depends
 
-from harbor.core.auth import validate_access_token
 from harbor.domain.token import AccessTokenData
+from harbor.helpers.auth import validate_access_token
 from harbor.repository.base import RepoDict, get_repos
 from harbor.use_cases.search import generic as uc_gen_search
 

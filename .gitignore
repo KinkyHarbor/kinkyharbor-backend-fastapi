@@ -25,12 +25,12 @@
 !/harbor/__init__.py
 !/harbor/app.py
 
-!/harbor/core/
-!/harbor/core/__init__.py
-!/harbor/core/auth.py
-!/harbor/core/db.py
-!/harbor/core/email.py
-!/harbor/core/settings.py
+!/harbor/helpers/
+!/harbor/helpers/__init__.py
+!/harbor/helpers/auth.py
+!/harbor/helpers/db.py
+!/harbor/helpers/email.py
+!/harbor/helpers/settings.py
 
 !/harbor/domain/
 !/harbor/domain/__init__.py
@@ -101,6 +101,10 @@
 !/tests/domain/test_common.py
 !/tests/domain/test_token.py
 !/tests/domain/test_user.py
+
+!/tests/helpers/
+!/tests/helpers/__init__.py
+!/tests/helpers/test_auth.py
 
 !/tests/repository/
 !/tests/repository/__init__.py

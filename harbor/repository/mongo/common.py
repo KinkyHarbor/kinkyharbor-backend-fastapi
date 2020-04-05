@@ -2,7 +2,7 @@
 
 from motor import motor_asyncio as motor
 
-from harbor.core import settings
+from harbor.helpers import settings
 
 
 def create_db_client():

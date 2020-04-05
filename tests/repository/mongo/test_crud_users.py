@@ -2,7 +2,7 @@
 
 import pytest
 
-from harbor.core import settings
+from harbor.helpers import settings
 from harbor.repository.mongo import users
 from harbor.use_cases.auth.register import RegisterRequest
 

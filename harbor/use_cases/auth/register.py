@@ -2,9 +2,9 @@
 
 from pydantic import BaseModel, EmailStr
 
-from harbor.core import auth, email, settings
 from harbor.domain.common import StrictBoolTrue, DisplayNameStr, StrongPasswordStr
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
+from harbor.helpers import auth, email, settings
 from harbor.repository import base as repo_base
 from harbor.repository.base import UserRepo, VerifTokenRepo
 

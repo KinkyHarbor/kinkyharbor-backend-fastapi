@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 
-from harbor.core import settings
+from harbor.helpers import settings
 from harbor.repository.mongo import (
     refresh_tokens as mongo_rt,
     users as mongo_user,

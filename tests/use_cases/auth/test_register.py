@@ -6,9 +6,9 @@ from unittest import mock
 import pytest
 from fastapi import BackgroundTasks
 
-from harbor.core import settings
 from harbor.domain.user import User
 from harbor.domain.token import VerificationToken, VerificationPurposeEnum as VerifPur
+from harbor.helpers import settings
 from harbor.repository.base import UserRepo, UsernameTakenError, VerifTokenRepo
 from harbor.use_cases.auth import register as uc_reg
 
@@ -46,7 +46,7 @@ def fixture_verif_token():
 
 @pytest.mark.asyncio
 @mock.patch('harbor.use_cases.auth.register.email')
-@mock.patch('harbor.core.auth.get_password_hash')
+@mock.patch('harbor.helpers.auth.get_password_hash')
 async def test_success_new_user(get_pw_hash, email, uc_req, user, verif_token):
     '''Should register a user'''
     # Create mocks
@@ -85,7 +85,7 @@ async def test_success_new_user(get_pw_hash, email, uc_req, user, verif_token):
 
 @pytest.mark.asyncio
 @mock.patch('harbor.use_cases.auth.register.email')
-@mock.patch('harbor.core.auth.get_password_hash')
+@mock.patch('harbor.helpers.auth.get_password_hash')
 async def test_success_existing_user(get_pw_hash, email, uc_req, verif_token):
     '''Should inform user for registering existing mail address'''
     # Create mocks
@@ -135,7 +135,7 @@ async def test_fail_reserved_username(username):
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.core.auth.get_password_hash')
+@mock.patch('harbor.helpers.auth.get_password_hash')
 async def test_fail_username_taken(get_pw_hash, uc_req):
     '''Should return UsernameTakenError'''
     # Create mocks

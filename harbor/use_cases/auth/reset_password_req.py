@@ -2,8 +2,8 @@
 
 from pydantic import BaseModel, EmailStr
 
-from harbor.core import email
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
+from harbor.helpers import email
 from harbor.repository.base import UserRepo, VerifTokenRepo
 
 

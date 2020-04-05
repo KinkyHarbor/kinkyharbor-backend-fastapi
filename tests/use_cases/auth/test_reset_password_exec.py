@@ -51,7 +51,7 @@ def fixture_test_verif_token():
     (True, uc_exec.ExecResetPasswordResponse.UPDATED),
     (False, uc_exec.ExecResetPasswordResponse.UPDATED_AND_VERIFIED),
 ])
-@mock.patch('harbor.core.auth.get_password_hash')
+@mock.patch('harbor.helpers.auth.get_password_hash')
 async def test_success(get_pw_hash, is_verified, expected, freezer, uc_req,
                        verif_token, verif_token_req):
     '''Should successfully verify a verification token'''

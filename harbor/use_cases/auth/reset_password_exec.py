@@ -4,11 +4,11 @@ import enum
 
 from pydantic import BaseModel
 
-from harbor.core import auth
 from harbor.domain.common import ObjectIdStr, StrongPasswordStr
 from harbor.domain.token import TokenVerifyRequest as VerifTokenReq
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.domain.user import UserFlags
+from harbor.helpers import auth
 from harbor.repository.base import UserRepo, VerifTokenRepo
 
 
