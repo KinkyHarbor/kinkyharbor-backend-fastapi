@@ -60,6 +60,7 @@ class UserMongoRepo(UserRepo):
         return parse_obj_as(List[BaseUser], user_list)
 
     async def add(self,
+                  *,  # Force key words only
                   display_name: str,
                   email: str,
                   password_hash: str) -> User:
@@ -70,7 +71,7 @@ class UserMongoRepo(UserRepo):
 
         # Try to insert new user into database
         try:
-            await self.col.insert_one(user.dict())
+            result = await self.col.insert_one(user.dict())
         except DuplicateKeyError as dup_error:
             if 'username' in str(dup_error):
                 raise UsernameTakenError()
@@ -78,6 +79,7 @@ class UserMongoRepo(UserRepo):
 
         # pylint: disable=no-member
         logging.info('%s: New user "%s" created', __name__, user.display_name)
+        user.id = result.inserted_id
         return User(**user.dict())
 
     async def set_password(self, user_id: str, password_hash: str) -> User:
@@ -93,6 +95,7 @@ class UserMongoRepo(UserRepo):
             {'$set': {flag.value: value}},
             return_document=ReturnDocument.AFTER,
         )
+        assert user_dict is not None, f'User should aways exist. User "{user_id}" not found'
         return User(**user_dict)
 
     async def set_info(self, user_id: str, user_info: Dict) -> User:

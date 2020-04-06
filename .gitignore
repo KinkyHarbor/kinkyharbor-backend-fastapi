@@ -25,12 +25,12 @@
 !/harbor/__init__.py
 !/harbor/app.py
 
-!/harbor/core/
-!/harbor/core/__init__.py
-!/harbor/core/auth.py
-!/harbor/core/db.py
-!/harbor/core/email.py
-!/harbor/core/settings.py
+!/harbor/helpers/
+!/harbor/helpers/__init__.py
+!/harbor/helpers/auth.py
+!/harbor/helpers/db.py
+!/harbor/helpers/email.py
+!/harbor/helpers/settings.py
 
 !/harbor/domain/
 !/harbor/domain/__init__.py
@@ -52,9 +52,15 @@
 
 !/harbor/rest/
 !/harbor/rest/__init__.py
-!/harbor/rest/auth.py
 !/harbor/rest/search.py
 !/harbor/rest/users.py
+
+!/harbor/rest/auth/
+!/harbor/rest/auth/base.py
+!/harbor/rest/auth/login.py
+!/harbor/rest/auth/password_reset.py
+!/harbor/rest/auth/refresh.py
+!/harbor/rest/auth/register.py
 
 !/harbor/use_cases/
 !/harbor/use_cases/__init__.py
@@ -90,6 +96,17 @@
 !/tests/__init__.py
 !/tests/conftest.py
 
+!/tests/domain/
+!/tests/domain/__init__.py
+!/tests/domain/test_common.py
+!/tests/domain/test_token.py
+!/tests/domain/test_user.py
+
+!/tests/helpers/
+!/tests/helpers/__init__.py
+!/tests/helpers/test_auth.py
+!/tests/helpers/test_email.py
+
 !/tests/repository/
 !/tests/repository/__init__.py
 
@@ -100,7 +117,15 @@
 !/tests/rest/
 !/tests/rest/__init__.py
 !/tests/rest/test_app.py
-!/tests/rest/test_auth.py
+!/tests/rest/test_search.py
+!/tests/rest/test_users.py
+
+!/tests/rest/auth/
+!/tests/rest/auth/__init__.py
+!/tests/rest/auth/test_login.py
+!/tests/rest/auth/test_password_reset.py
+!/tests/rest/auth/test_refresh.py
+!/tests/rest/auth/test_register.py
 
 !/tests/use_cases/
 !/tests/use_cases/__init__.py
@@ -109,9 +134,16 @@
 !/tests/use_cases/auth/__init__.py
 !/tests/use_cases/auth/test_login.py
 !/tests/use_cases/auth/test_register.py
-!/tests/use_cases/auth/test_update_profile.py
-!/tests/use_cases/auth/test_verify.py
+!/tests/use_cases/auth/test_register_verify.py
+!/tests/use_cases/auth/test_reset_password_req.py
+!/tests/use_cases/auth/test_reset_password_exec.py
+!/tests/use_cases/auth/test_token_refresh.py
 
 !/tests/use_cases/search/
 !/tests/use_cases/search/__init__.py
-!/tests/use_cases/search/test_all.py
+!/tests/use_cases/search/test_generic.py
+
+!/tests/use_cases/user/
+!/tests/use_cases/user/__init__.py
+!/tests/use_cases/user/test_profile_get.py
+!/tests/use_cases/user/test_profile_update.py

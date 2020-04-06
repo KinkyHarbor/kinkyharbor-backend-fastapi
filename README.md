@@ -1,3 +1,7 @@
+[![Build latest](https://github.com/KinkyHarbor/kinkyharbor-backend-fastapi/workflows/Build%20latest%20Docker%20image/badge.svg)](https://hub.docker.com/r/kinkyharbor/kinkyharbor-backend-fastapi/tags)
+[![codecov](https://codecov.io/gh/KinkyHarbor/kinkyharbor-backend-fastapi/branch/development/graph/badge.svg)](https://codecov.io/gh/KinkyHarbor/kinkyharbor-backend-fastapi)
+[![Maintainability](https://api.codeclimate.com/v1/badges/135715f257043669493e/maintainability)](https://codeclimate.com/github/KinkyHarbor/kinkyharbor-backend-fastapi/maintainability)
+
 # Backend in FastAPI
 
 Generate JWT key and store in `jwt-keys` folder

@@ -1,10 +1,31 @@
 '''This module contains reusable fields and mixins'''
 
 import re
-from typing import Optional, Union
-from bson.objectid import ObjectId
+from datetime import datetime
+from typing import Optional, Union, Dict, Any
 
-from pydantic import BaseModel, Field
+from bson.objectid import ObjectId
+from pydantic import BaseModel, Field, validator
+
+
+class StrictBoolTrue(int):
+    '''Bool which must be True'''
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def __modify_schema__(cls, field_schema: Dict[str, Any]) -> None:
+        field_schema.update(type='boolean')
+
+    @classmethod
+    def validate(cls, value):
+        '''Check if True'''
+        if not isinstance(value, bool):
+            raise TypeError('Value must be a bool')
+        if not bool(value):
+            raise ValueError('Value must be True')
+        return True
 
 
 class DisplayNameStr(str):
@@ -16,6 +37,9 @@ class DisplayNameStr(str):
     @classmethod
     def validate(cls, name):
         '''Check if display name matches criteria'''
+        if len(name) < 1:
+            raise ValueError("Name can't be empty.")
+
         if len(name) > 40:
             raise ValueError("Name is too long. Max 40 characters allowed.")
 
@@ -74,7 +98,7 @@ class ObjectIdStr(str):
     def validate(cls, object_id: Union[str, ObjectId]):
         '''Check if string is a valid ObjectID'''
         if not ObjectId.is_valid(str(object_id)):
-            return ValueError(f"Not a valid ObjectId: {object_id}")
+            raise ValueError(f"Invalid ObjectId: {object_id}")
         return str(object_id)
 
 
@@ -88,6 +112,29 @@ class DBModelMixin(BaseModel):
         json_encoders = {ObjectId: str}
 
 
+class CreatedOnMixin(BaseModel):
+    '''Mixin to add a created on date'''
+    created_on: datetime = None
+
+    @validator('created_on', always=True)
+    @classmethod
+    def set_created_on(cls, created_on):
+        '''Set Created On if not filled'''
+        return created_on or datetime.utcnow()
+
+
 class Message(BaseModel):
     '''Basic response with message'''
+    code: str
     msg: str
+
+
+def message_responses(responses: Dict[int, str]):
+    '''Converts status descriptions to FastAPI dict for responses'''
+    result = {}
+    for (status, msg) in responses.items():
+        result[status] = {
+            'model': Message,
+            'description': msg
+        }
+    return result

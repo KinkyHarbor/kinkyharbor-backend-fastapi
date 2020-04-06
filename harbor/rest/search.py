@@ -2,19 +2,18 @@
 
 from fastapi import APIRouter, Depends
 
-from harbor.core.auth import validate_access_token
 from harbor.domain.token import AccessTokenData
+from harbor.rest.auth.base import validate_access_token
 from harbor.repository.base import RepoDict, get_repos
-from harbor.use_cases.search import (
-    generic as uc_gen_search,
-)
+from harbor.use_cases.search import generic as uc_gen_search
 
 router = APIRouter()
 
 
 @router.get('/',
             summary='Search for people, pages, groups and events',
-            response_model=uc_gen_search.GenericSearchResponse)
+            response_model=uc_gen_search.GenericSearchResponse,
+            response_model_by_alias=False)
 async def search(q: str,
                  token_data: AccessTokenData = Depends(validate_access_token),
                  repos: RepoDict = Depends(get_repos)):

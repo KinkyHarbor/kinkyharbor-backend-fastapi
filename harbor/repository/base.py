@@ -7,7 +7,7 @@ from starlette.requests import Request
 
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.token import RefreshToken, VerificationToken
-from harbor.domain.token import VerificationTokenRequest as VerifTokenReq
+from harbor.domain.token import TokenVerifyRequest as VerifTokenReq
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.domain.user import BaseUser, User, UserWithPassword, UserFlags
 
@@ -39,8 +39,10 @@ class RefreshTokenRepo(Repo):
             None: Token is invalid
         '''
 
+
 class UsernameTakenError(Exception):
     '''Username is already taken'''
+
 
 class UserRepo(Repo):
     '''Repository for users'''
@@ -64,6 +66,7 @@ class UserRepo(Repo):
 
     @abstractmethod
     async def add(self,
+                  *,  # Force key words only
                   display_name: str,
                   email: str,
                   password_hash: str) -> User:

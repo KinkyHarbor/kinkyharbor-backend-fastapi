@@ -55,7 +55,7 @@ def get_mail_security(default_sec: EmailSecurity) -> EmailSecurity:
 DEBUG = get_bool('DEBUG')
 if DEBUG:
     logging.getLogger().setLevel(logging.DEBUG)
-RESERVED_USERNAMES = ['kinkyharbor', 'kinky-harbor', 'kinky_harbor', 'harbor',
+RESERVED_USERNAMES = ['me', 'kinkyharbor', 'kinky-harbor', 'kinky_harbor', 'harbor',
                       'pirate', 'captain', 'admin', '-', '_']
 FRONTEND_URL = get_required_env('FRONTEND_URL')
 CORS = get_cors(FRONTEND_URL)
@@ -79,8 +79,8 @@ JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 15
 async def get_jwt_key(key: str):
     '''Return ECDSA keys from files for JWT signing.'''
     filename = f'{key}.pem'
-    async with aiofiles.open(JWT_KEY_PATH / filename, mode='r') as f:
-        return await f.read()
+    async with aiofiles.open(JWT_KEY_PATH / filename, mode='r') as key_file:
+        return await key_file.read()
 
 # Mongo settings
 MONGO_HOST = environ.get('MONGO_HOST', 'localhost')

@@ -14,17 +14,17 @@ class BaseUser(DBModelMixin):
     display_name: DisplayNameStr
     username: str = None
 
-    @validator('username', pre=True, always=True)
+    @validator('username', always=True)
     @classmethod
     def lowercase_display_name(cls, _, values):
-        '''Converts display name to lowercase for username'''
+        '''Username should match lowercase display name'''
         return values['display_name'].lower()
 
 
 class User(BaseUser):
     '''General user to be used throughout the application'''
     # Core data
-    email: EmailStr
+    email: EmailStr = None
     last_login: datetime = None
     is_admin: bool = False
     is_verified: bool = False

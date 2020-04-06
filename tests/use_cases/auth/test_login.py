@@ -32,8 +32,8 @@ def fixture_test_user():
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.core.auth.create_access_token')
-async def test_uc_user_login_case_insensitive_success(create_access_token, uc_req, test_user):
+@mock.patch('harbor.helpers.auth.create_access_token')
+async def test_success_case_insensitive(create_access_token, uc_req, test_user):
     '''Should return an access and refresh token'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)
@@ -52,13 +52,14 @@ async def test_uc_user_login_case_insensitive_success(create_access_token, uc_re
     # Assert results
     user_repo.get_by_login.assert_called_with('testuser')
     user_repo.update_last_login.assert_called_with(test_user.id)
+    create_access_token.assert_called_with(user_id=test_user.id)
     rt_repo.create_token.assert_called_with(test_user.id)
     assert tokens.access_token == 'TestAccessToken'
     assert tokens.refresh_token == f'{test_user.id}:TestRefreshToken'
 
 
 @pytest.mark.asyncio
-async def test_uc_user_not_found_fail(uc_req):
+async def test_fail_user_not_found(uc_req):
     '''Should throw InvalidCredsError if user is not found'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)
@@ -78,7 +79,7 @@ async def test_uc_user_not_found_fail(uc_req):
 
 
 @pytest.mark.asyncio
-async def test_uc_invalid_password_fail(uc_req, test_user):
+async def test_fail_invalid_password(uc_req, test_user):
     '''Should throw InvalidCredsError if invalid password'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)
@@ -101,7 +102,7 @@ async def test_uc_invalid_password_fail(uc_req, test_user):
 
 
 @pytest.mark.asyncio
-async def test_uc_user_locked_fail(uc_req, test_user):
+async def test_fail_user_locked(uc_req, test_user):
     '''Should throw UserLockedError if user is locked'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)

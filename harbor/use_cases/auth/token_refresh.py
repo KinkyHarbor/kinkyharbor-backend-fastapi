@@ -2,8 +2,8 @@
 
 from pydantic import BaseModel, constr
 
-from harbor.core import auth
 from harbor.domain.token import AccessRefreshTokens, RefreshToken
+from harbor.helpers import auth
 from harbor.repository.base import RefreshTokenRepo
 
 
@@ -34,7 +34,7 @@ class TokenRefreshUseCase:
 
         if new_ref_token:
             # Token is valid => Generate new tokens
-            access_token = await auth.create_access_token(data={"sub": f'user:{user_id}'})
+            access_token = await auth.create_access_token(user_id=user_id)
             return AccessRefreshTokens(
                 access_token=access_token,
                 refresh_token=f'{user_id}:{new_ref_token.secret}',

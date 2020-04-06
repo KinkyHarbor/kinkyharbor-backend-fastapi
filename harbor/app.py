@@ -5,40 +5,44 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 
-from harbor.core import settings
+from harbor.helpers import settings
 from harbor.repository.mongo import (
     refresh_tokens as mongo_rt,
     users as mongo_user,
     verif_tokens as mongo_vt,
 )
+from harbor.rest.auth import base as router_auth
 from harbor.rest import (
-    auth as router_auth,
     search as router_search,
     users as router_users,
 )
 
 
 # Start app
-app = FastAPI()
+app = FastAPI(
+    title='Kinky Harbor',
+    description='Welcome to Kinky Harbor! Your safe harbor.',
+    version='alpha',
+)
 
 # Add routers
 # Auth
 app.include_router(
     router_auth.router,
     prefix='/auth',
-    tags=['auth']
+    tags=['Auth']
 )
 # Search
 app.include_router(
     router_search.router,
     prefix='/search',
-    tags=['search'],
+    tags=['Search'],
 )
 # Users
 app.include_router(
     router_users.router,
     prefix='/users',
-    tags=['users'],
+    tags=['Users'],
 )
 
 # Connect to database

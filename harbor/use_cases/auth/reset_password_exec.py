@@ -4,15 +4,15 @@ import enum
 
 from pydantic import BaseModel
 
-from harbor.core import auth
-from harbor.domain.common import ObjectIdStr, StrongPasswordStr, Message
-from harbor.domain.token import VerificationToken as VerifTokenReq
+from harbor.domain.common import ObjectIdStr, StrongPasswordStr
+from harbor.domain.token import TokenVerifyRequest as VerifTokenReq
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.domain.user import UserFlags
+from harbor.helpers import auth
 from harbor.repository.base import UserRepo, VerifTokenRepo
 
 
-class ExecResetPasswordRequest(BaseModel):
+class ExecPasswordResetRequest(BaseModel):
     '''Request for verify registration usecase'''
     user_id: ObjectIdStr
     token: str
@@ -21,8 +21,8 @@ class ExecResetPasswordRequest(BaseModel):
 
 class ExecResetPasswordResponse(enum.Enum):
     '''Response for verify registration usecase'''
-    UPDATED: 'passwordUpdated'
-    UPDATED_AND_VERIFIED: 'passwordUpdatedAndAccountVerified'
+    UPDATED = 'passwordUpdated'
+    UPDATED_AND_VERIFIED = 'passwordUpdatedAndAccountVerified'
 
 
 class InvalidTokenError(Exception):
@@ -36,7 +36,7 @@ class ExecResetPasswordUseCase:
         self.user_repo = user_repo
         self.vt_repo = vt_repo
 
-    async def execute(self, req: ExecResetPasswordRequest) -> Message:
+    async def execute(self, req: ExecPasswordResetRequest) -> ExecResetPasswordResponse:
         '''Exchanges token for right to set new password and sets VERIFIED flag on user account
 
         Raises:

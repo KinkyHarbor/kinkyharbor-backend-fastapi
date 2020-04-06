@@ -1,20 +1,12 @@
 '''This module contains all token related models'''
 
 import secrets
-from datetime import datetime
 from enum import Enum, unique
 from typing import Optional
 
 from pydantic import BaseModel, validator
 
-from harbor.domain.common import DBModelMixin, ObjectIdStr
-
-
-class AccessToken(BaseModel):
-    '''Token which grants access to the application'''
-    access_token: str = None
-    token: str = None
-    token_type: str
+from harbor.domain.common import CreatedOnMixin, DBModelMixin, ObjectIdStr
 
 
 class AccessTokenData(BaseModel):
@@ -28,22 +20,15 @@ class AccessRefreshTokens(BaseModel):
     refresh_token: str
 
 
-class SecretToken(BaseModel):
+class SecretToken(CreatedOnMixin):
     '''Base token containing a secret'''
     secret: str = None
-    created_on: datetime = None
 
-    @validator('secret', pre=True, always=True)
+    @validator('secret', always=True)
     @classmethod
     def generate_secret(cls, secret):
         '''Generate new secret if not filled'''
         return secret or secrets.token_urlsafe()
-
-    @validator('created_on', pre=True, always=True)
-    @classmethod
-    def set_created_on(cls, created_on):
-        '''Set Created On if not filled'''
-        return created_on or datetime.utcnow()
 
 
 @unique
@@ -54,8 +39,8 @@ class VerificationPurposeEnum(str, Enum):
     CHANGE_EMAIL = 'email'
 
 
-class VerificationTokenRequest(SecretToken):
-    '''Request for verification of account activation, password reset, ...'''
+class VerifTokenData(CreatedOnMixin):
+    '''Model containing data in verification token'''
     purpose: VerificationPurposeEnum
     user_id: Optional[ObjectIdStr]
 
@@ -69,8 +54,13 @@ class VerificationTokenRequest(SecretToken):
         return user_id
 
 
-class VerificationToken(VerificationTokenRequest, DBModelMixin):
+class VerificationToken(SecretToken, VerifTokenData, DBModelMixin):
     '''Provides verification for account activation, password reset, ...'''
+
+
+class TokenVerifyRequest(VerifTokenData):
+    '''Request for verification of account activation, password reset, ...'''
+    secret: str
 
 
 class RefreshToken(SecretToken):

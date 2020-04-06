@@ -5,8 +5,8 @@ from email.headerregistry import Address
 
 import aiosmtplib
 
-from harbor.core import settings
 from harbor.domain.email import EmailMsg, EmailSecurity
+from harbor.helpers import settings
 
 
 def get_address(name: str, email: str) -> Address:
@@ -17,7 +17,6 @@ def get_address(name: str, email: str) -> Address:
 
 async def send_mail(msg: EmailMsg):
     '''Sends an email'''
-    # Build message
     # Build message
     smtp_msg = EmailMessage()
     smtp_msg['Subject'] = msg.subject
@@ -69,6 +68,7 @@ TEMPLATE_REGISTER_HTML = """\
 
 
 def prepare_register_verification(recipient: Address, secret: str) -> EmailMsg:
+    '''Prepare mail with registration verification link'''
     registration_link = f'{settings.FRONTEND_URL}/register/verify?token={secret}'
     msg = TEMPLATE_REGISTER_TEXT.format(
         registration_link=registration_link)
@@ -107,6 +107,7 @@ TEMPLATE_REGISTER_EMAIL_EXISTS_HTML = """\
 
 
 def prepare_register_email_exist(recipient: Address) -> EmailMsg:
+    '''Prepare mail with link to request a password reset'''
     reset_password_link = f'{settings.FRONTEND_URL}/login/request-reset/'
     msg = TEMPLATE_REGISTER_EMAIL_EXISTS_TEXT.format(
         reset_password_link=reset_password_link)
@@ -145,11 +146,10 @@ TEMPLATE_RESET_PASSWORD_HTML = """\
 
 
 def prepare_reset_password(recipient: Address, user_id: str, token: str) -> EmailMsg:
-    reset_password_link = f'{settings.FRONTEND_URL}/login/reset-password?user={user_id}&token={token}'
-    msg = TEMPLATE_RESET_PASSWORD_TEXT.format(
-        reset_password_link=reset_password_link)
-    msg_html = TEMPLATE_RESET_PASSWORD_HTML.format(
-        reset_password_link=reset_password_link)
+    '''Prepare mail with link to reset your password'''
+    link = f'{settings.FRONTEND_URL}/login/reset-password?user={user_id}&token={token}'
+    msg = TEMPLATE_RESET_PASSWORD_TEXT.format(reset_password_link=link)
+    msg_html = TEMPLATE_RESET_PASSWORD_HTML.format(reset_password_link=link)
 
     return EmailMsg(
         recipient=recipient,

@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, constr
 
-from harbor.core import auth
+from harbor.helpers import auth
 from harbor.repository.base import UserRepo, RefreshTokenRepo
 
 
@@ -61,7 +61,7 @@ class LoginUseCase:
         await self.user_repo.update_last_login(user.id)
 
         # Generate tokens
-        access_token = await auth.create_access_token(data={"sub": f'user:{user.id}'})
+        access_token = await auth.create_access_token(user_id=user.id)
         refresh_token = await self.rt_repo.create_token(user.id)
 
         # Return results
