@@ -23,10 +23,10 @@ class VerifTokenMongoRepo(VerifTokenRepo):
         await self.col.create_index('created_on', expireAfterSeconds=3600)
 
     async def create_verif_token(self, user_id: str, purpose: VerifPur) -> VerificationToken:
-        token_req = TokenVerifyRequest(user_id=user_id, purpose=purpose)
+        token = VerificationToken(user_id=user_id, purpose=purpose)
         token_dict = await self.col.find_one_and_update(
             {'user_id': user_id, 'purpose': purpose},
-            {'$set': token_req.dict()},
+            {'$set': token.dict()},
             upsert=True,
             return_document=ReturnDocument.AFTER
         )

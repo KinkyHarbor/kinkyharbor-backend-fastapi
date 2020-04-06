@@ -29,20 +29,20 @@ def test_success_secrettoken_secret_empty():
 
 
 # ================================
-# =      TokenVerifyRequest      =
+# =        VerifTokenData        =
 # ================================
 
 @pytest.mark.parametrize("purpose", [VerifPur.REGISTER])
-def test_success_tokenverifyrequest_user_id_not_required(purpose):
+def test_success_veriftokendata_user_id_not_required(purpose):
     '''User ID should not be required for following verification purposes'''
-    token.TokenVerifyRequest(secret='test-secret', purpose=purpose)
+    token.VerifTokenData(secret='test-secret', purpose=purpose)
 
 
 @pytest.mark.parametrize("purpose", [VerifPur.RESET_PASSWORD, VerifPur.CHANGE_EMAIL])
-def test_fail_tokenverifyrequest_user_id_required(purpose):
+def test_fail_veriftokendata_user_id_required(purpose):
     '''User ID is required for following verification purposes'''
     with pytest.raises(ValidationError) as info:
-        token.TokenVerifyRequest(secret='test-secret', purpose=purpose)
+        token.VerifTokenData(secret='test-secret', purpose=purpose)
     err = info.value.errors()[0]
     assert err['type'] == 'value_error'
     assert "mandatory" in err['msg'].lower()

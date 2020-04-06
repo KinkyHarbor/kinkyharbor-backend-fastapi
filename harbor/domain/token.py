@@ -39,9 +39,8 @@ class VerificationPurposeEnum(str, Enum):
     CHANGE_EMAIL = 'email'
 
 
-class TokenVerifyRequest(CreatedOnMixin):
-    '''Request for verification of account activation, password reset, ...'''
-    secret: str
+class VerifTokenData(CreatedOnMixin):
+    '''Model containing data in verification token'''
     purpose: VerificationPurposeEnum
     user_id: Optional[ObjectIdStr]
 
@@ -55,8 +54,13 @@ class TokenVerifyRequest(CreatedOnMixin):
         return user_id
 
 
-class VerificationToken(TokenVerifyRequest, DBModelMixin):
+class VerificationToken(SecretToken, VerifTokenData, DBModelMixin):
     '''Provides verification for account activation, password reset, ...'''
+
+
+class TokenVerifyRequest(VerifTokenData):
+    '''Request for verification of account activation, password reset, ...'''
+    secret: str
 
 
 class RefreshToken(SecretToken):
