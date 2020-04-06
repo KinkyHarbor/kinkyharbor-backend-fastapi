@@ -15,4 +15,5 @@ EMAIL_FROM_ADDRESS=no-reply@kinkyharbor.com \
 EMAIL_SECURITY=unsecure \
 uvicorn harbor.app:app \
 --reload \
---host=localhost
+--host=localhost \
+--log-level=info
