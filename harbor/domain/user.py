@@ -42,7 +42,7 @@ class UserWithPassword(User):
 
 
 @unique
-class UserFlags(Enum):
+class UserFlags(str, Enum):
     '''Available flags on user profile'''
     ADMIN = 'is_admin'
     VERIFIED = 'is_verified'
