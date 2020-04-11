@@ -7,7 +7,7 @@ from starlette.testclient import TestClient
 
 from harbor.app import app
 from harbor.domain.token import AccessTokenData
-from harbor.domain.user import User
+from harbor.domain.user import User, UserRelation
 from harbor.repository.base import get_repos
 from harbor.rest.auth.base import validate_access_token
 from harbor.use_cases.user import (
@@ -52,8 +52,7 @@ def test_success_get_profile_me(uc_exec, client):
     uc_exec.return_value = uc_get.GetProfileResponse(
         user=user,
         exposed_fields=['test-field'],
-        is_self=True,
-        is_friend=False,
+        relation=UserRelation.SELF,
     )
 
     # Send test request
@@ -69,8 +68,7 @@ def test_success_get_profile_me(uc_exec, client):
     assert response.json() == {
         'user': user.dict(),
         'exposed_fields': ['test-field'],
-        'is_self': True,
-        'is_friend': False,
+        'relation': 'SELF',
     }
     assert response.status_code == 200
 
@@ -132,8 +130,7 @@ def test_success_get_profile_username(uc_exec, client):
     uc_exec.return_value = uc_get.GetProfileResponse(
         user=user,
         exposed_fields=['test-field'],
-        is_self=False,
-        is_friend=True,
+        relation=UserRelation.FRIEND,
     )
 
     # Send test request
@@ -149,8 +146,7 @@ def test_success_get_profile_username(uc_exec, client):
     assert response.json() == {
         'user': user.dict(),
         'exposed_fields': ['test-field'],
-        'is_self': False,
-        'is_friend': True,
+        'relation': 'FRIEND',
     }
     assert response.status_code == 200
 

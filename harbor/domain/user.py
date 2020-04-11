@@ -24,9 +24,9 @@ class BaseUser(DBModelMixin):
 @unique
 class UserRelation(str, Enum):
     '''Technical relation between users'''
-    SELF = 'self'
-    FRIEND = 'friend'
-    STRANGER = 'stranger'
+    SELF = 'SELF'
+    FRIEND = 'FRIEND'
+    STRANGER = 'STRANGER'
 
 
 class User(BaseUser):
@@ -74,16 +74,16 @@ class UserFlags(str, Enum):
     LOCKED = 'is_locked'
 
 
-STRANGER_FIELDS = {
+STRANGER_FIELDS = set([
     'id',
     'display_name',
     'username',
     'is_admin',
-}
+])
 
-FRIEND_FIELDS = {
+FRIEND_FIELDS = set([
     'bio',
     'gender',
     'friends',
     *STRANGER_FIELDS
-}
+])

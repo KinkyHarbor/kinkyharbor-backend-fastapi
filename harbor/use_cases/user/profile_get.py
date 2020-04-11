@@ -5,7 +5,7 @@ from typing import Union, List
 from pydantic import BaseModel
 
 from harbor.domain.common import ObjectIdStr
-from harbor.domain.user import User, FRIEND_FIELDS, STRANGER_FIELDS
+from harbor.domain.user import User, UserRelation, FRIEND_FIELDS, STRANGER_FIELDS
 from harbor.repository.base import UserRepo
 
 
@@ -34,9 +34,8 @@ class UserNotFoundError(Exception):
 class GetProfileResponse(BaseModel):
     '''Result of get profile'''
     user: User
+    relation: UserRelation
     exposed_fields: List[str]
-    is_self: bool
-    is_friend: bool
 
 
 class GetProfileUsercase:
@@ -57,22 +56,22 @@ class GetProfileUsercase:
         if not user:
             raise UserNotFoundError
 
+        # Get relation
+        relation = user.get_relation(req.requester)
+
         # User requested own profile
-        if req.requester == user.id:
+        if relation == UserRelation.SELF:
             return GetProfileResponse(
                 user=user,
-                exposed_fields=list(user.fields.keys()),
-                is_self=True,
-                is_friend=False,
+                relation=UserRelation.SELF,
+                exposed_fields=list(user.__fields__.keys()),
             )
 
         # Restrict returned fields
-        is_friend = req.requester in user.friends
-        include_fields = FRIEND_FIELDS if is_friend else STRANGER_FIELDS
+        include_fields = FRIEND_FIELDS if relation == UserRelation.FRIEND else STRANGER_FIELDS
         filtered_user = user.copy(include=include_fields)
         return GetProfileResponse(
             user=filtered_user,
+            relation=relation,
             exposed_fields=include_fields,
-            is_self=False,
-            is_friend=is_friend,
         )
