@@ -7,8 +7,9 @@
 !/README.md
 
 !/.pylintrc
-!/Dockerfile
+!/celeryworker.dockerfile
 !/docker-compose.dev.yml
+!/Dockerfile
 !/pytest.ini
 !/requirements.txt
 !/start-dev.sh
@@ -24,11 +25,11 @@
 !/harbor/
 !/harbor/__init__.py
 !/harbor/app.py
+!/harbor/tasks_test.py
 
 !/harbor/helpers/
 !/harbor/helpers/__init__.py
 !/harbor/helpers/auth.py
-!/harbor/helpers/db.py
 !/harbor/helpers/email.py
 !/harbor/helpers/settings.py
 
@@ -147,3 +148,9 @@
 !/tests/use_cases/user/__init__.py
 !/tests/use_cases/user/test_profile_get.py
 !/tests/use_cases/user/test_profile_update.py
+
+!/harbor/worker/
+!/harbor/worker/__init__.py
+!/harbor/worker/app.py
+!/harbor/worker/settings.py
+!/harbor/worker/tasks_test.py
