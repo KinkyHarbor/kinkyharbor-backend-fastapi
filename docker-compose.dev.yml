@@ -37,6 +37,7 @@ services:
       dockerfile: celery-worker.dockerfile
     environment:
       - "CELERY_RABBITMQ_HOST=harbor-rabbitmq"
+      - "MONGO_HOST=harbor-mongo"
     depends_on:
       - rabbitmq
 

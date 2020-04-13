@@ -4,7 +4,7 @@ FROM python:3.8
 WORKDIR /usr/src/app
 
 # Install dependencies
-RUN pip install --no-cache-dir celery
+RUN pip install --no-cache-dir celery fastapi motor email_validator aiofiles
 
 # Create non-root user
 RUN useradd celery

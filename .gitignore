@@ -38,6 +38,7 @@
 !/harbor/domain/__init__.py
 !/harbor/domain/common.py
 !/harbor/domain/email.py
+!/harbor/domain/stats.py
 !/harbor/domain/token.py
 !/harbor/domain/user.py
 
@@ -49,6 +50,7 @@
 !/harbor/repository/mongo/__init__.py
 !/harbor/repository/mongo/common.py
 !/harbor/repository/mongo/refresh_tokens.py
+!/harbor/repository/mongo/stats.py
 !/harbor/repository/mongo/users.py
 !/harbor/repository/mongo/verif_tokens.py
 
@@ -85,6 +87,17 @@
 !/harbor/use_cases/user/__init__.py
 !/harbor/use_cases/user/profile_get.py
 !/harbor/use_cases/user/profile_update.py
+
+!/harbor/worker/
+!/harbor/worker/__init__.py
+!/harbor/worker/app.py
+!/harbor/worker/scheduler.py
+!/harbor/worker/settings.py
+
+!/harbor/worker/tasks/
+!/harbor/worker/tasks/__init__.py
+!/harbor/worker/tasks/stats.py
+!/harbor/worker/tasks/email.py
 
 !/jwt-keys/
 !/jwt-keys/.gitkeep
@@ -149,14 +162,3 @@
 !/tests/use_cases/user/__init__.py
 !/tests/use_cases/user/test_profile_get.py
 !/tests/use_cases/user/test_profile_update.py
-
-!/harbor/worker/
-!/harbor/worker/__init__.py
-!/harbor/worker/app.py
-!/harbor/worker/scheduler.py
-!/harbor/worker/settings.py
-
-!/harbor/worker/tasks/
-!/harbor/worker/tasks/__init__.py
-!/harbor/worker/tasks/stats.py
-!/harbor/worker/tasks/email.py
