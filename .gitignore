@@ -7,7 +7,8 @@
 !/README.md
 
 !/.pylintrc
-!/celeryworker.dockerfile
+!/celery-scheduler.dockerfile
+!/celery-worker.dockerfile
 !/docker-compose.dev.yml
 !/Dockerfile
 !/pytest.ini
@@ -152,5 +153,10 @@
 !/harbor/worker/
 !/harbor/worker/__init__.py
 !/harbor/worker/app.py
+!/harbor/worker/scheduler.py
 !/harbor/worker/settings.py
-!/harbor/worker/tasks_test.py
+
+!/harbor/worker/tasks/
+!/harbor/worker/tasks/__init__.py
+!/harbor/worker/tasks/stats.py
+!/harbor/worker/tasks/email.py

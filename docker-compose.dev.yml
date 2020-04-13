@@ -20,6 +20,26 @@ services:
     ports:
       - "127.0.0.1:5672:5672"
 
+  harbor-scheduler:
+    container_name: harbor-scheduler
+    build:
+      context: .
+      dockerfile: celery-scheduler.dockerfile
+    environment:
+      - "CELERY_RABBITMQ_HOST=harbor-rabbitmq"
+    depends_on:
+      - rabbitmq
+
+  harbor-worker:
+    container_name: harbor-worker
+    build:
+      context: .
+      dockerfile: celery-worker.dockerfile
+    environment:
+      - "CELERY_RABBITMQ_HOST=harbor-rabbitmq"
+    depends_on:
+      - rabbitmq
+
   flower:
     container_name: harbor-flower
     image: mher/flower

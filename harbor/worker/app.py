@@ -7,7 +7,12 @@ from harbor.worker import settings
 app = Celery(
     "celery",
     broker=f"amqp://guest@{settings.CELERY_RABBITMQ_HOST}//",
-    include=['harbor.worker.tasks_test'])
+    include=[
+        'harbor.worker.scheduler',
+        'harbor.worker.tasks.email',
+        'harbor.worker.tasks.stats',
+    ])
+
 
 if __name__ == '__main__':
     app.start()

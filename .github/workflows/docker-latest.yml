@@ -56,6 +56,23 @@ jobs:
           TAG_NAME: "latest"
           LATEST: "true"
 
+  build-scheduler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build & Push to Docker Hub
+        uses: opspresso/action-docker@master
+        with:
+          args: --docker
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKERFILE: "celery-scheduler.dockerfile"
+          IMAGE_NAME: "kinkyharbor/kinkyharbor-backend-scheduler"
+          TAG_NAME: "latest"
+          LATEST: "true"
+
   build-worker:
     runs-on: ubuntu-latest
     steps:
@@ -68,7 +85,7 @@ jobs:
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKERFILE: "celeryworker.dockerfile"
+          DOCKERFILE: "celery-worker.dockerfile"
           IMAGE_NAME: "kinkyharbor/kinkyharbor-backend-worker"
           TAG_NAME: "latest"
           LATEST: "true"
