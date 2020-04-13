@@ -1,10 +1,18 @@
 '''This module contains scheduled tasks for Celery'''
 # pylint: disable=unused-argument
 
-# from celery.schedules import crontab
+from celery.schedules import crontab
 
 from harbor.worker.app import app
 # from harbor.worker.tasks import stats
+
+
+app.conf.beat_schedule = {
+    'add-every-30-seconds': {
+        'task': 'harbor.worker.tasks.stats.count_active_users',
+        'schedule': crontab(minute="0", hour="0"),
+    },
+}
 
 
 # @app.on_after_finalize.connect
@@ -21,10 +29,3 @@ from harbor.worker.app import app
 #         schedule=15,
 #         task=stats.count_active_users,
 #     )
-
-app.conf.beat_schedule = {
-    'add-every-30-seconds': {
-        'task': 'harbor.worker.tasks.stats.count_active_users',
-        'schedule': 15,
-    },
-}
