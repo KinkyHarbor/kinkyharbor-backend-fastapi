@@ -118,7 +118,7 @@ async def test_success(get_by, user, uc_res):
         uc_req = get_uc_req_name(user.display_name)
 
     # Call usecase
-    uc = uc_get.GetProfileUsercase(user_repo)
+    uc = uc_get.GetProfileUseCase(user_repo)
     res = await uc.execute(uc_req)
 
     # Assert results
@@ -146,7 +146,7 @@ async def test_fail(get_by, user, uc_res):
         uc_req = get_uc_req_name(user.display_name)
 
     # Call usecase
-    uc = uc_get.GetProfileUsercase(user_repo)
+    uc = uc_get.GetProfileUseCase(user_repo)
     with pytest.raises(uc_get.UserNotFoundError):
         await uc.execute(uc_req)
 

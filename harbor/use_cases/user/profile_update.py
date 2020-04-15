@@ -13,7 +13,7 @@ class UpdateProfileRequest(BaseModel):
     gender: str = None
 
 
-class UpdateProfileUsercase:
+class UpdateProfileUseCase:
     '''User wants to update their profile'''
 
     def __init__(self, user_repo: UserRepo):

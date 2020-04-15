@@ -38,7 +38,7 @@ class GetProfileResponse(BaseModel):
     exposed_fields: List[str]
 
 
-class GetProfileUsercase:
+class GetProfileUseCase:
     '''User requests a user profile'''
 
     def __init__(self, user_repo: UserRepo):

@@ -36,7 +36,7 @@ async def test_all(success, uc_req_all):
     user_repo.set_info.return_value = success
 
     # Call usecase
-    uc = uc_upd.UpdateProfileUsercase(user_repo)
+    uc = uc_upd.UpdateProfileUseCase(user_repo)
     result = await uc.execute(uc_req_all)
 
     # Assert results
@@ -56,7 +56,7 @@ async def test_partial(success, uc_req_partial):
     user_repo.set_info.return_value = success
 
     # Call usecase
-    uc = uc_upd.UpdateProfileUsercase(user_repo)
+    uc = uc_upd.UpdateProfileUseCase(user_repo)
     result = await uc.execute(uc_req_partial)
 
     # Assert results

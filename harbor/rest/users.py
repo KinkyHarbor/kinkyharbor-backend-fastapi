@@ -24,7 +24,7 @@ router = APIRouter()
 async def get_user_me(token_data: AccessTokenData = Depends(validate_access_token),
                       repos: RepoDict = Depends(get_repos)):
     '''Get your own user data.'''
-    uc = uc_get_profile.GetProfileUsercase(user_repo=repos['user'])
+    uc = uc_get_profile.GetProfileUseCase(user_repo=repos['user'])
     uc_req = uc_get_profile.GetProfileByIDRequest(
         requester=token_data.user_id,
         user_id=token_data.user_id,
@@ -47,7 +47,7 @@ async def set_user_me(form: UpdateProfileForm,
                           validate_access_token),
                       repos: RepoDict = Depends(get_repos)):
     '''Set your own user data.'''
-    uc = uc_update_profile.UpdateProfileUsercase(user_repo=repos['user'])
+    uc = uc_update_profile.UpdateProfileUseCase(user_repo=repos['user'])
     uc_req = uc_update_profile.UpdateProfileRequest(
         user_id=token_data.user_id,
         **form.dict(),
@@ -80,7 +80,7 @@ async def get_user(username: str,
                        validate_access_token),
                    repos: RepoDict = Depends(get_repos)):
     '''Get a user profile.'''
-    uc = uc_get_profile.GetProfileUsercase(user_repo=repos['user'])
+    uc = uc_get_profile.GetProfileUseCase(user_repo=repos['user'])
     uc_req = uc_get_profile.GetProfileByUsernameRequest(
         requester=token_data.user_id,
         username=username,

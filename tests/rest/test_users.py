@@ -41,7 +41,7 @@ def fixture_client():
 # =            GET /users/me/           =
 # =======================================
 
-@mock.patch.object(uc_get.GetProfileUsercase, 'execute')
+@mock.patch.object(uc_get.GetProfileUseCase, 'execute')
 def test_success_get_profile_me(uc_exec, client):
     '''Should return user's profile'''
     # Mock use case response
@@ -95,7 +95,7 @@ def fixture_uc_upd_req(json_upd_req):
     )
 
 
-@mock.patch.object(uc_upd.UpdateProfileUsercase, 'execute')
+@mock.patch.object(uc_upd.UpdateProfileUseCase, 'execute')
 def test_success_update_profile(uc_exec, client, json_upd_req, uc_upd_req):
     '''Should update and return user's profile'''
     # Mock use case response
@@ -119,7 +119,7 @@ def test_success_update_profile(uc_exec, client, json_upd_req, uc_upd_req):
 # =       GET /users/{username}/        =
 # =======================================
 
-@mock.patch.object(uc_get.GetProfileUsercase, 'execute')
+@mock.patch.object(uc_get.GetProfileUseCase, 'execute')
 def test_success_get_profile_username(uc_exec, client):
     '''Should return user's profile'''
     # Mock use case response
@@ -151,7 +151,7 @@ def test_success_get_profile_username(uc_exec, client):
     assert response.status_code == 200
 
 
-@mock.patch.object(uc_get.GetProfileUsercase, 'execute')
+@mock.patch.object(uc_get.GetProfileUseCase, 'execute')
 def test_fail_user_not_found(uc_exec, client):
     '''Should return UserNotFoundError'''
     # Mock use case response
