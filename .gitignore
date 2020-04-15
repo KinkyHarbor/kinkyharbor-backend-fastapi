@@ -57,6 +57,7 @@
 !/harbor/rest/
 !/harbor/rest/__init__.py
 !/harbor/rest/search.py
+!/harbor/rest/stats.py
 !/harbor/rest/users.py
 
 !/harbor/rest/auth/
@@ -82,6 +83,10 @@
 !/harbor/use_cases/search/
 !/harbor/use_cases/search/__init__.py
 !/harbor/use_cases/search/generic.py
+
+!/harbor/use_cases/stats/
+!/harbor/use_cases/stats/__init__.py
+!/harbor/use_cases/stats/get_active_user_count.py
 
 !/harbor/use_cases/user/
 !/harbor/use_cases/user/__init__.py

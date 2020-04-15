@@ -1,6 +1,7 @@
 '''Base classes for repositories'''
 
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from typing import List, Dict
 
 from starlette.requests import Request
@@ -48,7 +49,15 @@ class StatsRepo(Repo):
         '''Fetches latest reading for a subject'''
 
     @abstractmethod
-    async def set(self, reading: Reading):
+    async def get_by_month(self,
+                           subject: str,
+                           operation="avg",
+                           from_=timedelta(days=-365),
+                           to=timedelta()):
+        '''Returns aggregated readings for a subject by month'''
+
+    @abstractmethod
+    async def upsert(self, reading: Reading):
         '''Stores a reading'''
 
 
