@@ -49,7 +49,7 @@ def test_success(uc_count, client):
     )
 
     # Send test request
-    response = client.get("/stats/active-users")
+    response = client.get("/stats/active-users/")
 
     # Assert results
     uc_count.assert_called_with()
