@@ -138,6 +138,7 @@
 !/tests/rest/__init__.py
 !/tests/rest/test_app.py
 !/tests/rest/test_search.py
+!/tests/rest/test_stats.py
 !/tests/rest/test_users.py
 
 !/tests/rest/auth/
@@ -162,6 +163,10 @@
 !/tests/use_cases/search/
 !/tests/use_cases/search/__init__.py
 !/tests/use_cases/search/test_generic.py
+
+!/tests/use_cases/stats/
+!/tests/use_cases/stats/__init__.py
+!/tests/use_cases/stats/test_get_active_user_count.py
 
 !/tests/use_cases/user/
 !/tests/use_cases/user/__init__.py
