@@ -26,6 +26,7 @@ class GetActiveUserCountUsecase:
         co_now = self.stats_repo.get_latest(ReadingSubject.ACTIVE_USERS)
         co_history = self.stats_repo.get_by_month(ReadingSubject.ACTIVE_USERS)
         (now, history) = await asyncio.gather(co_now, co_history)
+        now_value = now.value if now is not None else 0
 
         # Return results
-        return GetActiveUserCountResponse(now=now.value, history=history)
+        return GetActiveUserCountResponse(now=now_value, history=history)

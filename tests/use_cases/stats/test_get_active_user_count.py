@@ -54,3 +54,24 @@ async def test_success(now, history):
     )
     assert result.now == now.value
     assert result.history == history
+
+
+@pytest.mark.asyncio
+async def test_no_now_success(history):
+    '''Should return 0 if no current count is found'''
+    # Create mocks
+    stats_repo = mock.Mock(StatsRepo)
+    stats_repo.get_latest.return_value = None
+    stats_repo.get_by_month.return_value = history
+
+    # Call usecase
+    uc = uc_count.GetActiveUserCountUsecase(stats_repo)
+    result = await uc.execute()
+
+    # Assert results
+    stats_repo.get_latest.assert_called_with(stats.ReadingSubject.ACTIVE_USERS)
+    stats_repo.get_by_month.assert_called_with(
+        stats.ReadingSubject.ACTIVE_USERS
+    )
+    assert result.now == 0
+    assert result.history == history
