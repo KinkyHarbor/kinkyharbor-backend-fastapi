@@ -18,7 +18,7 @@ class ActiveUserCountResponse(BaseModel):
     history: Dict[date, int]
 
 
-@router.get('/active-users',
+@router.get('/active-users/',
             summary='Get active user count',
             response_model=ActiveUserCountResponse,
             response_model_by_alias=False)

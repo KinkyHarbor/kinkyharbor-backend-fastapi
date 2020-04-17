@@ -53,7 +53,7 @@ def test_success(uc_count, client):
 
     # Assert results
     uc_count.assert_called_with()
-    assert response.url == 'http://testserver/stats/active-users'
+    assert response.url == 'http://testserver/stats/active-users/'
     assert response.json() == {
         'now': 50,
         'history': {
