@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 
-from harbor.helpers import settings
+from harbor.helpers.settings import get_settings
 from harbor.repository.mongo import (
     refresh_tokens as mongo_rt,
     stats as mongo_stats,
@@ -67,7 +67,7 @@ async def create_repos() -> None:
 # Add CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS,
+    allow_origins=get_settings().CORS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
