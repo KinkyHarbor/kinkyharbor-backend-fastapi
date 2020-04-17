@@ -5,17 +5,21 @@ from pymongo import ReturnDocument
 from harbor.domain.token import VerificationToken, TokenVerifyRequest
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.repository.base import VerifTokenRepo
-from harbor.repository.mongo.common import create_db_client
+from harbor.repository.mongo.common import MongoBaseRepo
 
 
-class VerifTokenMongoRepo(VerifTokenRepo):
+class VerifTokenMongoRepo(MongoBaseRepo, VerifTokenRepo):
     '''Repository for verification tokens in Mongo'''
 
     COLLECTION = 'verif_tokens'
 
     def __init__(self):
-        client = create_db_client()
-        self.col = client[self.COLLECTION]
+        super().__init__()
+        self.col = self.db[self.COLLECTION]
+
+    async def __aenter__(self):
+        await self.ensure_indexes()
+        return self
 
     async def ensure_indexes(self):
         '''Creates required indexes.'''

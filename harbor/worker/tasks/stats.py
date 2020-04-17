@@ -11,8 +11,9 @@ from harbor.worker.app import app
 async def async_count_active_users():
     '''Count and store active users'''
     # Fetch active users
-    user_repo = await users.create_repo()
-    count = await user_repo.count_active_users()
+    count = 0
+    async with users.UserMongoRepo() as user_repo:
+        count = await user_repo.count_active_users()
 
     # Create reading
     today = datetime.now(timezone.utc)
@@ -24,8 +25,8 @@ async def async_count_active_users():
     )
 
     # Save dummy reading
-    stats_repo = await stats.create_repo()
-    await stats_repo.upsert(reading)
+    async with stats.StatsMongoRepo() as stats_repo:
+        await stats_repo.upsert(reading)
 
 
 @app.task
