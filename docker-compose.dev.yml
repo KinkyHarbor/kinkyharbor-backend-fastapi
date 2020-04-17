@@ -14,6 +14,46 @@ services:
     depends_on:
       - mongo
 
+  rabbitmq:
+    container_name: harbor-rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "127.0.0.1:5672:5672"
+
+  harbor-scheduler:
+    container_name: harbor-scheduler
+    build:
+      context: .
+      dockerfile: celery-scheduler.dockerfile
+    environment:
+      - "CELERY_RABBITMQ_HOST=harbor-rabbitmq"
+    depends_on:
+      - rabbitmq
+
+  harbor-worker:
+    container_name: harbor-worker
+    build:
+      context: .
+      dockerfile: celery-worker.dockerfile
+    environment:
+      - "CELERY_RABBITMQ_HOST=harbor-rabbitmq"
+      - "MONGO_HOST=harbor-mongo"
+    depends_on:
+      - rabbitmq
+
+  flower:
+    container_name: harbor-flower
+    image: mher/flower
+    environment:
+      - "FLOWER_BASIC_AUTH=admin:admin"
+    command:
+      - "--broker=amqp://guest@harbor-rabbitmq:5672//"
+      - "--broker_api=http://guest:guest@harbor-rabbitmq:15672/api/"
+    ports:
+      - "127.0.0.1:8055:5555"
+    depends_on:
+      - rabbitmq
+
   smtpd:
     container_name: harbor-smtpd
     image: rnwood/smtp4dev:linux-amd64-v3

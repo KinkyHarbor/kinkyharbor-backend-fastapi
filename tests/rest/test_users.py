@@ -7,7 +7,7 @@ from starlette.testclient import TestClient
 
 from harbor.app import app
 from harbor.domain.token import AccessTokenData
-from harbor.domain.user import User
+from harbor.domain.user import User, UserRelation
 from harbor.repository.base import get_repos
 from harbor.rest.auth.base import validate_access_token
 from harbor.use_cases.user import (
@@ -41,7 +41,7 @@ def fixture_client():
 # =            GET /users/me/           =
 # =======================================
 
-@mock.patch.object(uc_get.GetProfileUsercase, 'execute')
+@mock.patch.object(uc_get.GetProfileUseCase, 'execute')
 def test_success_get_profile_me(uc_exec, client):
     '''Should return user's profile'''
     # Mock use case response
@@ -52,8 +52,7 @@ def test_success_get_profile_me(uc_exec, client):
     uc_exec.return_value = uc_get.GetProfileResponse(
         user=user,
         exposed_fields=['test-field'],
-        is_self=True,
-        is_friend=False,
+        relation=UserRelation.SELF,
     )
 
     # Send test request
@@ -69,8 +68,7 @@ def test_success_get_profile_me(uc_exec, client):
     assert response.json() == {
         'user': user.dict(),
         'exposed_fields': ['test-field'],
-        'is_self': True,
-        'is_friend': False,
+        'relation': 'SELF',
     }
     assert response.status_code == 200
 
@@ -97,7 +95,7 @@ def fixture_uc_upd_req(json_upd_req):
     )
 
 
-@mock.patch.object(uc_upd.UpdateProfileUsercase, 'execute')
+@mock.patch.object(uc_upd.UpdateProfileUseCase, 'execute')
 def test_success_update_profile(uc_exec, client, json_upd_req, uc_upd_req):
     '''Should update and return user's profile'''
     # Mock use case response
@@ -121,7 +119,7 @@ def test_success_update_profile(uc_exec, client, json_upd_req, uc_upd_req):
 # =       GET /users/{username}/        =
 # =======================================
 
-@mock.patch.object(uc_get.GetProfileUsercase, 'execute')
+@mock.patch.object(uc_get.GetProfileUseCase, 'execute')
 def test_success_get_profile_username(uc_exec, client):
     '''Should return user's profile'''
     # Mock use case response
@@ -132,8 +130,7 @@ def test_success_get_profile_username(uc_exec, client):
     uc_exec.return_value = uc_get.GetProfileResponse(
         user=user,
         exposed_fields=['test-field'],
-        is_self=False,
-        is_friend=True,
+        relation=UserRelation.FRIEND,
     )
 
     # Send test request
@@ -149,13 +146,12 @@ def test_success_get_profile_username(uc_exec, client):
     assert response.json() == {
         'user': user.dict(),
         'exposed_fields': ['test-field'],
-        'is_self': False,
-        'is_friend': True,
+        'relation': 'FRIEND',
     }
     assert response.status_code == 200
 
 
-@mock.patch.object(uc_get.GetProfileUsercase, 'execute')
+@mock.patch.object(uc_get.GetProfileUseCase, 'execute')
 def test_fail_user_not_found(uc_exec, client):
     '''Should return UserNotFoundError'''
     # Mock use case response

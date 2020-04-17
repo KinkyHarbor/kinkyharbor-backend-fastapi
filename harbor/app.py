@@ -8,12 +8,14 @@ from starlette.middleware.cors import CORSMiddleware
 from harbor.helpers import settings
 from harbor.repository.mongo import (
     refresh_tokens as mongo_rt,
+    stats as mongo_stats,
     users as mongo_user,
     verif_tokens as mongo_vt,
 )
 from harbor.rest.auth import base as router_auth
 from harbor.rest import (
     search as router_search,
+    stats as router_stats,
     users as router_users,
 )
 
@@ -38,6 +40,12 @@ app.include_router(
     prefix='/search',
     tags=['Search'],
 )
+# Stats
+app.include_router(
+    router_stats.router,
+    prefix='/stats',
+    tags=['Stats'],
+)
 # Users
 app.include_router(
     router_users.router,
@@ -51,6 +59,7 @@ async def create_repos() -> None:
     '''Creates repositories on application start'''
     app.state.repos = {
         'refresh_token': await mongo_rt.create_repo(),
+        'stats': await mongo_stats.create_repo(),
         'user': await mongo_user.create_repo(),
         'verif_token': await mongo_vt.create_repo()
     }

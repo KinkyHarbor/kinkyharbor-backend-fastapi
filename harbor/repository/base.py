@@ -1,11 +1,13 @@
 '''Base classes for repositories'''
 
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from typing import List, Dict
 
 from starlette.requests import Request
 
 from harbor.domain.common import ObjectIdStr
+from harbor.domain.stats import Reading
 from harbor.domain.token import RefreshToken, VerificationToken
 from harbor.domain.token import TokenVerifyRequest as VerifTokenReq
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
@@ -38,6 +40,25 @@ class RefreshTokenRepo(Repo):
             RefreshToken: Token is valid, new token is returned
             None: Token is invalid
         '''
+
+
+class StatsRepo(Repo):
+    '''Repository for statistics'''
+    @abstractmethod
+    async def get_latest(self, subject: str) -> Reading:
+        '''Fetches latest reading for a subject'''
+
+    @abstractmethod
+    async def get_by_month(self,
+                           subject: str,
+                           operation="avg",
+                           from_=timedelta(days=-365),
+                           to=timedelta()):
+        '''Returns aggregated readings for a subject by month'''
+
+    @abstractmethod
+    async def upsert(self, reading: Reading):
+        '''Stores a reading'''
 
 
 class UsernameTakenError(Exception):

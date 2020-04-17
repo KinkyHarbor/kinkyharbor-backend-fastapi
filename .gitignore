@@ -7,8 +7,10 @@
 !/README.md
 
 !/.pylintrc
-!/Dockerfile
+!/celery-scheduler.dockerfile
+!/celery-worker.dockerfile
 !/docker-compose.dev.yml
+!/Dockerfile
 !/pytest.ini
 !/requirements.txt
 !/start-dev.sh
@@ -24,11 +26,11 @@
 !/harbor/
 !/harbor/__init__.py
 !/harbor/app.py
+!/harbor/tasks_test.py
 
 !/harbor/helpers/
 !/harbor/helpers/__init__.py
 !/harbor/helpers/auth.py
-!/harbor/helpers/db.py
 !/harbor/helpers/email.py
 !/harbor/helpers/settings.py
 
@@ -36,6 +38,7 @@
 !/harbor/domain/__init__.py
 !/harbor/domain/common.py
 !/harbor/domain/email.py
+!/harbor/domain/stats.py
 !/harbor/domain/token.py
 !/harbor/domain/user.py
 
@@ -47,12 +50,14 @@
 !/harbor/repository/mongo/__init__.py
 !/harbor/repository/mongo/common.py
 !/harbor/repository/mongo/refresh_tokens.py
+!/harbor/repository/mongo/stats.py
 !/harbor/repository/mongo/users.py
 !/harbor/repository/mongo/verif_tokens.py
 
 !/harbor/rest/
 !/harbor/rest/__init__.py
 !/harbor/rest/search.py
+!/harbor/rest/stats.py
 !/harbor/rest/users.py
 
 !/harbor/rest/auth/
@@ -79,10 +84,25 @@
 !/harbor/use_cases/search/__init__.py
 !/harbor/use_cases/search/generic.py
 
+!/harbor/use_cases/stats/
+!/harbor/use_cases/stats/__init__.py
+!/harbor/use_cases/stats/get_active_user_count.py
+
 !/harbor/use_cases/user/
 !/harbor/use_cases/user/__init__.py
 !/harbor/use_cases/user/profile_get.py
 !/harbor/use_cases/user/profile_update.py
+
+!/harbor/worker/
+!/harbor/worker/__init__.py
+!/harbor/worker/app.py
+!/harbor/worker/scheduler.py
+!/harbor/worker/settings.py
+
+!/harbor/worker/tasks/
+!/harbor/worker/tasks/__init__.py
+!/harbor/worker/tasks/stats.py
+!/harbor/worker/tasks/email.py
 
 !/jwt-keys/
 !/jwt-keys/.gitkeep
@@ -118,6 +138,7 @@
 !/tests/rest/__init__.py
 !/tests/rest/test_app.py
 !/tests/rest/test_search.py
+!/tests/rest/test_stats.py
 !/tests/rest/test_users.py
 
 !/tests/rest/auth/
@@ -142,6 +163,10 @@
 !/tests/use_cases/search/
 !/tests/use_cases/search/__init__.py
 !/tests/use_cases/search/test_generic.py
+
+!/tests/use_cases/stats/
+!/tests/use_cases/stats/__init__.py
+!/tests/use_cases/stats/test_get_active_user_count.py
 
 !/tests/use_cases/user/
 !/tests/use_cases/user/__init__.py

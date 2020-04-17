@@ -1,7 +1,7 @@
 '''This module contains CRUD operations for users'''
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict
 
 from bson.objectid import ObjectId
@@ -59,6 +59,17 @@ class UserMongoRepo(UserRepo):
         user_list = await cursor.to_list(None)
         return parse_obj_as(List[BaseUser], user_list)
 
+    async def count_active_users(self, from_=timedelta(days=-30), to=timedelta()):
+        '''Returns active user count'''
+        datetime_from = datetime.now(timezone.utc) + from_
+        datetime_to = datetime.now(timezone.utc) + to
+        return await self.col.count_documents({
+            'last_login': {
+                '$gte': datetime_from,
+                '$lte': datetime_to,
+            }
+        })
+
     async def add(self,
                   *,  # Force key words only
                   display_name: str,
@@ -109,7 +120,7 @@ class UserMongoRepo(UserRepo):
     async def update_last_login(self, user_id: str):
         return await self.col.find_one_and_update(
             {'_id': ObjectId(user_id)},
-            {'$set': {'last_login': datetime.utcnow()}}
+            {'$set': {'last_login': datetime.now(timezone.utc)}}
         )
 
 

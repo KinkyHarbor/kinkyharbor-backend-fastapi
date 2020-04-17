@@ -57,13 +57,14 @@ if DEBUG:
     logging.getLogger().setLevel(logging.DEBUG)
 RESERVED_USERNAMES = ['me', 'kinkyharbor', 'kinky-harbor', 'kinky_harbor', 'harbor',
                       'pirate', 'captain', 'admin', '-', '_']
-FRONTEND_URL = get_required_env('FRONTEND_URL')
+FRONTEND_URL = environ.get('FRONTEND_URL', 'http://localhost:3000')
 CORS = get_cors(FRONTEND_URL)
 
 
 # Email settings
 EMAIL_FROM_NAME = environ.get('EMAIL_FROM_NAME', 'Kinky Harbor')
-EMAIL_FROM_ADDRESS = get_required_env('EMAIL_FROM_ADDRESS')
+EMAIL_FROM_ADDRESS = environ.get(
+    'EMAIL_FROM_ADDRESS', 'no-reply@kinkyharbor.com')
 EMAIL_HOSTNAME = environ.get('EMAIL_HOSTNAME', 'localhost')
 EMAIL_PORT = int(environ.get('EMAIL_PORT', '25'))
 EMAIL_SECURITY = get_mail_security(EmailSecurity.TLS_SSL)

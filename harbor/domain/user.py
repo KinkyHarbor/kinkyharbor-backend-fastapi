@@ -21,6 +21,14 @@ class BaseUser(DBModelMixin):
         return values['display_name'].lower()
 
 
+@unique
+class UserRelation(str, Enum):
+    '''Technical relation between users'''
+    SELF = 'SELF'
+    FRIEND = 'FRIEND'
+    STRANGER = 'STRANGER'
+
+
 class User(BaseUser):
     '''General user to be used throughout the application'''
     # Core data
@@ -35,6 +43,23 @@ class User(BaseUser):
     gender: str = None
     friends: List[ObjectIdStr] = []
 
+    def get_relation(self, user_id: str) -> UserRelation:
+        '''Get relation between this user and provided user
+
+        Raises
+            ValueError: self.id must be filled to check for relation SELF
+        '''
+        if self.id is None:
+            raise ValueError("Can't get relation if self.id is empty")
+
+        if self.id == user_id:
+            return UserRelation.SELF
+
+        if user_id in self.friends:
+            return UserRelation.FRIEND
+
+        return UserRelation.STRANGER
+
 
 class UserWithPassword(User):
     '''User model including password hash'''
@@ -42,23 +67,23 @@ class UserWithPassword(User):
 
 
 @unique
-class UserFlags(Enum):
+class UserFlags(str, Enum):
     '''Available flags on user profile'''
     ADMIN = 'is_admin'
     VERIFIED = 'is_verified'
     LOCKED = 'is_locked'
 
 
-STRANGER_FIELDS = {
+STRANGER_FIELDS = set([
     'id',
     'display_name',
     'username',
     'is_admin',
-}
+])
 
-FRIEND_FIELDS = {
+FRIEND_FIELDS = set([
     'bio',
     'gender',
     'friends',
     *STRANGER_FIELDS
-}
+])

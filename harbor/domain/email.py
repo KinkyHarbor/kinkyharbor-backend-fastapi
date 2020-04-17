@@ -19,7 +19,7 @@ class EmailMsg(BaseModel):
 
 
 @unique
-class EmailSecurity(Enum):
+class EmailSecurity(str, Enum):
     '''Security options for SMTP'''
     TLS_SSL = 'tls_ssl'
     STARTTLS = 'starttls'

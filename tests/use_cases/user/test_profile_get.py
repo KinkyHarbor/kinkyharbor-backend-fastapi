@@ -5,7 +5,7 @@ from unittest import mock
 
 import pytest
 
-from harbor.domain.user import User, FRIEND_FIELDS, STRANGER_FIELDS
+from harbor.domain.user import User, UserRelation, FRIEND_FIELDS, STRANGER_FIELDS
 from harbor.repository.base import UserRepo
 from harbor.use_cases.user import profile_get as uc_get
 
@@ -26,9 +26,8 @@ def get_uc_res_self(user_self):
     '''Returns a usecase response for own user'''
     return uc_get.GetProfileResponse(
         user=user_self,
-        exposed_fields=list(user_self.fields.keys()),
-        is_self=True,
-        is_friend=False,
+        exposed_fields=list(user_self.__fields__.keys()),
+        relation=UserRelation.SELF,
     )
 
 
@@ -46,8 +45,7 @@ def get_uc_res_friend(user_friend):
     return uc_get.GetProfileResponse(
         user=user_friend.copy(include=FRIEND_FIELDS),
         exposed_fields=FRIEND_FIELDS,
-        is_self=False,
-        is_friend=True,
+        relation=UserRelation.FRIEND,
     )
 
 
@@ -64,8 +62,7 @@ def get_uc_res_stranger(user_stranger):
     return uc_get.GetProfileResponse(
         user=user_stranger.copy(include=STRANGER_FIELDS),
         exposed_fields=STRANGER_FIELDS,
-        is_self=False,
-        is_friend=False,
+        relation=UserRelation.STRANGER,
     )
 
 
@@ -121,7 +118,7 @@ async def test_success(get_by, user, uc_res):
         uc_req = get_uc_req_name(user.display_name)
 
     # Call usecase
-    uc = uc_get.GetProfileUsercase(user_repo)
+    uc = uc_get.GetProfileUseCase(user_repo)
     res = await uc.execute(uc_req)
 
     # Assert results
@@ -149,7 +146,7 @@ async def test_fail(get_by, user, uc_res):
         uc_req = get_uc_req_name(user.display_name)
 
     # Call usecase
-    uc = uc_get.GetProfileUsercase(user_repo)
+    uc = uc_get.GetProfileUseCase(user_repo)
     with pytest.raises(uc_get.UserNotFoundError):
         await uc.execute(uc_req)
 
