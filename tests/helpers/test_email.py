@@ -1,4 +1,5 @@
 '''Unit tests for Email helpers'''
+# pylint: disable=no-member
 
 from unittest import mock
 
@@ -6,7 +7,7 @@ import pytest
 
 from harbor.domain.email import EmailMsg, EmailSecurity
 from harbor.helpers import email
-from harbor.helpers.settings import Settings, get_settings
+from harbor.helpers.settings import get_settings
 
 
 def test_get_address():
