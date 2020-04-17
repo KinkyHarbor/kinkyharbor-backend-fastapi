@@ -1,12 +1,12 @@
 '''Unit tests for Email helpers'''
 
-from email.message import EmailMessage
 from unittest import mock
 
 import pytest
 
 from harbor.domain.email import EmailMsg, EmailSecurity
-from harbor.helpers import email, settings
+from harbor.helpers import email
+from harbor.helpers.settings import Settings, get_settings
 
 
 def test_get_address():
@@ -36,9 +36,13 @@ def fixture_msg(recipient):
 
 def assert_email_send(args, kwargs):
     '''Helper to assert the email.send mock'''
+    # Get settings
+    settings = get_settings()
+
+    # Assert results
     smtp_msg = args[0]
     assert smtp_msg['Subject'] == 'test-subject'
-    assert smtp_msg['From'] == f'{settings.EMAIL_FROM_NAME} <{settings.EMAIL_FROM_ADDRESS}>'
+    assert smtp_msg['From'] == f'{settings.EMAIL_FROM.name} <{settings.EMAIL_FROM.email}>'
     assert smtp_msg['To'] == 'TestUser <user@kh.test>'
     assert kwargs['hostname'] == settings.EMAIL_HOSTNAME
     assert kwargs['port'] == settings.EMAIL_PORT
@@ -47,10 +51,11 @@ def assert_email_send(args, kwargs):
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.helpers.email.settings.EMAIL_SECURITY', None)
 @mock.patch('harbor.helpers.email.aiosmtplib.send')
-async def test_send_mail_unsecure(send, msg):
+async def test_send_mail_unsecure(send, msg, monkeypatch):
     '''Should send a mail over unsecure SMTP'''
+    monkeypatch.setenv("EMAIL_SECURITY", EmailSecurity.UNSECURE)
+    get_settings.cache_clear()
     await email.send_mail(msg)
     args, kwargs = send.call_args
     assert 'use_tls' not in kwargs or not kwargs['use_tls']
@@ -59,10 +64,11 @@ async def test_send_mail_unsecure(send, msg):
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.helpers.email.settings.EMAIL_SECURITY', EmailSecurity.TLS_SSL)
 @mock.patch('harbor.helpers.email.aiosmtplib.send')
-async def test_send_mail_tls_ssl(send, msg):
+async def test_send_mail_tls_ssl(send, msg, monkeypatch):
     '''Should send a mail over SMTP secured with TLS/SSL'''
+    monkeypatch.setenv("EMAIL_SECURITY", EmailSecurity.TLS_SSL)
+    get_settings.cache_clear()
     await email.send_mail(msg)
     args, kwargs = send.call_args
     assert 'use_tls' in kwargs and kwargs['use_tls'] is True
@@ -71,10 +77,11 @@ async def test_send_mail_tls_ssl(send, msg):
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.helpers.email.settings.EMAIL_SECURITY', EmailSecurity.STARTTLS)
 @mock.patch('harbor.helpers.email.aiosmtplib.send')
-async def test_send_mail_starttls(send, msg):
+async def test_send_mail_starttls(send, msg, monkeypatch):
     '''Should send a mail over SMTP secured with STARTTLS'''
+    monkeypatch.setenv("EMAIL_SECURITY", EmailSecurity.STARTTLS)
+    get_settings.cache_clear()
     await email.send_mail(msg)
     args, kwargs = send.call_args
     assert 'use_tls' not in kwargs or not kwargs['use_tls']

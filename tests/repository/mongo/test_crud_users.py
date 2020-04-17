@@ -7,9 +7,6 @@ from harbor.repository.mongo import users
 from harbor.use_cases.auth.register import RegisterRequest
 
 
-settings.MONGO_DATABASE = f'{settings.MONGO_DATABASE}_test'
-
-
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_register_new_user():
