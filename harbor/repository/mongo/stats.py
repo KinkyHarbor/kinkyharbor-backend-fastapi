@@ -12,17 +12,21 @@ from harbor.domain.stats import (
     ReadingAggregationOperation as AggOper
 )
 from harbor.repository.base import StatsRepo
-from harbor.repository.mongo.common import create_db_client
+from harbor.repository.mongo.common import MongoBaseRepo
 
 
-class StatsMongoRepo(StatsRepo):
+class StatsMongoRepo(MongoBaseRepo, StatsRepo):
     '''Repository for statistics in Mongo'''
 
     COLLECTION = 'statistics'
 
     def __init__(self):
-        self.client = create_db_client()
-        self.col = self.client[self.COLLECTION]
+        super().__init__()
+        self.col = self.db[self.COLLECTION]
+
+    async def __aenter__(self):
+        await self.ensure_indexes()
+        return self
 
     async def ensure_indexes(self):
         '''Creates required indexes.'''

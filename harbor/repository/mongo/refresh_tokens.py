@@ -3,17 +3,21 @@
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.token import RefreshToken
 from harbor.repository.base import RefreshTokenRepo
-from harbor.repository.mongo.common import create_db_client
+from harbor.repository.mongo.common import MongoBaseRepo
 
 
-class RefreshTokenMongoRepo(RefreshTokenRepo):
+class RefreshTokenMongoRepo(MongoBaseRepo, RefreshTokenRepo):
     '''Repository for refresh tokens in Mongo'''
 
     COLLECTION = 'refresh_tokens'
 
     def __init__(self):
-        client = create_db_client()
-        self.col = client[self.COLLECTION]
+        super().__init__()
+        self.col = self.db[self.COLLECTION]
+
+    async def __aenter__(self):
+        await self.ensure_indexes()
+        return self
 
     async def ensure_indexes(self):
         '''Creates required indexes.'''

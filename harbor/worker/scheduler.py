@@ -8,9 +8,13 @@ from harbor.worker.app import app
 
 
 app.conf.beat_schedule = {
-    'add-every-30-seconds': {
+    'count-users-at-midnight': {
         'task': 'harbor.worker.tasks.stats.count_active_users',
         'schedule': crontab(minute="0", hour="0"),
+    },
+    'count-users-at-15': {
+        'task': 'harbor.worker.tasks.stats.count_active_users',
+        'schedule': 15,
     },
 }
 
