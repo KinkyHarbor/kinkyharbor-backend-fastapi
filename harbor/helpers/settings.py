@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     MONGO_DATABASE: str = 'kinkyharbor'
 
 
-@lru_cache
+@lru_cache(maxsize=None)
 def get_settings():
     '''Returns cached settings object'''
     settings = Settings()
@@ -45,7 +45,7 @@ def get_settings():
     return settings
 
 
-@lru_cache
+@lru_cache(maxsize=None)
 def get_jwt_key(key: str):
     '''Return ECDSA keys from files for JWT signing.'''
     filename = f'{key}.pem'
