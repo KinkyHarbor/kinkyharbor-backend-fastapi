@@ -4,7 +4,7 @@ from pydantic import BaseModel, EmailStr
 
 from harbor.domain.common import StrictBoolTrue, DisplayNameStr, StrongPasswordStr
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
-from harbor.helpers import auth, email, settings
+from harbor.helpers import auth, email, const
 from harbor.repository import base as repo_base
 from harbor.repository.base import UserRepo, VerifTokenRepo
 
@@ -44,7 +44,7 @@ class RegisterUseCase:
 
         # Check if username is reserved
         username = req.display_name.lower()
-        if username in settings.RESERVED_USERNAMES:
+        if username in const.RESERVED_USERNAMES:
             raise UsernameReservedError()
 
         # Create a new user in the database

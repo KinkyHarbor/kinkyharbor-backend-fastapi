@@ -8,7 +8,8 @@ import jwt
 import pytest
 
 from harbor.domain.token import AccessTokenData
-from harbor.helpers import auth, settings
+from harbor.helpers import auth
+from harbor.helpers.settings import get_settings
 
 
 def test_password_hash_roundtrip():
@@ -19,12 +20,15 @@ def test_password_hash_roundtrip():
 
 @pytest.mark.asyncio
 @mock.patch('harbor.helpers.auth.jwt.encode')
-@mock.patch('harbor.helpers.auth.settings.get_jwt_key')
+@mock.patch('harbor.helpers.auth.get_jwt_key')
 async def test_create_access_token_with_defaults(get_jwt_key, jwt_encode, freezer):
     '''Should return an access token'''
     # Create mocks
     get_jwt_key.return_value = 'test-private-key'
     jwt_encode.return_value = 'test-access-token'
+
+    # Get settings
+    settings = get_settings()
 
     # Call function
     token = await auth.create_access_token(user_id='test-user-id')
@@ -44,12 +48,15 @@ async def test_create_access_token_with_defaults(get_jwt_key, jwt_encode, freeze
 
 @pytest.mark.asyncio
 @mock.patch('harbor.helpers.auth.jwt.encode')
-@mock.patch('harbor.helpers.auth.settings.get_jwt_key')
+@mock.patch('harbor.helpers.auth.get_jwt_key')
 async def test_create_access_token_with_expire(get_jwt_key, jwt_encode, freezer):
     '''Should return an access token'''
     # Create mocks
     get_jwt_key.return_value = 'test-private-key'
     jwt_encode.return_value = 'test-access-token'
+
+    # Get settings
+    settings = get_settings()
 
     # Call function
     delta = timedelta(minutes=123456)
@@ -70,12 +77,15 @@ async def test_create_access_token_with_expire(get_jwt_key, jwt_encode, freezer)
 
 @pytest.mark.asyncio
 @mock.patch('harbor.helpers.auth.jwt.decode')
-@mock.patch('harbor.helpers.auth.settings.get_jwt_key')
+@mock.patch('harbor.helpers.auth.get_jwt_key')
 async def test_success_validate_access_token(get_jwt_key, jwt_decode):
     '''Should return an access token'''
     # Create mocks
     get_jwt_key.return_value = 'test-public-key'
     jwt_decode.return_value = {'sub': 'user:507f1f77bcf86cd799439011'}
+
+    # Get settings
+    settings = get_settings()
 
     # Call function
     data = await auth.validate_access_token(token='test-jwt-token')
@@ -94,12 +104,15 @@ async def test_success_validate_access_token(get_jwt_key, jwt_decode):
 
 @pytest.mark.asyncio
 @mock.patch('harbor.helpers.auth.jwt.decode')
-@mock.patch('harbor.helpers.auth.settings.get_jwt_key')
+@mock.patch('harbor.helpers.auth.get_jwt_key')
 async def test_fail_invalid_token_jwt_error(get_jwt_key, jwt_decode):
     '''Should throw InvalidTokenError'''
     # Create mocks
     get_jwt_key.return_value = 'test-public-key'
     jwt_decode.side_effect = jwt.PyJWTError
+
+    # Get settings
+    settings = get_settings()
 
     # Call function
     with pytest.raises(auth.InvalidTokenError):
@@ -120,12 +133,15 @@ async def test_fail_invalid_token_jwt_error(get_jwt_key, jwt_decode):
     {'sub': 'user:invalid'},
 ])
 @mock.patch('harbor.helpers.auth.jwt.decode')
-@mock.patch('harbor.helpers.auth.settings.get_jwt_key')
+@mock.patch('harbor.helpers.auth.get_jwt_key')
 async def test_fail_invalid_token_other(get_jwt_key, jwt_decode, payload):
     '''Should throw InvalidTokenError'''
     # Create mocks
     get_jwt_key.return_value = 'test-public-key'
     jwt_decode.return_value = payload
+
+    # Get settings
+    settings = get_settings()
 
     # Call function
     with pytest.raises(auth.InvalidTokenError):

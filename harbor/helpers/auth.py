@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from pydantic import ValidationError
 
 from harbor.domain.token import AccessTokenData
-from harbor.helpers import settings
+from harbor.helpers.settings import get_settings, get_jwt_key
 
 PASSLIB_OPTS = {
     'schemes': ['bcrypt'],
@@ -29,18 +29,22 @@ def get_password_hash(password):
 
 async def create_access_token(*, user_id: str, expires_delta: timedelta = None):
     '''Generates an access token containing provided data'''
+    # Get settings
+    settings = get_settings()
+
     # Prepare contents
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
+        minutes = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+        expire = datetime.utcnow() + timedelta(minutes=minutes)
     data = {
         "sub": f"user:{user_id}",
         "exp": expire,
     }
 
     # Generate token
-    jwt_key_private = await settings.get_jwt_key('private')
+    jwt_key_private = get_jwt_key('private')
     return jwt.encode(data, jwt_key_private, algorithm=settings.JWT_ALG)
 
 
@@ -54,9 +58,12 @@ async def validate_access_token(token: str) -> AccessTokenData:
     Raises
         InvalidTokenError: Provided token is invalid
     '''
+    # Get settings
+    settings = get_settings()
+
     # Decode JWT token
     try:
-        jwt_key_public = await settings.get_jwt_key('public')
+        jwt_key_public = get_jwt_key('public')
         payload = jwt.decode(token, jwt_key_public,
                              algorithms=[settings.JWT_ALG])
     except jwt.PyJWTError:

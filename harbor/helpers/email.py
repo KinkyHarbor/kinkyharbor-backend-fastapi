@@ -6,7 +6,7 @@ from email.headerregistry import Address
 import aiosmtplib
 
 from harbor.domain.email import EmailMsg, EmailSecurity
-from harbor.helpers import settings
+from harbor.helpers.settings import get_settings
 
 
 def get_address(name: str, email: str) -> Address:
@@ -17,11 +17,15 @@ def get_address(name: str, email: str) -> Address:
 
 async def send_mail(msg: EmailMsg):
     '''Sends an email'''
+    # Get settings
+    settings = get_settings()
+
     # Build message
     smtp_msg = EmailMessage()
     smtp_msg['Subject'] = msg.subject
-    smtp_msg['From'] = get_address(settings.EMAIL_FROM_NAME,
-                                   settings.EMAIL_FROM_ADDRESS)
+    # pylint: disable=no-member
+    smtp_msg['From'] = get_address(settings.EMAIL_FROM.name,
+                                   settings.EMAIL_FROM.email)
     smtp_msg['To'] = msg.recipient
     smtp_msg.set_content(msg.text)
     smtp_msg.add_alternative(msg.html, subtype='html')
@@ -42,7 +46,7 @@ async def send_mail(msg: EmailMsg):
         hostname=settings.EMAIL_HOSTNAME,
         port=settings.EMAIL_PORT,
         username=settings.EMAIL_USERNAME,
-        password=settings.EMAIL_PASSWORD,
+        password=settings.EMAIL_PASSWORD.get_secret_value(),
         **sec_opts)
 
 
@@ -69,6 +73,10 @@ TEMPLATE_REGISTER_HTML = """\
 
 def prepare_register_verification(recipient: Address, secret: str) -> EmailMsg:
     '''Prepare mail with registration verification link'''
+    # Get settings
+    settings = get_settings()
+
+    # Build message
     registration_link = f'{settings.FRONTEND_URL}/register/verify?token={secret}'
     msg = TEMPLATE_REGISTER_TEXT.format(
         registration_link=registration_link)
@@ -108,6 +116,10 @@ TEMPLATE_REGISTER_EMAIL_EXISTS_HTML = """\
 
 def prepare_register_email_exist(recipient: Address) -> EmailMsg:
     '''Prepare mail with link to request a password reset'''
+    # Get settings
+    settings = get_settings()
+
+    # Build message
     reset_password_link = f'{settings.FRONTEND_URL}/login/request-reset/'
     msg = TEMPLATE_REGISTER_EMAIL_EXISTS_TEXT.format(
         reset_password_link=reset_password_link)
@@ -147,6 +159,10 @@ TEMPLATE_RESET_PASSWORD_HTML = """\
 
 def prepare_reset_password(recipient: Address, user_id: str, token: str) -> EmailMsg:
     '''Prepare mail with link to reset your password'''
+    # Get settings
+    settings = get_settings()
+
+    # Build message
     link = f'{settings.FRONTEND_URL}/login/reset-password?user={user_id}&token={token}'
     msg = TEMPLATE_RESET_PASSWORD_TEXT.format(reset_password_link=link)
     msg_html = TEMPLATE_RESET_PASSWORD_HTML.format(reset_password_link=link)

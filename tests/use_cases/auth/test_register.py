@@ -8,7 +8,7 @@ from fastapi import BackgroundTasks
 
 from harbor.domain.user import User
 from harbor.domain.token import VerificationToken, VerificationPurposeEnum as VerifPur
-from harbor.helpers import settings
+from harbor.helpers import const
 from harbor.repository.base import UserRepo, UsernameTakenError, VerifTokenRepo
 from harbor.use_cases.auth import register as uc_reg
 
@@ -116,7 +116,7 @@ async def test_success_existing_user(get_pw_hash, email, uc_req, verif_token):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize('username', settings.RESERVED_USERNAMES)
+@pytest.mark.parametrize('username', const.RESERVED_USERNAMES)
 async def test_fail_reserved_username(username):
     '''Should return UsernameReservedError'''
     # Create request
