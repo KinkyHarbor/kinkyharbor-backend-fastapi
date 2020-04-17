@@ -46,7 +46,7 @@ async def send_mail(msg: EmailMsg):
         hostname=settings.EMAIL_HOSTNAME,
         port=settings.EMAIL_PORT,
         username=settings.EMAIL_USERNAME,
-        password=settings.EMAIL_PASSWORD,
+        password=settings.EMAIL_PASSWORD.get_secret_value(),
         **sec_opts)
 
 

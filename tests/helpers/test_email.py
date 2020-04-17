@@ -47,7 +47,7 @@ def assert_email_send(args, kwargs):
     assert kwargs['hostname'] == settings.EMAIL_HOSTNAME
     assert kwargs['port'] == settings.EMAIL_PORT
     assert kwargs['username'] == settings.EMAIL_USERNAME
-    assert kwargs['password'] == settings.EMAIL_PASSWORD
+    assert kwargs['password'] == settings.EMAIL_PASSWORD.get_secret_value()
 
 
 @pytest.mark.asyncio
