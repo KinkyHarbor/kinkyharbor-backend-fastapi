@@ -12,10 +12,6 @@ app.conf.beat_schedule = {
         'task': 'harbor.worker.tasks.stats.count_active_users',
         'schedule': crontab(minute="0", hour="0"),
     },
-    'count-users-at-15': {
-        'task': 'harbor.worker.tasks.stats.count_active_users',
-        'schedule': 15,
-    },
 }
 
 
