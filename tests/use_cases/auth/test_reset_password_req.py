@@ -1,13 +1,13 @@
 '''Unit tests for Request Password Reset usecase'''
-# pylint: disable=unused-argument
+# pylint: disable=too-many-arguments
 
 from unittest import mock
 
 import pytest
-from fastapi import BackgroundTasks
 
-from harbor.domain.user import User
+from harbor.domain.email import EmailMsg
 from harbor.domain.token import VerificationToken, VerificationPurposeEnum as VerifPur
+from harbor.domain.user import User
 from harbor.repository.base import UserRepo, VerifTokenRepo
 from harbor.use_cases.auth import reset_password_req as uc_pw_req
 
@@ -38,21 +38,32 @@ def fixture_verif_token():
     )
 
 
+@pytest.fixture(name='msg')
+def fixture_msg():
+    '''Returns an EmailMsg model'''
+    return EmailMsg(
+        to_name='test-User',
+        to_email='user@kh.test',
+        subject='test-subject',
+        text='test-text-content',
+        html='test-html-content',
+    )
+
+
 @pytest.mark.asyncio
+@mock.patch('harbor.use_cases.auth.reset_password_req.celery_app')
 @mock.patch('harbor.use_cases.auth.reset_password_req.email')
-async def test_success(email, uc_req, user, verif_token):
+async def test_success(email, celery_app, uc_req, user, verif_token, msg):
     '''Should send a password reset link'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)
     user_repo.get_by_login.return_value = user
     vt_repo = mock.Mock(VerifTokenRepo)
     vt_repo.create_verif_token.return_value = verif_token
-    email.get_address.return_value = "test-Address"
-    email.prepare_reset_password.return_value = "test-msg"
-    bg_tasks = mock.Mock(BackgroundTasks)
+    email.prepare_reset_password.return_value = msg
 
     # Call usecase
-    uc = uc_pw_req.RequestPasswordResetUseCase(user_repo, vt_repo, bg_tasks)
+    uc = uc_pw_req.RequestPasswordResetUseCase(user_repo, vt_repo)
     await uc.execute(uc_req)
 
     # Assert results
@@ -61,32 +72,34 @@ async def test_success(email, uc_req, user, verif_token):
         '507f1f77bcf86cd799439011',
         VerifPur.RESET_PASSWORD,
     )
-    email.get_address.assert_called_with('TestUser', 'user@kh.test')
     email.prepare_reset_password.assert_called_with(
-        "test-Address",
+        'TestUser',
+        'user@kh.test',
         '507f1f77bcf86cd799439011',
         'test-secret',
     )
-    bg_tasks.add_task.assert_called_with(email.send_mail, "test-msg")
+    celery_app.send_task.assert_called_with(
+        'harbor.worker.tasks.email.send_mail',
+        args=[msg.dict()],
+    )
 
 
 @pytest.mark.asyncio
+@mock.patch('harbor.use_cases.auth.reset_password_req.celery_app')
 @mock.patch('harbor.use_cases.auth.reset_password_req.email')
-async def test_fail(email, uc_req, user):
+async def test_fail(email, celery_app, uc_req):
     '''User not found => Don't send link'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)
     user_repo.get_by_login.return_value = None
     vt_repo = mock.Mock(VerifTokenRepo)
-    bg_tasks = mock.Mock(BackgroundTasks)
 
     # Call usecase
-    uc = uc_pw_req.RequestPasswordResetUseCase(user_repo, vt_repo, bg_tasks)
+    uc = uc_pw_req.RequestPasswordResetUseCase(user_repo, vt_repo)
     await uc.execute(uc_req)
 
     # Assert results
     user_repo.get_by_login.assert_called_with('user@kh.test')
     vt_repo.create_verif_token.assert_not_called()
-    email.get_address.assert_not_called()
     email.prepare_reset_password.assert_not_called()
-    bg_tasks.add_task.assert_not_called()
+    celery_app.send_task.assert_not_called()

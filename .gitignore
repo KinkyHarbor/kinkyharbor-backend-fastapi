@@ -173,3 +173,10 @@
 !/tests/use_cases/user/__init__.py
 !/tests/use_cases/user/test_profile_get.py
 !/tests/use_cases/user/test_profile_update.py
+
+!/tests/worker/
+!/tests/worker/__init__.py
+
+!/tests/worker/tasks/
+!/tests/worker/tasks/__init__.py
+!/tests/worker/tasks/test_email.py

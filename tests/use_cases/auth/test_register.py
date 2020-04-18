@@ -1,13 +1,13 @@
 '''Unit tests for Register User usecase'''
-# pylint: disable=unused-argument
+# pylint: disable=too-many-arguments
 
 from unittest import mock
 
 import pytest
-from fastapi import BackgroundTasks
 
-from harbor.domain.user import User
+from harbor.domain.email import EmailMsg
 from harbor.domain.token import VerificationToken, VerificationPurposeEnum as VerifPur
+from harbor.domain.user import User
 from harbor.helpers import const
 from harbor.repository.base import UserRepo, UsernameTakenError, VerifTokenRepo
 from harbor.use_cases.auth import register as uc_reg
@@ -44,10 +44,23 @@ def fixture_verif_token():
     )
 
 
+@pytest.fixture(name='msg')
+def fixture_msg():
+    '''Returns an EmailMsg model'''
+    return EmailMsg(
+        to_name='test-User',
+        to_email='user@kh.test',
+        subject='test-subject',
+        text='test-text-content',
+        html='test-html-content',
+    )
+
+
 @pytest.mark.asyncio
+@mock.patch('harbor.use_cases.auth.register.celery_app')
 @mock.patch('harbor.use_cases.auth.register.email')
 @mock.patch('harbor.helpers.auth.get_password_hash')
-async def test_success_new_user(get_pw_hash, email, uc_req, user, verif_token):
+async def test_success_new_user(get_pw_hash, email, celery_app, uc_req, user, verif_token, msg):
     '''Should register a user'''
     # Create mocks
     get_pw_hash.return_value = "test-secure-hash"
@@ -55,12 +68,10 @@ async def test_success_new_user(get_pw_hash, email, uc_req, user, verif_token):
     user_repo.add.return_value = user
     vt_repo = mock.Mock(VerifTokenRepo)
     vt_repo.create_verif_token.return_value = verif_token
-    email.get_address.return_value = "test-Address"
-    email.prepare_register_verification.return_value = "test-msg"
-    bg_tasks = mock.Mock(BackgroundTasks)
+    email.prepare_register_verification.return_value = msg
 
     # Call usecase
-    uc = uc_reg.RegisterUseCase(user_repo, vt_repo, bg_tasks)
+    uc = uc_reg.RegisterUseCase(user_repo, vt_repo)
     res = await uc.execute(uc_req)
 
     # Assert results
@@ -71,34 +82,36 @@ async def test_success_new_user(get_pw_hash, email, uc_req, user, verif_token):
         email='user@kh.test',
         password_hash='test-secure-hash'
     )
-    email.get_address.assert_called_with('TestUser', 'user@kh.test')
     vt_repo.create_verif_token.assert_called_with(
         '507f1f77bcf86cd799439011',
         VerifPur.REGISTER,
     )
     email.prepare_register_verification.assert_called_with(
-        "test-Address",
+        'TestUser',
+        'user@kh.test',
         'test-secret',
     )
-    bg_tasks.add_task.assert_called_with(email.send_mail, "test-msg")
+    celery_app.send_task.assert_called_with(
+        'harbor.worker.tasks.email.send_mail',
+        args=[msg.dict()],
+    )
 
 
 @pytest.mark.asyncio
+@mock.patch('harbor.use_cases.auth.register.celery_app')
 @mock.patch('harbor.use_cases.auth.register.email')
 @mock.patch('harbor.helpers.auth.get_password_hash')
-async def test_success_existing_user(get_pw_hash, email, uc_req, verif_token):
+async def test_success_existing_user(get_pw_hash, email, celery_app, uc_req, msg):
     '''Should inform user for registering existing mail address'''
     # Create mocks
     get_pw_hash.return_value = "test-secure-hash"
     user_repo = mock.Mock(UserRepo)
     user_repo.add.return_value = None
     vt_repo = mock.Mock(VerifTokenRepo)
-    email.get_address.return_value = "test-Address"
-    email.prepare_register_email_exist.return_value = "test-msg"
-    bg_tasks = mock.Mock(BackgroundTasks)
+    email.prepare_register_email_exist.return_value = msg
 
     # Call usecase
-    uc = uc_reg.RegisterUseCase(user_repo, vt_repo, bg_tasks)
+    uc = uc_reg.RegisterUseCase(user_repo, vt_repo)
     res = await uc.execute(uc_req)
 
     # Assert results
@@ -109,10 +122,15 @@ async def test_success_existing_user(get_pw_hash, email, uc_req, verif_token):
         email='user@kh.test',
         password_hash='test-secure-hash'
     )
-    email.get_address.assert_called_with('TestUser', 'user@kh.test')
     vt_repo.create_verif_token.assert_not_called()
-    email.prepare_register_email_exist.assert_called_with("test-Address")
-    bg_tasks.add_task.assert_called_with(email.send_mail, "test-msg")
+    email.prepare_register_email_exist.assert_called_with(
+        'TestUser',
+        'user@kh.test'
+    )
+    celery_app.send_task.assert_called_with(
+        'harbor.worker.tasks.email.send_mail',
+        args=[msg.dict()],
+    )
 
 
 @pytest.mark.asyncio
@@ -129,7 +147,7 @@ async def test_fail_reserved_username(username):
     )
 
     # Call usecase
-    uc = uc_reg.RegisterUseCase(None, None, None)
+    uc = uc_reg.RegisterUseCase(None, None)
     with pytest.raises(uc_reg.UsernameReservedError):
         await uc.execute(uc_req)
 
@@ -144,6 +162,6 @@ async def test_fail_username_taken(get_pw_hash, uc_req):
     user_repo.add.side_effect = UsernameTakenError  # Error from repo
 
     # Call usecase
-    uc = uc_reg.RegisterUseCase(user_repo, None, None)
+    uc = uc_reg.RegisterUseCase(user_repo, None)
     with pytest.raises(uc_reg.UsernameTakenError):
         await uc.execute(uc_req)
