@@ -1,20 +1,22 @@
 version: "3.7"
 services:
-  mongo:
+  harbor-mongo:
     container_name: harbor-mongo
     image: mongo
     ports:
       - "127.0.0.1:27017:27017"
 
-  mongo-express:
+  harbor-mongo-web:
     container_name: harbor-mongo-web
     image: mongo-express
     ports:
       - "127.0.0.1:8027:8081"
+    environment:
+      - "ME_CONFIG_MONGODB_SERVER=harbor-mongo"
     depends_on:
-      - mongo
+      - harbor-mongo
 
-  rabbitmq:
+  harbor-rabbitmq:
     container_name: harbor-rabbitmq
     image: rabbitmq:3-management
     ports:
@@ -28,7 +30,7 @@ services:
     environment:
       - "CELERY_RABBITMQ_HOST=harbor-rabbitmq"
     depends_on:
-      - rabbitmq
+      - harbor-rabbitmq
 
   harbor-worker:
     container_name: harbor-worker
@@ -39,9 +41,9 @@ services:
       - "CELERY_RABBITMQ_HOST=harbor-rabbitmq"
       - "MONGO_HOST=harbor-mongo"
     depends_on:
-      - rabbitmq
+      - harbor-rabbitmq
 
-  flower:
+  harbor-flower:
     container_name: harbor-flower
     image: mher/flower
     environment:
@@ -52,11 +54,11 @@ services:
     ports:
       - "127.0.0.1:8055:5555"
     depends_on:
-      - rabbitmq
+      - harbor-rabbitmq
 
-  smtpd:
+  harbor-smtpd:
     container_name: harbor-smtpd
-    image: rnwood/smtp4dev:linux-amd64-v3
+    image: rnwood/smtp4dev:v3
     ports:
       - "127.0.0.1:8025:80"
       - "127.0.0.1:25:25"
