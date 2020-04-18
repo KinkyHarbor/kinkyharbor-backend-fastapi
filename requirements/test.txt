@@ -29,6 +29,3 @@ pytest-env
 pytest-freezegun
 pytest-xdist
 requests
-
-# Email
-aiosmtplib

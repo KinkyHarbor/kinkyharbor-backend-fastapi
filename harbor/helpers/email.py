@@ -1,53 +1,7 @@
-'''This module contains everything to prepare and send mails'''
+'''This module contains all email templates'''
 
-from email.message import EmailMessage
-from email.headerregistry import Address
-
-import aiosmtplib
-
-from harbor.domain.email import EmailMsg, EmailSecurity
+from harbor.domain.email import EmailMsg
 from harbor.helpers.settings import get_settings
-
-
-def get_address(name: str, email: str) -> Address:
-    '''Returns an Address based on recipient name and mail address'''
-    email_parts = email.split('@')
-    return Address(name, email_parts[0], email_parts[1])
-
-
-async def send_mail(msg: EmailMsg):
-    '''Sends an email'''
-    # Get settings
-    settings = get_settings()
-
-    # Build message
-    smtp_msg = EmailMessage()
-    smtp_msg['Subject'] = msg.subject
-    # pylint: disable=no-member
-    smtp_msg['From'] = get_address(settings.EMAIL_FROM.name,
-                                   settings.EMAIL_FROM.email)
-    smtp_msg['To'] = msg.recipient
-    smtp_msg.set_content(msg.text)
-    smtp_msg.add_alternative(msg.html, subtype='html')
-
-    # Get security
-    mail_sec = settings.EMAIL_SECURITY
-    if mail_sec == EmailSecurity.TLS_SSL:
-        sec_opts = {'use_tls': True}
-    elif mail_sec == EmailSecurity.STARTTLS:
-        sec_opts = {'start_tls': True}
-    else:
-        # Unsecure
-        sec_opts = {}
-
-    # Send mail
-    await aiosmtplib.send(
-        smtp_msg,
-        hostname=settings.EMAIL_HOSTNAME,
-        port=settings.EMAIL_PORT,
-        username=settings.EMAIL_USERNAME,
-        password=settings.EMAIL_PASSWORD.get_secret_value(),
-        **sec_opts)
 
 
 TEMPLATE_REGISTER_TEXT = """\
@@ -71,7 +25,7 @@ TEMPLATE_REGISTER_HTML = """\
 """
 
 
-def prepare_register_verification(recipient: Address, secret: str) -> EmailMsg:
+def prepare_register_verification(to_name: str, to_email: str, secret: str) -> EmailMsg:
     '''Prepare mail with registration verification link'''
     # Get settings
     settings = get_settings()
@@ -84,7 +38,8 @@ def prepare_register_verification(recipient: Address, secret: str) -> EmailMsg:
         registration_link=registration_link)
 
     return EmailMsg(
-        recipient=recipient,
+        to_name=to_name,
+        to_email=to_email,
         subject='Verify your Kinky Harbor account',
         text=msg,
         html=msg_html,
@@ -114,7 +69,7 @@ TEMPLATE_REGISTER_EMAIL_EXISTS_HTML = """\
 """
 
 
-def prepare_register_email_exist(recipient: Address) -> EmailMsg:
+def prepare_register_email_exist(to_name: str, to_email: str) -> EmailMsg:
     '''Prepare mail with link to request a password reset'''
     # Get settings
     settings = get_settings()
@@ -127,7 +82,8 @@ def prepare_register_email_exist(recipient: Address) -> EmailMsg:
         reset_password_link=reset_password_link)
 
     return EmailMsg(
-        recipient=recipient,
+        to_name=to_name,
+        to_email=to_email,
         subject='Registration attempt at Kinky Harbor',
         text=msg,
         html=msg_html,
@@ -157,7 +113,7 @@ TEMPLATE_RESET_PASSWORD_HTML = """\
 """
 
 
-def prepare_reset_password(recipient: Address, user_id: str, token: str) -> EmailMsg:
+def prepare_reset_password(to_name: str, to_email: str, user_id: str, token: str) -> EmailMsg:
     '''Prepare mail with link to reset your password'''
     # Get settings
     settings = get_settings()
@@ -168,7 +124,8 @@ def prepare_reset_password(recipient: Address, user_id: str, token: str) -> Emai
     msg_html = TEMPLATE_RESET_PASSWORD_HTML.format(reset_password_link=link)
 
     return EmailMsg(
-        recipient=recipient,
+        to_name=to_name,
+        to_email=to_email,
         subject='Password reset for Kinky Harbor',
         text=msg,
         html=msg_html,

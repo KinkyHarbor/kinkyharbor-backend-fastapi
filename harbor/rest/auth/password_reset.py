@@ -1,6 +1,6 @@
 '''This module contains all password reset related routes'''
 
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, EmailStr
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST
@@ -25,13 +25,11 @@ class RequestPasswordResetForm(BaseModel):
              summary='Request mail with password reset link',
              response_model=Message)
 async def request_password_reset(form: RequestPasswordResetForm,
-                                 background_tasks: BackgroundTasks,
                                  repos: RepoDict = Depends(get_repos)):
     '''User requests a password reset'''
     uc = uc_user_reset_pw_req.RequestPasswordResetUseCase(
         user_repo=repos['user'],
         vt_repo=repos['verif_token'],
-        background_tasks=background_tasks,
     )
     uc_req = uc_user_reset_pw_req.RequestPasswordResetRequest(
         email=form.email

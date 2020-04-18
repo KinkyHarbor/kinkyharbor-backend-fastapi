@@ -7,6 +7,7 @@ from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.helpers import auth, email, const
 from harbor.repository import base as repo_base
 from harbor.repository.base import UserRepo, VerifTokenRepo
+from harbor.worker.app import app as celery_app
 
 
 class RegisterRequest(BaseModel):
@@ -29,10 +30,9 @@ class UsernameTakenError(Exception):
 class RegisterUseCase:
     '''User registers a new account'''
 
-    def __init__(self, user_repo: UserRepo, vt_repo: VerifTokenRepo, background_tasks):
+    def __init__(self, user_repo: UserRepo, vt_repo: VerifTokenRepo):
         self.user_repo = user_repo
         self.vt_repo = vt_repo
-        self.bg_tasks = background_tasks  # TODO: Move to tool like Celery
 
     async def execute(self, req: RegisterRequest) -> bool:
         '''Validate info and add new user. Sends verification mail on success.
@@ -59,17 +59,26 @@ class RegisterUseCase:
             raise UsernameTakenError
 
         # Send mail to user
-        recipient = email.get_address(req.display_name, req.email)
         if user:
             # Get verification token
             token = await self.vt_repo.create_verif_token(user.id, VerifPur.REGISTER)
 
             # Send verification mail
-            msg = email.prepare_register_verification(recipient, token.secret)
+            msg = email.prepare_register_verification(
+                req.display_name,
+                req.email,
+                token.secret
+            )
         else:
             # Send password reset mail
-            msg = email.prepare_register_email_exist(recipient)
+            msg = email.prepare_register_email_exist(
+                req.display_name,
+                req.email,
+            )
 
         # Send mail and confirm success
-        self.bg_tasks.add_task(email.send_mail, msg)
+        celery_app.send_task(
+            'harbor.worker.tasks.email.send_mail',
+            args=[msg.dict()],
+        )
         return True

@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     # Email
     EMAIL_FROM: NameEmail = 'Kinky Harbor <no-reply@kinkyharbor.com>'
-    EMAIL_HOSTNAME: str = 'localhost'
+    EMAIL_HOSTNAME: str = 'harbor-smtpd'
     EMAIL_PORT: int = 25
     EMAIL_SECURITY: EmailSecurity = EmailSecurity.UNSECURE
     EMAIL_USERNAME: str = ''

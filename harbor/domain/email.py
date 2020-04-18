@@ -1,21 +1,17 @@
 '''This module contains all email related models'''
 
 from enum import Enum, unique
-from email.headerregistry import Address
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class EmailMsg(BaseModel):
     '''Email message'''
-    recipient: Address
+    to_name: str
+    to_email: EmailStr
     subject: str
     text: str
     html: str
-
-    class Config:
-        '''Pydantic config'''
-        arbitrary_types_allowed = True
 
 
 @unique

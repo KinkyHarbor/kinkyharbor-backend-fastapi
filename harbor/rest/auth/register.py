@@ -1,6 +1,6 @@
 '''This module contains all registration related routes'''
 
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, constr, EmailStr, Field
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_409_CONFLICT
@@ -46,14 +46,11 @@ class RegisterForm(BaseModel):
                  403: 'Username is reserved (Code: reserved_username)',
                  409: 'Username already taken (Code: username_taken)',
              }))
-async def register(form: RegisterForm,
-                   background_tasks: BackgroundTasks,
-                   repos: RepoDict = Depends(get_repos)):
+async def register(form: RegisterForm, repos: RepoDict = Depends(get_repos)):
     '''Register a new user and send verification link'''
     uc = uc_user_register.RegisterUseCase(
         repos['user'],
         repos['verif_token'],
-        background_tasks
     )
 
     try:
