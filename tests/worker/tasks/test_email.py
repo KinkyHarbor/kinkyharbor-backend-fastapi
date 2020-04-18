@@ -22,7 +22,7 @@ def test_get_address():
 def fixture_msg():
     '''Returns an EmailMsg model'''
     return EmailMsg(
-        to_name='test-User',
+        to_name='TestUser',
         to_email='user@kh.test',
         subject='test-subject',
         text='test-text-content',
@@ -30,7 +30,7 @@ def fixture_msg():
     )
 
 
-def assert_email_send(args, kwargs):
+def assert_email_send(args):
     '''Helper to assert the email.send mock'''
     # Get settings
     settings = get_settings()
@@ -40,43 +40,111 @@ def assert_email_send(args, kwargs):
     assert smtp_msg['Subject'] == 'test-subject'
     assert smtp_msg['From'] == f'{settings.EMAIL_FROM.name} <{settings.EMAIL_FROM.email}>'
     assert smtp_msg['To'] == 'TestUser <user@kh.test>'
-    assert kwargs['hostname'] == settings.EMAIL_HOSTNAME
-    assert kwargs['port'] == settings.EMAIL_PORT
-    assert kwargs['username'] == settings.EMAIL_USERNAME
-    assert kwargs['password'] == settings.EMAIL_PASSWORD.get_secret_value()
 
 
-@mock.patch('harbor.helpers.email.aiosmtplib.send')
-async def test_send_mail_unsecure(send, msg, monkeypatch):
+@pytest.mark.parametrize('with_login,username,password', [
+    (False, '', ''),
+    (True, 'test-username', 'test-password'),
+])
+@mock.patch('harbor.worker.tasks.email.smtplib.SMTP_SSL')
+@mock.patch('harbor.worker.tasks.email.smtplib.SMTP')
+def test_send_mail_unsecure(smtp, smtp_ssl, with_login, username, password, msg, monkeypatch):
     '''Should send a mail over unsecure SMTP'''
+    # Mock ENV settings
+    monkeypatch.setenv("EMAIL_USERNAME", username)
+    monkeypatch.setenv("EMAIL_PASSWORD", password)
     monkeypatch.setenv("EMAIL_SECURITY", EmailSecurity.UNSECURE)
     get_settings.cache_clear()
-    await email.send_mail(msg)
-    args, kwargs = send.call_args
-    assert 'use_tls' not in kwargs or not kwargs['use_tls']
-    assert 'start_tls' not in kwargs or not kwargs['start_tls']
-    assert_email_send(args, kwargs)
+    settings = get_settings()
+
+    # Create mocks
+    mock_smtp_ctx = mock.MagicMock()
+    mock_smtp = mock.MagicMock()
+    mock_smtp.__enter__.return_value = mock_smtp_ctx
+    smtp.return_value = mock_smtp
+
+    # Call task
+    email.send_mail(msg.dict())
+
+    # Assert results
+    smtp.assert_called_with(settings.EMAIL_HOSTNAME, settings.EMAIL_PORT)
+    smtp_ssl.assert_not_called()
+    mock_smtp_ctx.starttls.assert_not_called()
+    if with_login:
+        mock_smtp_ctx.login.assert_called_with(username, password)
+    else:
+        mock_smtp_ctx.login.assert_not_called()
+    args, _ = mock_smtp_ctx.send_message.call_args
+    assert_email_send(args)
 
 
-@mock.patch('harbor.helpers.email.aiosmtplib.send')
-async def test_send_mail_tls_ssl(send, msg, monkeypatch):
+@pytest.mark.parametrize('with_login,username,password', [
+    (False, '', ''),
+    (True, 'test-username', 'test-password'),
+])
+@mock.patch('harbor.worker.tasks.email.smtplib.SMTP_SSL')
+@mock.patch('harbor.worker.tasks.email.smtplib.SMTP')
+def test_send_mail_tls_ssl(smtp, smtp_ssl, with_login, username, password, msg, monkeypatch):
     '''Should send a mail over SMTP secured with TLS/SSL'''
+    # Mock ENV settings
+    monkeypatch.setenv("EMAIL_USERNAME", username)
+    monkeypatch.setenv("EMAIL_PASSWORD", password)
     monkeypatch.setenv("EMAIL_SECURITY", EmailSecurity.TLS_SSL)
     get_settings.cache_clear()
-    await email.send_mail(msg)
-    args, kwargs = send.call_args
-    assert 'use_tls' in kwargs and kwargs['use_tls'] is True
-    assert 'start_tls' not in kwargs or not kwargs['start_tls']
-    assert_email_send(args, kwargs)
+    settings = get_settings()
+
+    # Create mocks
+    mock_smtp_ctx = mock.MagicMock()
+    mock_smtp = mock.MagicMock()
+    mock_smtp.__enter__.return_value = mock_smtp_ctx
+    smtp_ssl.return_value = mock_smtp
+
+    # Call task
+    email.send_mail(msg.dict())
+
+    # Assert results
+    smtp_ssl.assert_called_with(settings.EMAIL_HOSTNAME, settings.EMAIL_PORT)
+    smtp.assert_not_called()
+    mock_smtp_ctx.starttls.assert_not_called()
+    if with_login:
+        mock_smtp_ctx.login.assert_called_with(username, password)
+    else:
+        mock_smtp_ctx.login.assert_not_called()
+    args, _ = mock_smtp_ctx.send_message.call_args
+    assert_email_send(args)
 
 
-@mock.patch('harbor.helpers.email.aiosmtplib.send')
-async def test_send_mail_starttls(send, msg, monkeypatch):
+@pytest.mark.parametrize('with_login,username,password', [
+    (False, '', ''),
+    (True, 'test-username', 'test-password'),
+])
+@mock.patch('harbor.worker.tasks.email.smtplib.SMTP_SSL')
+@mock.patch('harbor.worker.tasks.email.smtplib.SMTP')
+def test_send_mail_starttls(smtp, smtp_ssl, with_login, username, password, msg, monkeypatch):
     '''Should send a mail over SMTP secured with STARTTLS'''
+    # Mock ENV settings
+    monkeypatch.setenv("EMAIL_USERNAME", username)
+    monkeypatch.setenv("EMAIL_PASSWORD", password)
     monkeypatch.setenv("EMAIL_SECURITY", EmailSecurity.STARTTLS)
     get_settings.cache_clear()
-    await email.send_mail(msg)
-    args, kwargs = send.call_args
-    assert 'use_tls' not in kwargs or not kwargs['use_tls']
-    assert 'start_tls' in kwargs and kwargs['start_tls'] is True
-    assert_email_send(args, kwargs)
+    settings = get_settings()
+
+    # Create mocks
+    mock_smtp_ctx = mock.MagicMock()
+    mock_smtp = mock.MagicMock()
+    mock_smtp.__enter__.return_value = mock_smtp_ctx
+    smtp.return_value = mock_smtp
+
+    # Call task
+    email.send_mail(msg.dict())
+
+    # Assert results
+    smtp.assert_called_with(settings.EMAIL_HOSTNAME, settings.EMAIL_PORT)
+    smtp_ssl.assert_not_called()
+    mock_smtp_ctx.starttls.assert_called_with()
+    if with_login:
+        mock_smtp_ctx.login.assert_called_with(username, password)
+    else:
+        mock_smtp_ctx.login.assert_not_called()
+    args, _ = mock_smtp_ctx.send_message.call_args
+    assert_email_send(args)
