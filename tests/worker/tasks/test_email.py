@@ -58,9 +58,8 @@ def test_send_mail_unsecure(smtp, smtp_ssl, with_login, username, password, msg,
     settings = get_settings()
 
     # Create mocks
-    mock_smtp_ctx = mock.MagicMock()
     mock_smtp = mock.MagicMock()
-    mock_smtp.__enter__.return_value = mock_smtp_ctx
+    mock_smtp.__enter__.return_value = mock_smtp
     smtp.return_value = mock_smtp
 
     # Call task
@@ -69,12 +68,12 @@ def test_send_mail_unsecure(smtp, smtp_ssl, with_login, username, password, msg,
     # Assert results
     smtp.assert_called_with(settings.EMAIL_HOSTNAME, settings.EMAIL_PORT)
     smtp_ssl.assert_not_called()
-    mock_smtp_ctx.starttls.assert_not_called()
+    mock_smtp.starttls.assert_not_called()
     if with_login:
-        mock_smtp_ctx.login.assert_called_with(username, password)
+        mock_smtp.login.assert_called_with(username, password)
     else:
-        mock_smtp_ctx.login.assert_not_called()
-    args, _ = mock_smtp_ctx.send_message.call_args
+        mock_smtp.login.assert_not_called()
+    args, _ = mock_smtp.send_message.call_args
     assert_email_send(args)
 
 
@@ -94,9 +93,8 @@ def test_send_mail_tls_ssl(smtp, smtp_ssl, with_login, username, password, msg, 
     settings = get_settings()
 
     # Create mocks
-    mock_smtp_ctx = mock.MagicMock()
     mock_smtp = mock.MagicMock()
-    mock_smtp.__enter__.return_value = mock_smtp_ctx
+    mock_smtp.__enter__.return_value = mock_smtp
     smtp_ssl.return_value = mock_smtp
 
     # Call task
@@ -105,12 +103,12 @@ def test_send_mail_tls_ssl(smtp, smtp_ssl, with_login, username, password, msg, 
     # Assert results
     smtp_ssl.assert_called_with(settings.EMAIL_HOSTNAME, settings.EMAIL_PORT)
     smtp.assert_not_called()
-    mock_smtp_ctx.starttls.assert_not_called()
+    mock_smtp.starttls.assert_not_called()
     if with_login:
-        mock_smtp_ctx.login.assert_called_with(username, password)
+        mock_smtp.login.assert_called_with(username, password)
     else:
-        mock_smtp_ctx.login.assert_not_called()
-    args, _ = mock_smtp_ctx.send_message.call_args
+        mock_smtp.login.assert_not_called()
+    args, _ = mock_smtp.send_message.call_args
     assert_email_send(args)
 
 
@@ -130,9 +128,8 @@ def test_send_mail_starttls(smtp, smtp_ssl, with_login, username, password, msg,
     settings = get_settings()
 
     # Create mocks
-    mock_smtp_ctx = mock.MagicMock()
     mock_smtp = mock.MagicMock()
-    mock_smtp.__enter__.return_value = mock_smtp_ctx
+    mock_smtp.__enter__.return_value = mock_smtp
     smtp.return_value = mock_smtp
 
     # Call task
@@ -141,10 +138,10 @@ def test_send_mail_starttls(smtp, smtp_ssl, with_login, username, password, msg,
     # Assert results
     smtp.assert_called_with(settings.EMAIL_HOSTNAME, settings.EMAIL_PORT)
     smtp_ssl.assert_not_called()
-    mock_smtp_ctx.starttls.assert_called_with()
+    mock_smtp.starttls.assert_called_with()
     if with_login:
-        mock_smtp_ctx.login.assert_called_with(username, password)
+        mock_smtp.login.assert_called_with(username, password)
     else:
-        mock_smtp_ctx.login.assert_not_called()
-    args, _ = mock_smtp_ctx.send_message.call_args
+        mock_smtp.login.assert_not_called()
+    args, _ = mock_smtp.send_message.call_args
     assert_email_send(args)
