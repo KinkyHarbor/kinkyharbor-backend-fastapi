@@ -91,7 +91,7 @@ class MarkNotificationAsForm(BaseModel):
     mark_as: MarkAs
 
 
-@router.post('/mark_as_read',
+@router.post('/mark-as-read',
              summary="Mark multiple notifications as read or unread",
              response_model=List[Notification],
              response_model_by_alias=False)
