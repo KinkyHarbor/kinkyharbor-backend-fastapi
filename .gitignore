@@ -147,6 +147,7 @@
 !/tests/rest/
 !/tests/rest/__init__.py
 !/tests/rest/test_app.py
+!/tests/rest/test_notifications.py
 !/tests/rest/test_search.py
 !/tests/rest/test_stats.py
 !/tests/rest/test_users.py
@@ -169,6 +170,12 @@
 !/tests/use_cases/auth/test_reset_password_req.py
 !/tests/use_cases/auth/test_reset_password_exec.py
 !/tests/use_cases/auth/test_token_refresh.py
+
+!/tests/use_cases/notifications/
+!/tests/use_cases/notifications/__init__.py
+!/tests/use_cases/notifications/test_get_historic.py
+!/tests/use_cases/notifications/test_get_recent.py
+!/tests/use_cases/notifications/test_mark_as_read.py
 
 !/tests/use_cases/search/
 !/tests/use_cases/search/__init__.py
