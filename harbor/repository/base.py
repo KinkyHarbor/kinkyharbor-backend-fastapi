@@ -1,12 +1,13 @@
 '''Base classes for repositories'''
 
 from abc import ABC, abstractmethod
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import List, Dict
 
 from starlette.requests import Request
 
 from harbor.domain.common import ObjectIdStr
+from harbor.domain.notification import Notification
 from harbor.domain.stats import Reading
 from harbor.domain.token import RefreshToken, VerificationToken
 from harbor.domain.token import TokenVerifyRequest as VerifTokenReq
@@ -24,6 +25,32 @@ RepoDict = Dict[str, Repo]
 def get_repos(request: Request) -> RepoDict:
     '''Returns instance of all repositories from request'''
     return request.app.state.repos
+
+
+class NotificationRepo(Repo):
+    '''Repository for notifications'''
+    @abstractmethod
+    async def get_recent(self, user_id: str) -> List[Notification]:
+        '''Returns all recent notifications for a user
+
+        A recent notification is either not read yet or is maximum one week old
+        '''
+
+    @abstractmethod
+    async def get_historic(self, user_id: str, from_: datetime, to: datetime) -> List[Notification]:
+        '''Returns notifications for a user for a range in time'''
+
+    @abstractmethod
+    async def get_search(self, user_id: str, search_string: str) -> List[Notification]:
+        '''Searches in all notifications of a user'''
+
+    @abstractmethod
+    async def add(self, notification: Notification):
+        '''Adds a notification for a user'''
+
+    @abstractmethod
+    async def set_read(self, user_id: str, notif_ids: List[str], value: bool = True):
+        '''Sets "is_read" flag on multiple notifications'''
 
 
 class RefreshTokenRepo(Repo):

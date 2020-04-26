@@ -39,6 +39,7 @@
 !/harbor/domain/__init__.py
 !/harbor/domain/common.py
 !/harbor/domain/email.py
+!/harbor/domain/notification.py
 !/harbor/domain/stats.py
 !/harbor/domain/token.py
 !/harbor/domain/user.py
@@ -50,6 +51,7 @@
 !/harbor/repository/mongo/
 !/harbor/repository/mongo/__init__.py
 !/harbor/repository/mongo/common.py
+!/harbor/repository/mongo/notifications.py
 !/harbor/repository/mongo/refresh_tokens.py
 !/harbor/repository/mongo/stats.py
 !/harbor/repository/mongo/users.py
@@ -57,6 +59,7 @@
 
 !/harbor/rest/
 !/harbor/rest/__init__.py
+!/harbor/rest/notifications.py
 !/harbor/rest/search.py
 !/harbor/rest/stats.py
 !/harbor/rest/users.py
@@ -80,6 +83,12 @@
 !/harbor/use_cases/auth/reset_password_req.py
 !/harbor/use_cases/auth/token_refresh.py
 !/harbor/use_cases/auth/update_profile.py
+
+!/harbor/use_cases/notifications/
+!/harbor/use_cases/notifications/__init__.py
+!/harbor/use_cases/notifications/get_historic.py
+!/harbor/use_cases/notifications/get_recent.py
+!/harbor/use_cases/notifications/mark_as_read.py
 
 !/harbor/use_cases/search/
 !/harbor/use_cases/search/__init__.py
