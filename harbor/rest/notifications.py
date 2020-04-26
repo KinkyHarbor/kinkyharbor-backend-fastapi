@@ -78,17 +78,10 @@ async def get_historic(form: GetHistoricNotificationsForm,
         )
 
 
-@unique
-class MarkAs(str, Enum):
-    '''Mark notification as read or unread'''
-    READ = 'READ'
-    UNREAD = 'UNREAD'
-
-
 class MarkNotificationAsForm(BaseModel):
     '''Form to mark notifications as read or unread'''
     notification_ids: List[ObjectIdStr]
-    mark_as: MarkAs
+    unread: bool = Field(False, title="Mark as unread")
 
 
 class MarkNotificationAsResponse(BaseModel):
@@ -108,7 +101,7 @@ async def mark_as(form: MarkNotificationAsForm,
     uc_req = uc_mark_read.MarkAsReadRequest(
         user_id=token_data.user_id,
         notifications=form.notification_ids,
-        is_read=(form.mark_as == MarkAs.READ)
+        is_read=(not form.unread)
     )
 
     # Call use case and return results
