@@ -43,7 +43,7 @@ class GetHistoricNotificationsForm(BaseModel):
     to: datetime
 
 
-@router.post('/get-historic',
+@router.post('/get-historic/',
              summary='Get historic notifications',
              response_model=List[Notification],
              response_model_by_alias=False,
@@ -91,7 +91,7 @@ class MarkNotificationAsForm(BaseModel):
     mark_as: MarkAs
 
 
-@router.post('/mark-as-read',
+@router.post('/mark-as-read/',
              summary="Mark multiple notifications as read or unread",
              response_model=List[Notification],
              response_model_by_alias=False)
