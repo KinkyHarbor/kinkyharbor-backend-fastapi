@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 from typing import List
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.notification import Notification
@@ -16,13 +16,9 @@ class GetHistoricRequest(BaseModel):
     from_: datetime
     to: datetime
 
-    @validator('to')
-    @classmethod
-    def max_time_range(cls, value, values):
-        '''Time range should be maximum 90 days'''
-        if value - values['from_'] > timedelta(days=90):
-            raise ValueError('Maximum time range of 90 days exceeded')
-        return value
+
+class MaxTimeRangeExceeded(Exception):
+    '''Maximum time range of 90 days exceeded'''
 
 
 class GetHistoricUsecase:
@@ -33,4 +29,8 @@ class GetHistoricUsecase:
 
     async def execute(self, req: GetHistoricRequest) -> List[Notification]:
         '''Get historic notifications'''
+        # Check if time range is valid
+        if (req.to - req.from_) > timedelta(days=90):
+            raise MaxTimeRangeExceeded('max 90 days')
+
         return await self.notif_repo.get_historic(req.user_id, req.from_, req.to)

@@ -6,8 +6,10 @@ from typing import List
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
+from starlette.responses import JSONResponse
+from starlette.status import HTTP_400_BAD_REQUEST
 
-from harbor.domain.common import ObjectIdStr
+from harbor.domain.common import ObjectIdStr, message_responses
 from harbor.domain.notification import Notification
 from harbor.domain.token import AccessTokenData
 from harbor.rest.auth.base import validate_access_token
@@ -44,7 +46,10 @@ class GetHistoricNotificationsForm(BaseModel):
 @router.post('/get-historic',
              summary='Get historic notifications',
              response_model=List[Notification],
-             response_model_by_alias=False)
+             response_model_by_alias=False,
+             responses=message_responses({
+                 400: 'Maximum time range of 90 days exceeded',
+             }))
 async def get_historic(form: GetHistoricNotificationsForm,
                        token_data: AccessTokenData = Depends(
                            validate_access_token),
@@ -59,7 +64,18 @@ async def get_historic(form: GetHistoricNotificationsForm,
         from_=form.from_,
         to=form.to,
     )
-    return await uc.execute(uc_req)
+
+    try:
+        return await uc.execute(uc_req)
+
+    except uc_historic.MaxTimeRangeExceeded:
+        return JSONResponse(
+            status_code=HTTP_400_BAD_REQUEST,
+            content={
+                'code': 'max_time_range_exceeded',
+                'msg': 'Maximum time range of 90 days exceeded',
+            },
+        )
 
 
 @unique
