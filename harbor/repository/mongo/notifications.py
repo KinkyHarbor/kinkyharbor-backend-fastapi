@@ -73,14 +73,16 @@ class NotificationMongoRepo(MongoBaseRepo, NotificationRepo):
         return parse_obj_as(List[Notification], notif_list)
 
     async def add(self, notification: Notification):
-        await self.col.insert_one(notification.dict())
+        notif_dict = notification.dict(exclude_none=True)
+        notif_dict['user_id'] = ObjectId(notification.user_id)
+        await self.col.insert_one(notif_dict)
 
     async def set_read(self, user_id: str, notif_ids: List[str], value: bool = True):
         notif_ids = [ObjectId(notif_id) for notif_id in notif_ids]
         await self.col.update_many(
             {
                 '_id': {'$in': notif_ids},
-                'user_id': {'$eq': user_id},
+                'user_id': {'$eq': ObjectId(user_id)},
             },
             {'$set': {'is_read': value}},
         )
