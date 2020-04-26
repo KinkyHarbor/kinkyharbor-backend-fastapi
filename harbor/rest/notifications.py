@@ -86,23 +86,31 @@ class MarkAs(str, Enum):
 
 
 class MarkNotificationAsForm(BaseModel):
-    '''Form to request historic notifications'''
+    '''Form to mark notifications as read or unread'''
     notification_ids: List[ObjectIdStr]
     mark_as: MarkAs
 
 
+class MarkNotificationAsResponse(BaseModel):
+    '''Response to mark notifications as read or unread'''
+    count_updated: int
+
+
 @router.post('/mark-as-read/',
              summary="Mark multiple notifications as read or unread",
-             response_model=List[Notification],
-             response_model_by_alias=False)
+             response_model=MarkNotificationAsResponse)
 async def mark_as(form: MarkNotificationAsForm,
                   token_data: AccessTokenData = Depends(validate_access_token),
                   repos: RepoDict = Depends(get_repos)):
     '''Mark multiple notifications as read or unread'''
+    # Prepare use case and request
     uc = uc_mark_read.MarkAsReadUsecase(notif_repo=repos['notification'])
     uc_req = uc_mark_read.MarkAsReadRequest(
         user_id=token_data.user_id,
         notifications=form.notification_ids,
         is_read=(form.mark_as == MarkAs.READ)
     )
-    return await uc.execute(uc_req)
+
+    # Call use case and return results
+    result = await uc.execute(uc_req)
+    return MarkNotificationAsResponse(count_updated=result.count_updated)

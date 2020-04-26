@@ -77,15 +77,16 @@ class NotificationMongoRepo(MongoBaseRepo, NotificationRepo):
         notif_dict['user_id'] = ObjectId(notification.user_id)
         await self.col.insert_one(notif_dict)
 
-    async def set_read(self, user_id: str, notif_ids: List[str], value: bool = True):
+    async def set_read(self, user_id: str, notif_ids: List[str], value: bool = True) -> int:
         notif_ids = [ObjectId(notif_id) for notif_id in notif_ids]
-        await self.col.update_many(
+        result = await self.col.update_many(
             {
                 '_id': {'$in': notif_ids},
                 'user_id': {'$eq': ObjectId(user_id)},
             },
             {'$set': {'is_read': value}},
         )
+        return result.matched_count
 
 
 async def create_repo() -> NotificationMongoRepo:

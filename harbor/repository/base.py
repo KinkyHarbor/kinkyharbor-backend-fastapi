@@ -49,8 +49,11 @@ class NotificationRepo(Repo):
         '''Adds a notification for a user'''
 
     @abstractmethod
-    async def set_read(self, user_id: str, notif_ids: List[str], value: bool = True):
-        '''Sets "is_read" flag on multiple notifications'''
+    async def set_read(self, user_id: str, notif_ids: List[str], value: bool = True) -> int:
+        '''Sets "is_read" flag on multiple notifications
+
+        Returns updated notification count
+        '''
 
 
 class RefreshTokenRepo(Repo):
