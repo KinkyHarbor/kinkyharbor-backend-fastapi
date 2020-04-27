@@ -124,7 +124,6 @@
 
 !/tests/
 !/tests/__init__.py
-!/tests/conftest.py
 
 !/tests/domain/
 !/tests/domain/__init__.py
@@ -142,7 +141,7 @@
 
 !/tests/repository/mongo/
 !/tests/repository/mongo/__init__.py
-!/tests/repository/mongo/test_crud_users.py
+!/tests/repository/mongo/test_notifications.py
 
 !/tests/rest/
 !/tests/rest/__init__.py
