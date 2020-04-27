@@ -9,6 +9,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from harbor.helpers.settings import get_settings
 from harbor.repository.mongo import (
+    notifications as mongo_notif,
     refresh_tokens as mongo_rt,
     stats as mongo_stats,
     users as mongo_user,
@@ -16,6 +17,7 @@ from harbor.repository.mongo import (
 )
 from harbor.rest.auth import base as router_auth
 from harbor.rest import (
+    notifications as router_notif,
     search as router_search,
     stats as router_stats,
     users as router_users,
@@ -35,6 +37,12 @@ app.include_router(
     router_auth.router,
     prefix='/auth',
     tags=['Auth']
+)
+# Notifications
+app.include_router(
+    router_notif.router,
+    prefix='/notifications',
+    tags=['Notifications'],
 )
 # Search
 app.include_router(
@@ -61,6 +69,7 @@ async def create_repos():
     '''Creates repositories on application start'''
     logging.info("Database repositories: Creating ...")
     app.state.repos = {
+        'notification': await mongo_notif.create_repo(),
         'refresh_token': await mongo_rt.create_repo(),
         'stats': await mongo_stats.create_repo(),
         'user': await mongo_user.create_repo(),
@@ -73,6 +82,7 @@ async def create_repos():
 async def close_repos():
     '''Close DB client of repositories on application shutdown'''
     logging.info("Database repositories: Closing ...")
+    await app.state.repos['notification'].close()
     await app.state.repos['refresh_token'].close()
     await app.state.repos['stats'].close()
     await app.state.repos['user'].close()
