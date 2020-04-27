@@ -161,7 +161,7 @@ def test_success_mark_as_read(uc_mark_mock, client, notifications, freezer):
     # Assert results
     uc_req = uc_mark.MarkAsReadRequest(
         user_id='5e7f656765f1b64f3f7f6900',
-        notifications=[
+        notification_ids=[
             "5ea5d4cb8322e417540fb555",
             "5ea5d4cb8322e417540fb666",
         ],
@@ -193,7 +193,7 @@ def test_success_mark_as_unread(uc_mark_mock, client, notifications, freezer):
     # Assert results
     uc_req = uc_mark.MarkAsReadRequest(
         user_id='5e7f656765f1b64f3f7f6900',
-        notifications=[
+        notification_ids=[
             "5ea5d4cb8322e417540fb555",
             "5ea5d4cb8322e417540fb666",
         ],

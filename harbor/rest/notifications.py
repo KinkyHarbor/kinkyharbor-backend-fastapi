@@ -100,7 +100,7 @@ async def mark_as(form: MarkNotificationAsForm,
     uc = uc_mark_read.MarkAsReadUsecase(notif_repo=repos['notification'])
     uc_req = uc_mark_read.MarkAsReadRequest(
         user_id=token_data.user_id,
-        notifications=form.notification_ids,
+        notification_ids=form.notification_ids,
         is_read=(not form.unread)
     )
 

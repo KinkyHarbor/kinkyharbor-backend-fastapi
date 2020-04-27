@@ -11,7 +11,7 @@ from harbor.repository.base import NotificationRepo
 class MarkAsReadRequest(BaseModel):
     '''Request to mark one or more notifications as (un)read'''
     user_id: ObjectIdStr
-    notifications: List[ObjectIdStr]
+    notification_ids: List[ObjectIdStr]
     is_read: bool
 
 
@@ -28,5 +28,5 @@ class MarkAsReadUsecase:
 
     async def execute(self, req: MarkAsReadRequest) -> MarkAsReadResponse:
         '''Set is_read flag of notifications'''
-        count = await self.notif_repo.set_read(req.user_id, req.notifications, req.is_read)
+        count = await self.notif_repo.set_read(req.user_id, req.notification_ids, req.is_read)
         return MarkAsReadResponse(count_updated=count)
