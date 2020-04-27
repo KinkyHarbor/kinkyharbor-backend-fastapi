@@ -1,5 +1,7 @@
 '''This module contains CRUD operations for refresh tokens'''
 
+from bson import ObjectId
+
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.token import RefreshToken
 from harbor.repository.base import RefreshTokenRepo
@@ -26,13 +28,15 @@ class RefreshTokenMongoRepo(MongoBaseRepo, RefreshTokenRepo):
 
     async def create_token(self, user_id: ObjectIdStr) -> RefreshToken:
         token = RefreshToken(user_id=user_id)
-        await self.col.insert_one(token.dict())
+        token_dict = token.dict(exclude_none=True)
+        token_dict['user_id'] = ObjectId(token.user_id)
+        await self.col.insert_one(token_dict)
         return token
 
     async def replace_token(self, token: RefreshToken) -> RefreshToken:
         db_token_dict = await self.col.find_one_and_delete({
             'secret': token.secret,
-            'user_id': token.user_id
+            'user_id': ObjectId(token.user_id)
         })
 
         if db_token_dict:

@@ -88,9 +88,10 @@ class StatsMongoRepo(MongoBaseRepo, StatsRepo):
         )
 
     async def upsert(self, reading: Reading):
+        reading_dict = reading.dict(exclude_none=True)
         await self.col.find_one_and_update(
             {'datetime': reading.datetime, 'subject': reading.subject},
-            {'$set': reading.dict()},
+            {'$set': reading_dict},
             upsert=True,
         )
 

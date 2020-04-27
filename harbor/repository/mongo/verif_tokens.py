@@ -1,5 +1,7 @@
 '''This module contains CRUD operations for verification tokens'''
+# pylint: disable=no-member
 
+from bson import ObjectId
 from pymongo import ReturnDocument
 
 from harbor.domain.token import VerificationToken, TokenVerifyRequest
@@ -27,14 +29,22 @@ class VerifTokenMongoRepo(MongoBaseRepo, VerifTokenRepo):
         await self.col.create_index('created_on', expireAfterSeconds=3600)
 
     async def create_verif_token(self, user_id: str, purpose: VerifPur) -> VerificationToken:
+        # Build token
         token = VerificationToken(user_id=user_id, purpose=purpose)
-        token_dict = await self.col.find_one_and_update(
-            {'user_id': user_id, 'purpose': purpose},
-            {'$set': token.dict()},
+        token_dict = token.dict(exclude_none=True)
+        token_dict['user_id'] = ObjectId(token.user_id)
+
+        # Insert token into DB
+        result_dict = await self.col.find_one_and_update(
+            {
+                'user_id': ObjectId(user_id),
+                'purpose': purpose,
+            },
+            {'$set': token_dict},
             upsert=True,
             return_document=ReturnDocument.AFTER
         )
-        return VerificationToken(**token_dict)
+        return VerificationToken(**result_dict)
 
     async def verify_verif_token(self, token: TokenVerifyRequest) -> VerificationToken:
         db_token_dict = await self.col.find_one({'secret': token.secret})

@@ -1,4 +1,5 @@
 '''This module contains CRUD operations for users'''
+# pylint: disable=no-member
 
 import logging
 from datetime import datetime, timedelta, timezone
@@ -75,7 +76,7 @@ class UserMongoRepo(MongoBaseRepo, UserRepo):
         })
 
     async def add(self,
-                  *,  # Force key words only
+                  *,  # Force keywords only
                   display_name: str,
                   email: str,
                   password_hash: str) -> User:
@@ -86,13 +87,13 @@ class UserMongoRepo(MongoBaseRepo, UserRepo):
 
         # Try to insert new user into database
         try:
-            result = await self.col.insert_one(user.dict())
+            user_dict = user.dict(exclude_none=True)
+            result = await self.col.insert_one(user_dict)
         except DuplicateKeyError as dup_error:
             if 'username' in str(dup_error):
                 raise UsernameTakenError()
             return None
 
-        # pylint: disable=no-member
         logging.info('%s: New user "%s" created', __name__, user.display_name)
         user.id = result.inserted_id
         return User(**user.dict())
