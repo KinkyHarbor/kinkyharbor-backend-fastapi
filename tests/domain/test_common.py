@@ -1,7 +1,7 @@
 '''Unit tests for common domain'''
 # pylint: disable=unused-argument
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 from pydantic import BaseModel, ValidationError
@@ -183,4 +183,4 @@ def test_success_createdonmixin_createdon_filled():
 def test_success_createdonmixin_createdon_empty(freezer):
     '''Should automatically store current datetime'''
     created_mixin = common.CreatedOnMixin()
-    assert created_mixin.created_on == datetime.utcnow()
+    assert created_mixin.created_on == datetime.now(timezone.utc)

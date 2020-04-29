@@ -1,6 +1,6 @@
 '''Helpers module for authentication related functions'''
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import jwt
 from passlib.context import CryptContext
@@ -34,10 +34,10 @@ async def create_access_token(*, user_id: str, expires_delta: timedelta = None):
 
     # Prepare contents
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
         minutes = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
-        expire = datetime.utcnow() + timedelta(minutes=minutes)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=minutes)
     data = {
         "sub": f"user:{user_id}",
         "exp": expire,

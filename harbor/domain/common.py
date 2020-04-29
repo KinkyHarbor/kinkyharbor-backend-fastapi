@@ -1,7 +1,7 @@
 '''This module contains reusable fields and mixins'''
 
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Union, Dict, Any
 
 from bson.objectid import ObjectId
@@ -120,7 +120,7 @@ class CreatedOnMixin(BaseModel):
     @classmethod
     def set_created_on(cls, created_on):
         '''Set Created On if not filled'''
-        return created_on or datetime.utcnow()
+        return created_on or datetime.now(timezone.utc)
 
 
 class Message(BaseModel):

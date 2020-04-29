@@ -1,7 +1,7 @@
 '''Unit tests for Auth helpers'''
 # pylint: disable=unused-argument
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 import jwt
@@ -39,7 +39,8 @@ async def test_create_access_token_with_defaults(get_jwt_key, jwt_encode, freeze
     jwt_encode.assert_called_with(
         {
             'sub': 'user:test-user-id',
-            'exp': datetime.utcnow() + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES),
+            'exp': datetime.now(timezone.utc) +
+            timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES),
         },
         'test-private-key',
         algorithm=settings.JWT_ALG,
@@ -68,7 +69,7 @@ async def test_create_access_token_with_expire(get_jwt_key, jwt_encode, freezer)
     jwt_encode.assert_called_with(
         {
             'sub': 'user:test-user-id',
-            'exp': datetime.utcnow() + delta,
+            'exp': datetime.now(timezone.utc) + delta,
         },
         'test-private-key',
         algorithm=settings.JWT_ALG,
