@@ -64,18 +64,19 @@ class NotificationMongoRepo(MongoBaseRepo, NotificationRepo):
             filter={
                 'user_id': {'$eq': ObjectId(user_id)},
                 '$or': [
-                    {'title': {'$regex': f'/.*{search_string}.*/i'}},
-                    {'description': {'$regex': f'/.*{search_string}.*/i'}},
+                    {'title': {'$regex': f'.*{search_string}.*', '$options': 'i'}},
+                    {'description': {'$regex': f'.*{search_string}.*', '$options': 'i'}},
                 ]
             },
             sort=[('created_on', DESCENDING)],
         ).to_list(None)
         return parse_obj_as(List[Notification], notif_list)
 
-    async def add(self, notification: Notification):
+    async def add(self, notification: Notification) -> ObjectId:
         notif_dict = notification.dict(exclude_none=True)
         notif_dict['user_id'] = ObjectId(notification.user_id)
-        await self.col.insert_one(notif_dict)
+        result = await self.col.insert_one(notif_dict)
+        return result.inserted_id
 
     async def set_read(self, user_id: str, notif_ids: List[str], value: bool = True) -> int:
         notif_ids = [ObjectId(notif_id) for notif_id in notif_ids]
