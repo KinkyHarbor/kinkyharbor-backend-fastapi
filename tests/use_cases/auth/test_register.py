@@ -18,7 +18,7 @@ def fixture_uc_req():
     '''Returns a register request'''
     return uc_reg.RegisterRequest(
         display_name='TestUser',
-        email='user@kh.test',
+        email='User@KH.test',
         password='VeryStrongTestPassword',
         is_adult=True,
         accept_privacy_and_terms=True,

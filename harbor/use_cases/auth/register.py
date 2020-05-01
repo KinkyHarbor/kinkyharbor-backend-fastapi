@@ -41,6 +41,8 @@ class RegisterUseCase:
             UsernameReservedError: Username is a reserved name. E.g. "admin"
             UsernameTakenError: Username is already taken
         '''
+        # Force email to lowercase
+        req.email = req.email.lower()
 
         # Check if username is reserved
         username = req.display_name.lower()
