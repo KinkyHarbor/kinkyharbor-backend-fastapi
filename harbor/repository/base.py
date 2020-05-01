@@ -95,6 +95,10 @@ class UsernameTakenError(Exception):
     '''Username is already taken'''
 
 
+class EmailTakenError(Exception):
+    '''Email is already taken'''
+
+
 class UserRepo(Repo):
     '''Repository for users'''
     @abstractmethod

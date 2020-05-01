@@ -56,26 +56,25 @@ class RegisterUseCase:
                 email=req.email,
                 password_hash=auth.get_password_hash(req.password)
             )
+
         except repo_base.UsernameTakenError:
             # Translate error
             raise UsernameTakenError
 
-        # Send mail to user
-        if user:
-            # Get verification token
-            token = await self.vt_repo.create_verif_token(user.id, VerifPur.REGISTER)
+        except repo_base.EmailTakenError:
+            # Prepare password reset mail
+            msg = email.prepare_register_email_exist(
+                req.display_name,
+                req.email,
+            )
 
-            # Send verification mail
+        else:
+            # Prepare verification mail
+            token = await self.vt_repo.create_verif_token(user.id, VerifPur.REGISTER)
             msg = email.prepare_register_verification(
                 req.display_name,
                 req.email,
                 token.secret
-            )
-        else:
-            # Send password reset mail
-            msg = email.prepare_register_email_exist(
-                req.display_name,
-                req.email,
             )
 
         # Send mail and confirm success

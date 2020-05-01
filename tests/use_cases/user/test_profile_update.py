@@ -4,6 +4,7 @@ from unittest import mock
 
 import pytest
 
+from harbor.domain.user import UserInfo
 from harbor.repository.base import UserRepo
 from harbor.use_cases.user import profile_update as uc_upd
 
@@ -40,10 +41,13 @@ async def test_all(success, uc_req_all):
     result = await uc.execute(uc_req_all)
 
     # Assert results
-    user_repo.set_info.assert_called_with('507f1f77bcf86cd799439010', {
-        'bio': 'test-bio',
-        'gender': 'test-gender',
-    })
+    user_repo.set_info.assert_called_with(
+        '507f1f77bcf86cd799439010',
+        UserInfo(
+            bio='test-bio',
+            gender='test-gender'
+        ),
+    )
     assert result is success
 
 
@@ -60,7 +64,10 @@ async def test_partial(success, uc_req_partial):
     result = await uc.execute(uc_req_partial)
 
     # Assert results
-    user_repo.set_info.assert_called_with('507f1f77bcf86cd799439010', {
-        'bio': 'test-bio',
-    })
+    user_repo.set_info.assert_called_with(
+        '507f1f77bcf86cd799439010',
+        UserInfo(
+            bio='test-bio',
+        ),
+    )
     assert result is success

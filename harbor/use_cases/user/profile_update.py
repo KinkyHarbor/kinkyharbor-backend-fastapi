@@ -3,6 +3,7 @@
 from pydantic import BaseModel
 
 from harbor.domain.common import ObjectIdStr
+from harbor.domain.user import UserInfo
 from harbor.repository.base import UserRepo
 
 
@@ -22,5 +23,7 @@ class UpdateProfileUseCase:
     async def execute(self, req: UpdateProfileRequest) -> bool:
         '''Updates and returns the profile'''
         # Update the profile
-        update_dict = req.dict(exclude={'user_id'}, exclude_unset=True)
-        return await self.user_repo.set_info(req.user_id, update_dict)
+        user_info = UserInfo(
+            **req.dict(exclude={'user_id'}, exclude_unset=True)
+        )
+        return await self.user_repo.set_info(req.user_id, user_info)

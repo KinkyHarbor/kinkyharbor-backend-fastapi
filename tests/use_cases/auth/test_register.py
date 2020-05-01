@@ -9,7 +9,7 @@ from harbor.domain.email import EmailMsg
 from harbor.domain.token import VerificationToken, VerificationPurposeEnum as VerifPur
 from harbor.domain.user import User
 from harbor.helpers import const
-from harbor.repository.base import UserRepo, UsernameTakenError, VerifTokenRepo
+from harbor.repository.base import UserRepo, UsernameTakenError, EmailTakenError, VerifTokenRepo
 from harbor.use_cases.auth import register as uc_reg
 
 
@@ -106,7 +106,7 @@ async def test_success_existing_user(get_pw_hash, email, celery_app, uc_req, msg
     # Create mocks
     get_pw_hash.return_value = "test-secure-hash"
     user_repo = mock.Mock(UserRepo)
-    user_repo.add.return_value = None
+    user_repo.add.side_effect = EmailTakenError
     vt_repo = mock.Mock(VerifTokenRepo)
     email.prepare_register_email_exist.return_value = msg
 

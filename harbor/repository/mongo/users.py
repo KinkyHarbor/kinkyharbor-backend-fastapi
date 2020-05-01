@@ -10,8 +10,8 @@ from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 from pydantic import parse_obj_as
 
-from harbor.domain.user import BaseUser, User, UserWithPassword, UserFlags
-from harbor.repository.base import UserRepo, UsernameTakenError
+from harbor.domain.user import BaseUser, User, UserWithPassword, UserFlags, UserInfo
+from harbor.repository.base import UserRepo, UsernameTakenError, EmailTakenError
 from harbor.repository.mongo.common import MongoBaseRepo
 
 
@@ -91,8 +91,10 @@ class UserMongoRepo(MongoBaseRepo, UserRepo):
             result = await self.col.insert_one(user_dict)
         except DuplicateKeyError as dup_error:
             if 'username' in str(dup_error):
-                raise UsernameTakenError()
-            return None
+                raise UsernameTakenError(user.display_name)
+            if 'email' in str(dup_error):
+                raise EmailTakenError(user.email)
+            raise dup_error
 
         logging.info('%s: New user "%s" created', __name__, user.display_name)
         user.id = result.inserted_id
@@ -114,10 +116,11 @@ class UserMongoRepo(MongoBaseRepo, UserRepo):
         assert user_dict is not None, f'User should aways exist. User "{user_id}" not found'
         return User(**user_dict)
 
-    async def set_info(self, user_id: str, user_info: Dict) -> User:
+    async def set_info(self, user_id: str, user_info: UserInfo) -> User:
+        user_info_dict = user_info.dict(exclude_none=True)
         user_dict = await self.col.find_one_and_update(
             {'_id': ObjectId(user_id)},
-            {'$set': user_info},
+            {'$set': user_info_dict},
             return_document=ReturnDocument.AFTER,
         )
         return User(**user_dict)

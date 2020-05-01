@@ -4,7 +4,7 @@ from enum import Enum, unique
 from datetime import datetime
 from typing import List
 
-from pydantic import EmailStr, validator
+from pydantic import EmailStr, validator, BaseModel
 
 from harbor.domain.common import DBModelMixin, DisplayNameStr, ObjectIdStr
 
@@ -29,7 +29,13 @@ class UserRelation(str, Enum):
     STRANGER = 'STRANGER'
 
 
-class User(BaseUser):
+class UserInfo(BaseModel):
+    '''Optional user information'''
+    bio: str = None
+    gender: str = None
+
+
+class User(BaseUser, UserInfo):
     '''General user to be used throughout the application'''
     # Core data
     email: EmailStr = None
@@ -37,10 +43,6 @@ class User(BaseUser):
     is_admin: bool = False
     is_verified: bool = False
     is_locked: bool = False
-
-    # Additional data
-    bio: str = None
-    gender: str = None
     friends: List[ObjectIdStr] = []
 
     def get_relation(self, user_id: str) -> UserRelation:
@@ -61,7 +63,7 @@ class User(BaseUser):
         return UserRelation.STRANGER
 
 
-class UserWithPassword(User):
+class UserWithPassword(User, UserInfo):
     '''User model including password hash'''
     password_hash: str
 
