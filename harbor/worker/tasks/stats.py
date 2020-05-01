@@ -24,7 +24,7 @@ async def async_count_active_users():
         unit="users",
     )
 
-    # Save dummy reading
+    # Save reading
     async with stats.StatsMongoRepo() as stats_repo:
         await stats_repo.upsert(reading)
 

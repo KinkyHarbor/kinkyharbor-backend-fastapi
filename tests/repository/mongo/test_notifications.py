@@ -33,7 +33,7 @@ async def fixture_notif():
 async def fixture_notif_repo(monkeypatch, event_loop):
     '''Returns a temporary notification repo for testing'''
     appendix = str(uuid.uuid4()).replace('-', '')[:10]
-    monkeypatch.setenv("MONGO_DATABASE", f"test-kh-notificatons-{appendix}")
+    monkeypatch.setenv("MONGO_DATABASE", f"test-kh-notifications-{appendix}")
     get_settings.cache_clear()
     repo = await create_repo()
     yield repo

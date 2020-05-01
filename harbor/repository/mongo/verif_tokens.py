@@ -50,10 +50,10 @@ class VerifTokenMongoRepo(MongoBaseRepo, VerifTokenRepo):
         db_token_dict = await self.col.find_one({'secret': token.secret})
         if db_token_dict:
             # Don't touch tokens which don't belong to the user
-            if token.user_id and token.user_id != db_token_dict['user_id']:
+            if token.user_id and token.user_id != str(db_token_dict['user_id']):
                 return None
 
-            # Valid secret provided and token belong to user
+            # Valid secret provided and token belongs to user
             # => Delete token
             await self.col.delete_one({'_id': db_token_dict['_id']})
 
