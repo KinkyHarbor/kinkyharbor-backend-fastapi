@@ -4,7 +4,8 @@ import asyncio
 from datetime import datetime, timezone
 
 from harbor.domain.stats import Reading, ReadingSubject
-from harbor.repository.mongo import stats, users
+from harbor.repository.mongo.stats import StatsMongoRepo
+from harbor.repository.mongo.users import UserMongoRepo
 from harbor.worker.app import app
 
 
@@ -12,8 +13,9 @@ async def async_count_active_users():
     '''Count and store active users'''
     # Fetch active users
     count = 0
-    async with users.UserMongoRepo() as user_repo:
+    async with UserMongoRepo() as user_repo:
         count = await user_repo.count_active_users()
+        print(count)
 
     # Create reading
     today = datetime.now(timezone.utc)
@@ -25,7 +27,7 @@ async def async_count_active_users():
     )
 
     # Save reading
-    async with stats.StatsMongoRepo() as stats_repo:
+    async with StatsMongoRepo() as stats_repo:
         await stats_repo.upsert(reading)
 
 

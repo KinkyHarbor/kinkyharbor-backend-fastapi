@@ -199,3 +199,4 @@
 !/tests/worker/tasks/
 !/tests/worker/tasks/__init__.py
 !/tests/worker/tasks/test_email.py
+!/tests/worker/tasks/test_stats.py

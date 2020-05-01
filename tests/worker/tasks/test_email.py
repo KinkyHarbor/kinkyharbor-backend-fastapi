@@ -1,5 +1,5 @@
 '''Unit tests for Email worker tasks'''
-# pylint: disable=no-member
+# pylint: disable=no-member,too-many-arguments
 
 from unittest import mock
 
