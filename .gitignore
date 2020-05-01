@@ -143,6 +143,9 @@
 !/tests/repository/mongo/__init__.py
 !/tests/repository/mongo/test_notifications.py
 !/tests/repository/mongo/test_refresh_tokens.py
+!/tests/repository/mongo/test_stats.py
+!/tests/repository/mongo/test_users.py
+!/tests/repository/mongo/test_verif_tokens.py
 
 !/tests/rest/
 !/tests/rest/__init__.py

@@ -1,12 +1,13 @@
 '''This module contains all statistics related models'''
 
 from datetime import datetime, date
-from enum import Enum
+from enum import Enum, unique
 from typing import Dict
 
 from pydantic import BaseModel
 
 
+@unique
 class ReadingSubject(str, Enum):
     '''Supported reading subjects'''
     ACTIVE_USERS = 'active_users'

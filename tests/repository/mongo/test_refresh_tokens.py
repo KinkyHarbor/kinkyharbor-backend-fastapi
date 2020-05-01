@@ -2,18 +2,11 @@
 # pylint: disable=unused-argument
 
 import uuid
-from typing import Dict
 
 import pytest
 
-from harbor.domain.notification import Notification
 from harbor.helpers.settings import get_settings
 from harbor.repository.mongo.refresh_tokens import create_repo
-
-
-def notif_to_assert_dict(notif: Notification) -> Dict:
-    '''Convert Notification to assertable dict'''
-    return notif.dict(exclude={'id', 'created_on'})
 
 
 @pytest.fixture(name='repo')
@@ -35,14 +28,17 @@ async def test_refresh_token_roundtrip(repo):
     user_id = '5e7f656765f1b64f3f7f6900'
     token = await repo.create_token(user_id)
 
+    # Secret value should match
     invalid_secret = token.copy()
     invalid_secret.secret = 'invalid'
     invalid_secret_result = await repo.replace_token(invalid_secret)
 
+    # User ID should match
     invalid_user_id = token.copy()
     invalid_user_id.user_id = '5e7f656765f1b64f3f7f6999'
     invalid_user_id_result = await repo.replace_token(invalid_user_id)
 
+    # Token should only be replacable a single time
     token2 = await repo.replace_token(token)
     invalid_token = await repo.replace_token(token)
 
