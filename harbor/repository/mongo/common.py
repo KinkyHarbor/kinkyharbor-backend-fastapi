@@ -10,7 +10,7 @@ from harbor.helpers.settings import get_settings
 
 def create_db_client():
     '''Returns instance of database client'''
-    return motor.AsyncIOMotorClient(get_settings().MONGO_HOST)
+    return motor.AsyncIOMotorClient(get_settings().MONGO_HOST, tz_aware=True)
 
 
 def get_default_db(client: motor.AsyncIOMotorClient):
