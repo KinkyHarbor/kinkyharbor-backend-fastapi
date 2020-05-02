@@ -1,7 +1,6 @@
 '''Test cases for crud stats module'''
 # pylint: disable=unused-argument
 
-import asyncio
 import uuid
 from datetime import datetime, timedelta, timezone, date
 
@@ -101,8 +100,6 @@ async def test_stats_by_month(repo, reading):
         from_=(-time_since_reading - timedelta(days=1)),
         to=(-time_since_reading + timedelta(days=60)),
     )
-
-    await asyncio.sleep(20)
 
     # Assert result
     assert result == expected

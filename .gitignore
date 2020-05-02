@@ -136,6 +136,7 @@
 !/tests/helpers/__init__.py
 !/tests/helpers/test_auth.py
 !/tests/helpers/test_email.py
+!/tests/helpers/test_settings.py
 
 !/tests/repository/
 !/tests/repository/__init__.py
