@@ -1,6 +1,7 @@
 '''Test cases for crud stats module'''
 # pylint: disable=unused-argument
 
+import asyncio
 import uuid
 from datetime import datetime, timedelta, timezone, date
 
@@ -15,7 +16,7 @@ from harbor.repository.mongo.stats import create_repo
 async def fixture_reading(monkeypatch, event_loop):
     '''Returns a dummy reading'''
     return stats.Reading(
-        datetime=datetime(2020, 5, 1, 15, 9, 54, 0, timezone.utc),
+        datetime=datetime(2020, 5, 10, 15, 9, 54, 0, timezone.utc),
         subject=stats.ReadingSubject.ACTIVE_USERS,
         unit="users",
         value=50,
@@ -93,12 +94,15 @@ async def test_stats_by_month(repo, reading):
     )
 
     # Get aggregated result
+    time_since_reading = datetime.now(timezone.utc) - reading.datetime
     result = await repo.get_by_month(
         subject=expected.subject,
         operation=expected.operation,
-        from_=(datetime.now(timezone.utc) - reading.datetime),
-        to=(datetime.now(timezone.utc) - reading.datetime + timedelta(days=60)),
+        from_=(-time_since_reading - timedelta(days=1)),
+        to=(-time_since_reading + timedelta(days=60)),
     )
+
+    await asyncio.sleep(20)
 
     # Assert result
     assert result == expected
