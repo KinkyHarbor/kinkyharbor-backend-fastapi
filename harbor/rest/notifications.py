@@ -1,7 +1,6 @@
 '''This module handles all routes for notifications operations'''
 
 from datetime import datetime
-from enum import Enum, unique
 from typing import List
 
 from fastapi import APIRouter, Depends

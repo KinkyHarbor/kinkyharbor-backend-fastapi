@@ -17,6 +17,7 @@ from harbor.repository.mongo import (
 )
 from harbor.rest.auth import base as router_auth
 from harbor.rest import (
+    debug as router_debug,
     notifications as router_notif,
     search as router_search,
     stats as router_stats,
@@ -38,6 +39,15 @@ app.include_router(
     prefix='/auth',
     tags=['Auth']
 )
+
+# Debug
+if (get_settings().DEBUG):
+    app.include_router(
+        router_debug.router,
+        prefix='/debug',
+        tags=['Debug'],
+    )
+
 # Notifications
 app.include_router(
     router_notif.router,

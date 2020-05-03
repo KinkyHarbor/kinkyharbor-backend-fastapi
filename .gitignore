@@ -59,6 +59,7 @@
 
 !/harbor/rest/
 !/harbor/rest/__init__.py
+!/harbor/rest/debug.py
 !/harbor/rest/notifications.py
 !/harbor/rest/search.py
 !/harbor/rest/stats.py

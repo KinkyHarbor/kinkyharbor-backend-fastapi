@@ -10,6 +10,7 @@ echo -e "\nInstall requirements"
 pip install -r requirements.txt
 
 echo -e "\nStart uvicorn dev server ..."
+DEBUG=True \
 uvicorn harbor.app:app \
 --reload \
 --host=localhost \

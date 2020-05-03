@@ -12,4 +12,4 @@ class Notification(DBModelMixin, CreatedOnMixin):
     description: str = None
     is_read: bool = False
     icon: HttpUrl
-    link: HttpUrl
+    link: str
