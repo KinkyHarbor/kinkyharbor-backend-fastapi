@@ -5,6 +5,7 @@ import asyncio
 from pydantic import BaseModel
 
 from harbor.domain.stats import ReadingSubject, ReadingAggregation
+from harbor.helpers import debug
 from harbor.repository.base import StatsRepo
 
 
@@ -22,6 +23,9 @@ class GetActiveUserCountUsecase:
 
     async def execute(self) -> GetActiveUserCountResponse:
         '''Get count of users which logged in during past month'''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", None)
+
         # Fetch counts
         co_now = self.stats_repo.get_latest(ReadingSubject.ACTIVE_USERS)
         co_history = self.stats_repo.get_by_month(ReadingSubject.ACTIVE_USERS)

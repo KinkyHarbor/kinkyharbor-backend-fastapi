@@ -5,6 +5,7 @@ from pydantic import BaseModel, constr
 from harbor.domain.token import TokenVerifyRequest as VerifTokenReq
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.domain.user import UserFlags
+from harbor.helpers import debug
 from harbor.repository.base import UserRepo, VerifTokenRepo
 
 
@@ -30,6 +31,10 @@ class RegisterVerifyUseCase:
         Raises:
             InvalidTokenError: Provided token is invalid
         '''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", req.dict())
+
+        # Verify token
         token_req = VerifTokenReq(secret=req.secret,
                                   purpose=VerifPur.REGISTER)
         valid = await self.vt_repo.verify_verif_token(token_req)

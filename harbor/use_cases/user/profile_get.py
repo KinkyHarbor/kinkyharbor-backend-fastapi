@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.user import User, UserRelation, FRIEND_FIELDS, STRANGER_FIELDS
+from harbor.helpers import debug
 from harbor.repository.base import UserRepo
 
 
@@ -46,6 +47,9 @@ class GetProfileUseCase:
 
     async def execute(self, req: GetProfileRequest) -> GetProfileResponse:
         '''Gets user profile by ID or username'''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", req.dict())
+
         # Fetch user from repo
         if isinstance(req, GetProfileByIDRequest):
             user = await self.user_repo.get(req.user_id)

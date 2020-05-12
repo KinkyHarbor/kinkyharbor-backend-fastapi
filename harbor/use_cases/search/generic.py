@@ -6,6 +6,7 @@ from pydantic import BaseModel, constr
 
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.user import BaseUser
+from harbor.helpers import debug
 from harbor.repository.base import UserRepo
 
 
@@ -31,6 +32,10 @@ class GenericSearchUseCase:
 
     async def execute(self, req: GenericSearchRequest) -> GenericSearchResponse:
         '''Searches across users, groups, pages and events'''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", req.dict())
+
+        # Execute search and return results
         return GenericSearchResponse(
             users=await self.user_repo.get_search(req.user_id, req.query),
             groups=[],

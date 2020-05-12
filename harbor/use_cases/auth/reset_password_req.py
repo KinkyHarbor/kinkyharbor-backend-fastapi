@@ -3,7 +3,7 @@
 from pydantic import BaseModel, EmailStr
 
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
-from harbor.helpers import email
+from harbor.helpers import email, debug
 from harbor.repository.base import UserRepo, VerifTokenRepo
 from harbor.worker.app import app as celery_app
 
@@ -22,6 +22,10 @@ class RequestPasswordResetUseCase:
 
     async def execute(self, req: RequestPasswordResetRequest):
         '''Checks if user exists and sends a verification token'''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", req.dict())
+
+        # Fetch user by email
         user = await self.user_repo.get_by_login(req.email)
         if user:
             # User found => Send verification token

@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from harbor.domain.common import ObjectIdStr
 from harbor.domain.notification import Notification
+from harbor.helpers import debug
 from harbor.repository.base import NotificationRepo
 
 
@@ -29,6 +30,9 @@ class GetHistoricUsecase:
 
     async def execute(self, req: GetHistoricRequest) -> List[Notification]:
         '''Get historic notifications'''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", req.dict())
+
         # Check if time range is valid
         if (req.to - req.from_) > timedelta(days=90):
             raise MaxTimeRangeExceeded('max 90 days')

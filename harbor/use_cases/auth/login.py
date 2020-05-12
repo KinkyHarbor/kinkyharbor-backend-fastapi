@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, constr
 
-from harbor.helpers import auth
+from harbor.helpers import auth, debug
 from harbor.repository.base import UserRepo, RefreshTokenRepo
 
 
@@ -40,6 +40,10 @@ class LoginUseCase:
             InvalidCredsError: Provided credentials are invalid
             UserLockedError: User is locked
         '''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", req.login)
+
+        # Fetch user
         login = req.login.lower()
         user = await self.user_repo.get_by_login(login)
 

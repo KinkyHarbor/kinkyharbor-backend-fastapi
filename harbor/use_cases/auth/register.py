@@ -4,7 +4,7 @@ from pydantic import BaseModel, EmailStr
 
 from harbor.domain.common import StrictBoolTrue, DisplayNameStr, StrongPasswordStr
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
-from harbor.helpers import auth, email, const
+from harbor.helpers import auth, debug, email, const
 from harbor.repository import base as repo_base
 from harbor.repository.base import UserRepo, VerifTokenRepo
 from harbor.worker.app import app as celery_app
@@ -41,6 +41,9 @@ class RegisterUseCase:
             UsernameReservedError: Username is a reserved name. E.g. "admin"
             UsernameTakenError: Username is already taken
         '''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", req.dict(exclude={"password"}))
+
         # Force email to lowercase
         req.email = req.email.lower()
 

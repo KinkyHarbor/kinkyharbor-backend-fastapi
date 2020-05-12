@@ -32,6 +32,7 @@
 !/harbor/helpers/__init__.py
 !/harbor/helpers/auth.py
 !/harbor/helpers/const.py
+!/harbor/helpers/debug.py
 !/harbor/helpers/email.py
 !/harbor/helpers/settings.py
 

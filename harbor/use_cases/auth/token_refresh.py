@@ -3,7 +3,7 @@
 from pydantic import BaseModel, constr
 
 from harbor.domain.token import AccessRefreshTokens, RefreshToken
-from harbor.helpers import auth
+from harbor.helpers import auth, debug
 from harbor.repository.base import RefreshTokenRepo
 
 
@@ -28,6 +28,10 @@ class TokenRefreshUseCase:
         Raises:
             InvalidTokenError: Provided token is invalid
         '''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", req.dict())
+
+        # Verify and replace token
         (user_id, token) = req.refresh_token.split(':')
         old_ref_token = RefreshToken(secret=token, user_id=user_id)
         new_ref_token = await self.rt_repo.replace_token(old_ref_token)

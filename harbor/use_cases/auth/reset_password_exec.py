@@ -8,7 +8,7 @@ from harbor.domain.common import ObjectIdStr, StrongPasswordStr
 from harbor.domain.token import TokenVerifyRequest as VerifTokenReq
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.domain.user import UserFlags
-from harbor.helpers import auth
+from harbor.helpers import auth, debug
 from harbor.repository.base import UserRepo, VerifTokenRepo
 
 
@@ -42,6 +42,10 @@ class ExecResetPasswordUseCase:
         Raises:
             InvalidTokenError: Provided token is invalid
         '''
+        # Log call for debugging
+        debug.log_call(__name__, "execute", req.user_id)
+
+        # Verify token
         token = VerifTokenReq(secret=req.token,
                               user_id=req.user_id,
                               purpose=VerifPur.RESET_PASSWORD)
