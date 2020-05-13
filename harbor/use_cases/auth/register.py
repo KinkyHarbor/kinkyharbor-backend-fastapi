@@ -7,7 +7,7 @@ from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.helpers import auth, debug, email, const
 from harbor.repository import base as repo_base
 from harbor.repository.base import UserRepo, VerifTokenRepo
-from harbor.worker.app import app as celery_app
+from harbor.worker.app import queue_task
 
 
 class RegisterRequest(BaseModel):
@@ -81,8 +81,7 @@ class RegisterUseCase:
             )
 
         # Send mail and confirm success
-        celery_app.send_task(
-            'harbor.worker.tasks.email.send_mail',
-            args=[msg.dict()],
-        )
+        queue_task('harbor.worker.tasks.email.send_mail', [msg.dict()])
+
+        # Return success
         return True

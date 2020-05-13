@@ -137,6 +137,7 @@
 !/tests/helpers/
 !/tests/helpers/__init__.py
 !/tests/helpers/test_auth.py
+!/tests/helpers/test_debug.py
 !/tests/helpers/test_email.py
 !/tests/helpers/test_settings.py
 

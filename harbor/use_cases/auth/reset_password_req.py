@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr
 from harbor.domain.token import VerificationPurposeEnum as VerifPur
 from harbor.helpers import email, debug
 from harbor.repository.base import UserRepo, VerifTokenRepo
-from harbor.worker.app import app as celery_app
+from harbor.worker.app import queue_task
 
 
 class RequestPasswordResetRequest(BaseModel):
@@ -36,7 +36,4 @@ class RequestPasswordResetUseCase:
                 token.user_id,
                 token.secret
             )
-            celery_app.send_task(
-                'harbor.worker.tasks.email.send_mail',
-                args=[msg.dict()],
-            )
+            queue_task('harbor.worker.tasks.email.send_mail', [msg.dict()])

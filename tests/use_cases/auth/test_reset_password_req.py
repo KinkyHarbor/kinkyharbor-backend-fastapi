@@ -51,9 +51,9 @@ def fixture_msg():
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.use_cases.auth.reset_password_req.celery_app')
+@mock.patch('harbor.use_cases.auth.reset_password_req.queue_task')
 @mock.patch('harbor.use_cases.auth.reset_password_req.email')
-async def test_success(email, celery_app, uc_req, user, verif_token, msg):
+async def test_success(email, queue_task, uc_req, user, verif_token, msg):
     '''Should send a password reset link'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)
@@ -78,16 +78,16 @@ async def test_success(email, celery_app, uc_req, user, verif_token, msg):
         '507f1f77bcf86cd799439011',
         'test-secret',
     )
-    celery_app.send_task.assert_called_with(
+    queue_task.assert_called_with(
         'harbor.worker.tasks.email.send_mail',
-        args=[msg.dict()],
+        [msg.dict()],
     )
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.use_cases.auth.reset_password_req.celery_app')
+@mock.patch('harbor.use_cases.auth.reset_password_req.queue_task')
 @mock.patch('harbor.use_cases.auth.reset_password_req.email')
-async def test_fail(email, celery_app, uc_req):
+async def test_fail(email, queue_task, uc_req):
     '''User not found => Don't send link'''
     # Create mocks
     user_repo = mock.Mock(UserRepo)
@@ -102,4 +102,4 @@ async def test_fail(email, celery_app, uc_req):
     user_repo.get_by_login.assert_called_with('user@kh.test')
     vt_repo.create_verif_token.assert_not_called()
     email.prepare_reset_password.assert_not_called()
-    celery_app.send_task.assert_not_called()
+    queue_task.assert_not_called()

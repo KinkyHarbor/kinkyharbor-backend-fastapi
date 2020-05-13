@@ -57,10 +57,10 @@ def fixture_msg():
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.use_cases.auth.register.celery_app')
+@mock.patch('harbor.use_cases.auth.register.queue_task')
 @mock.patch('harbor.use_cases.auth.register.email')
 @mock.patch('harbor.helpers.auth.get_password_hash')
-async def test_success_new_user(get_pw_hash, email, celery_app, uc_req, user, verif_token, msg):
+async def test_success_new_user(get_pw_hash, email, queue_task, uc_req, user, verif_token, msg):
     '''Should register a user'''
     # Create mocks
     get_pw_hash.return_value = "test-secure-hash"
@@ -91,17 +91,17 @@ async def test_success_new_user(get_pw_hash, email, celery_app, uc_req, user, ve
         'user@kh.test',
         'test-secret',
     )
-    celery_app.send_task.assert_called_with(
+    queue_task.assert_called_with(
         'harbor.worker.tasks.email.send_mail',
-        args=[msg.dict()],
+        [msg.dict()],
     )
 
 
 @pytest.mark.asyncio
-@mock.patch('harbor.use_cases.auth.register.celery_app')
+@mock.patch('harbor.use_cases.auth.register.queue_task')
 @mock.patch('harbor.use_cases.auth.register.email')
 @mock.patch('harbor.helpers.auth.get_password_hash')
-async def test_success_existing_user(get_pw_hash, email, celery_app, uc_req, msg):
+async def test_success_existing_user(get_pw_hash, email, queue_task, uc_req, msg):
     '''Should inform user for registering existing mail address'''
     # Create mocks
     get_pw_hash.return_value = "test-secure-hash"
@@ -127,9 +127,9 @@ async def test_success_existing_user(get_pw_hash, email, celery_app, uc_req, msg
         'TestUser',
         'user@kh.test'
     )
-    celery_app.send_task.assert_called_with(
+    queue_task.assert_called_with(
         'harbor.worker.tasks.email.send_mail',
-        args=[msg.dict()],
+        [msg.dict()],
     )
 
 
