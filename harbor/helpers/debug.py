@@ -43,10 +43,11 @@ def trace_calls(frame, event, arg):
         return
 
     # Log trace
-    message = '%s:%s called "%s" (%s:%s)'
-    logging.debug(message,
-                  func_filename,
-                  func_line_no,
-                  func_name,
-                  caller_line_no,
-                  caller_filename)
+    logging.debug(
+        'Function "%s" called (%s:%s => %s:%s)',
+        func_name,
+        caller_filename,
+        caller_line_no,
+        func_filename,
+        func_line_no,
+    )
