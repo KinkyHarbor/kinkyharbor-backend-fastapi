@@ -1,12 +1,14 @@
 '''This module handles all ENV and file based settings.'''
 
 import logging
+import sys
 from functools import lru_cache
 from typing import Set
 
 from pydantic import BaseSettings, AnyHttpUrl, NameEmail, SecretStr, DirectoryPath
 
 from harbor.domain.email import EmailSecurity
+from harbor.helpers import debug
 
 
 class Settings(BaseSettings):
@@ -41,6 +43,7 @@ def get_settings():
 
     if settings.DEBUG:
         logging.getLogger().setLevel(logging.DEBUG)
+        sys.settrace(debug.trace_calls)
 
     return settings
 
