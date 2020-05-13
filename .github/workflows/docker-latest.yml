@@ -60,6 +60,7 @@ jobs:
           LATEST: "true"
 
   build-scheduler:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -77,6 +78,7 @@ jobs:
           LATEST: "true"
 
   build-worker:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
