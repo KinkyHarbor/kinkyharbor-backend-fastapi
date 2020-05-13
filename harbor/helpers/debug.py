@@ -9,6 +9,17 @@ def log_call(module_name, function_name, args):
     logging.debug(message, module_name, function_name, args)
 
 
+def is_harbor_file(filename: str) -> bool:
+    '''Checks if provided file is a Harbor module'''
+    exclude = ['python', 'importlib']
+    exclude_match = any((item in filename for item in exclude))
+
+    include = ['harbor']
+    include_match = all((item in filename for item in include))
+
+    return (not exclude_match) and include_match
+
+
 def trace_calls(frame, event, arg):
     '''Trace function to print calls
 
@@ -28,7 +39,7 @@ def trace_calls(frame, event, arg):
     func_filename = target.co_filename
 
     # Only trace Harbor files
-    if 'python' in caller_filename or 'python' in func_filename:
+    if not (is_harbor_file(caller_filename) and is_harbor_file(func_filename)):
         return
 
     # Log trace
