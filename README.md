@@ -1,3 +1,8 @@
+**I've decided to stop the development of Kinky Harbor.
+  This project has been started as a hobby project.
+  As it was more about improving my Python skills and checking the feasibility,
+  instead of fundamental beliefs, I feel it's better not to commit on this project towards the community.**
+
 [![Build latest](https://github.com/KinkyHarbor/kinkyharbor-backend-fastapi/workflows/Build%20latest%20Docker%20image/badge.svg)](https://hub.docker.com/r/kinkyharbor/kinkyharbor-backend-fastapi/tags)
 [![codecov](https://codecov.io/gh/KinkyHarbor/kinkyharbor-backend-fastapi/branch/development/graph/badge.svg)](https://codecov.io/gh/KinkyHarbor/kinkyharbor-backend-fastapi)
 [![Maintainability](https://api.codeclimate.com/v1/badges/135715f257043669493e/maintainability)](https://codeclimate.com/github/KinkyHarbor/kinkyharbor-backend-fastapi/maintainability)
